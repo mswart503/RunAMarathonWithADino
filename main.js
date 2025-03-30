@@ -1,4 +1,72 @@
 // Global Configuration and Game State – adjust these during development!
+class EffectManager {
+    constructor() {
+        // Array to store active effects.
+        this.effects = [];
+    }
+
+    /**
+     * Adds a new effect.
+     * @param {Object} effect - An object with properties:
+     *   type: "stamina" or "speed" etc.
+     *   value: multiplier (e.g., 0.5 means half usage, 1.1 means 10% increase)
+     *   cycle: (optional) the full cycle time (in seconds)
+     *   activeDuration: (optional) how long within the cycle the effect is active
+     *   duration: (optional) total duration of effect (or Infinity for permanent)
+     */
+    addEffect(effect) {
+        effect.elapsed = 0; // Initialize elapsed time.
+        // If duration is not specified, assume effect lasts for the whole race.
+        effect.duration = effect.duration || Infinity;
+        this.effects.push(effect);
+    }
+
+    /**
+     * Removes an effect. You might call this if an item is sold.
+     * @param {Object} effectToRemove 
+     */
+    removeEffect(effectToRemove) {
+        this.effects = this.effects.filter(eff => eff !== effectToRemove);
+    }
+
+    /**
+     * Updates all effects by delta (in seconds) and removes expired ones.
+     */
+    update(delta) {
+        this.effects = this.effects.filter(effect => {
+            effect.elapsed += delta;
+            // Remove if its duration has been exceeded.
+            return (effect.elapsed < effect.duration);
+        });
+    }
+
+    /**
+     * Computes the net multiplier for a given type.
+     * Effects with a cycle apply only during their active phase.
+     * Effects stack multiplicatively.
+     * @param {String} type - e.g., "stamina" or "speed"
+     * @returns {Number} net multiplier
+     */
+    getNetMultiplier(type) {
+        let multiplier = 1;
+        this.effects.forEach(effect => {
+            if (effect.type === type) {
+                // If the effect has a cycle, check if it's active.
+                if (effect.cycle && effect.activeDuration) {
+                    let phase = effect.elapsed % effect.cycle;
+                    if (phase < effect.activeDuration) {
+                        multiplier *= effect.value;
+                    }
+                } else {
+                    // Continuous effect.
+                    multiplier *= effect.value;
+                }
+            }
+        });
+        return multiplier;
+    }
+}
+
 var GameConfig = {
     totalRounds: 63,
     // Define 63 rounds that scale from a short sprint to a full marathon.
@@ -11,37 +79,87 @@ var GameConfig = {
     baseStaminaTime: 10,
     minDistance: 100,
     maxDistance: 6300, // now maximum is level 63 (6300m)
-    // --- Item effects renamed ---
-    itemEffects: {
-        Coin: { halfDuration: 3, cycle: 5 },   // was "Feather"
-        Beehive: { reduction: 0.10 },             // was "Item2"
-        Target: { recover: 5, interval: 5 },       // was "Item3"
-        Bomb: { cooldownReduction: 0.01 },       // was "Item4"
-        Log: { staminaIncrease: 0.02, winBonus: 0.01 } // was "Item5"
+
+    itemData: {
+        Coin: { rarity: "Common", cycle: 3 },
+        Bit: { rarity: "Common", cycle: 4 },
+        Copper: { rarity: "Common", cycle: 5 },
+        CopperStack: { rarity: "Common", cycle: 5 },
+        Silver: { rarity: "Uncommon", cycle: 5 },
+        Dubloon: { rarity: "Uncommon", cycle: 2 },
+        Piece: { rarity: "Uncommon", cycle: 4 },
+        Gold: { rarity: "Rare", cycle: 5 },
+        Pound: { rarity: "Rare", cycle: 3 },
+        Booty: { rarity: "Rare", cycle: 5 },
+
+
+        Ruby_Amulet: { cycle: 5 }
     },
+
+    rarityWeights: {
+        Rare: 1,
+        Uncommon: 5,
+        Common: 10
+    },
+
+    rarityColors: {
+        Common: "#0000FF",   // Blue
+        Uncommon: "#FF0000", // Red
+        Rare: "#FFD700"      // Gold
+    },
+
     itemDescriptions: {
-        Coin: "Halves stamina usage for 3 sec every 5 sec.",
-        Beehive: "Stamina depletes 10% slower.",
-        Target: "Recovers 5% stamina every 5 sec.",
-        Bomb: "Reduces item cooldowns by 1%.",
-        Log: "Increases max stamina by 2% (plus bonus per win)."
+        Coin: "Halves stamina usage for 1 sec every 3 sec.",
+        Bit: "Halves stamina usage for 1 sec every 4 sec.",
+        Copper: "Halves stamina usage for 1 sec every 5 sec.",
+        CopperStack: "Halves stamina usage for 2 sec every 5 sec.",
+        Silver: "Halves stamina usage for 3 sec every 5 sec.",
+        Dubloon: "Halves stamina usage for 1 sec every 2 sec.",
+        Piece: "Halves stamina usage for 2 sec every 4 sec.",
+        Gold: "Halves stamina usage for 4 sec every 5 sec.",
+        Pound: "Halves stamina usage for 2 sec every 3 sec.",
+        Booty: "Halves stamina usage for 3 sec every 4 sec.",
+
+        Ginger: "Stamina depletes 10% slower.",
+        Ruby_Amulet: "Recovers 5% stamina every 5 sec.",
+        Ring: "Reduces item cooldowns by 1%.",
+        Candle: "Increases max stamina by 2% (plus bonus per win)."
     },
     // Items sprite sheet now has 12 columns.
-    itemSpriteSheetColumns: 12,
+    itemSpriteSheetColumns: 64,
     itemSpriteFrames: {
-        Coin: { col: 10, row: 8 },
-        Beehive: { col: 11, row: 8 },
-        Target: { col: 12, row: 8 },
-        Bomb: { col: 10, row: 9 },
-        Log: { col: 11, row: 9 }
+        Coin: { col: 23, row: 9 },
+        Bit: { col: 26, row: 9 },
+        Copper: { col: 32, row: 9 },
+        CopperStack: { col: 34, row: 9 },
+        Silver: { col: 18, row: 9 },
+        Dubloon: { col: 15, row: 9 },
+        Piece: { col: 12, row: 9 },
+        Gold: { col: 3, row: 9 },
+        Pound: { col: 10, row: 9 },
+        Booty: { col: 13, row: 9 },
+
+        Ginger: { col: 1, row: 10 },
+        Ruby_Amulet: { col: 1, row: 6 },
+        Ring: { col: 1, row: 5 },
+        Candle: { col: 1, row: 12 }
     },
     // Define fixed item purchase prices (hard-coded values between $3 and $7)
     itemPrices: {
-        Coin: 2,
-        Beehive: 2,
-        Target: 2,
-        Bomb: 2,
-        Log: 2
+        Coin: 1,
+        Bit: 1,
+        Copper: 1,
+        CopperStack: 1,
+        Silver: 2,
+        Dubloon: 2,
+        Piece: 2,
+        Gold: 3,
+        Pound: 3,
+        Booty: 3,
+        Ginger: 2,
+        Ruby_Amulet: 2,
+        Ring: 2,
+        Candle: 2
     },
     consumableDescriptions: {
         apple: "5% stamina refill",
@@ -49,6 +167,7 @@ var GameConfig = {
         Beer: "20% stamina refill"
     }
 };
+
 
 
 var GameState = {
@@ -78,7 +197,7 @@ class MainMenuScene extends Phaser.Scene {
         this.load.image('flag', 'assets/flag.png');
         this.load.spritesheet('items', 'assets/items.png', { frameWidth: 16, frameHeight: 16, spacing: 1 });
         this.load.spritesheet('consumableSprites', 'assets/consumableSprites.png', { frameWidth: 16, frameHeight: 16, spacing: 0 });
-
+        this.load.spritesheet('bulkItems', 'assets/bulkitems.png', { frameWidth: 16, frameHeight: 16, spacing: 0 })
     }
     create() {
         // Add background image
@@ -86,17 +205,20 @@ class MainMenuScene extends Phaser.Scene {
 
         this.add.text(200, 150, "Run A Marathon With A Dino", { fontSize: '28px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
         this.add.text(200, 200, "Select your starting item", { fontSize: '20px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
-
+        // Randomly pick 3 unique items from the available list.
+        let allItems = Object.keys(GameConfig.itemData);
+        Phaser.Utils.Array.Shuffle(allItems);
+        let availableItems = allItems.slice(0, 5);
         // List the 5 available items.
-        const items = Object.keys(GameConfig.itemEffects);
+        //const items = Object.keys(GameConfig.itemDescriptions);
         let startY = 250;
-        items.forEach(item => {
+        availableItems.forEach(item => {
             // Create a container for the icon and the text.
             let container = this.add.container(200, startY);
 
             // Get the frame index from the sprite sheet using our mapping.
             let frameIndex = getItemFrameIndex(item);
-            let icon = this.add.image(0, 0, 'items', frameIndex).setScale(2);
+            let icon = this.add.image(0, 0, 'bulkItems', frameIndex).setScale(2);
             let desc = GameConfig.itemDescriptions[item];
             let text = this.add.text(40, -8, `${item}: ${desc}`, { fontSize: '16px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
             container.add([icon, text]);
@@ -106,9 +228,9 @@ class MainMenuScene extends Phaser.Scene {
             container.on('pointerdown', () => {
                 // Save the chosen item.
                 GameState.equippedItems.push(item);
-                // If Log is chosen, update max stamina.
-                if (item === "Log") {
-                    GameState.maxStamina = 100 * (1 + GameConfig.itemEffects.Log.staminaIncrease);
+                // If Candle is chosen, update max stamina.
+                if (item === "Candle") {
+                    GameState.maxStamina = 100 * (1 + GameConfig.itemData.Candle.staminaIncrease);
                 }
                 this.scene.start('RaceScene');
             });
@@ -162,20 +284,175 @@ class RaceScene extends Phaser.Scene {
         this.isTripping = false;
         this.isBoosting = false;
 
+        // Create an EffectManager instance.
+        this.effectManager = new EffectManager();
+
+        // Initialize base properties.
+        this.speedMultiplier = 1;   // Base speed multiplier.
+        // (Your stamina value is already set from GameState.maxStamina, etc.)
+
+        // Add effects for each equipped item.
         GameState.equippedItems.forEach((item, index) => {
-            // Compute frame index for the item icon.
-            let frameIndex = getItemFrameIndex(item);
-            let x = startX + index * (iconSize + spacing);
-            let icon = this.add.image(x, iconY, 'items', frameIndex).setScale(iconScale);
-            // For items with a cooldown, set the cycle time; for passive items, leave null.
-            let cooldownCycle = null;
             if (item === "Coin") {
-                cooldownCycle = GameConfig.itemEffects.Coin.cycle;
-            } else if (item === "Target") {
-                cooldownCycle = GameConfig.itemEffects.Target.interval;
+                this.effectManager.addEffect({
+                    type: "stamina",
+                    value: 0.5,          // Half stamina usage
+                    cycle: 3,            // Every 3 seconds,
+                    activeDuration: 1,   // active for 1 seconds,
+                    duration: Infinity   // lasting for the whole race
+                });
             }
+            if (item === "Bit") {
+                this.effectManager.addEffect({
+                    type: "stamina",
+                    value: 0.5,          // Half stamina usage
+                    cycle: 4,            // Every 4 seconds,
+                    activeDuration: 1,   // active for 1 seconds,
+                    duration: Infinity   // lasting for the whole race
+                });
+            }
+            if (item === "Copper") {
+                this.effectManager.addEffect({
+                    type: "stamina",
+                    value: 0.5,          // Half stamina usage
+                    cycle: 5,            // Every 5 seconds,
+                    activeDuration: 1,   // active for 1 seconds,
+                    duration: Infinity   // lasting for the whole race
+                });
+            }
+            if (item === "CopperStack") {
+                this.effectManager.addEffect({
+                    type: "stamina",
+                    value: 0.5,          // Half stamina usage
+                    cycle: 5,            // Every 5 seconds,
+                    activeDuration: 2,   // active for 1 seconds,
+                    duration: Infinity   // lasting for the whole race
+                });
+            }
+            if (item === "Silver") {
+                this.effectManager.addEffect({
+                    type: "stamina",
+                    value: 0.5,          // Half stamina usage
+                    cycle: 5,            // Every 5 seconds,
+                    activeDuration: 3,   // active for 1 seconds,
+                    duration: Infinity   // lasting for the whole race
+                });
+            }
+            if (item === "Dubloon") {
+                this.effectManager.addEffect({
+                    type: "stamina",
+                    value: 0.5,          // Half stamina usage
+                    cycle: 2,            // Every 2 seconds,
+                    activeDuration: 1,   // active for 1 seconds,
+                    duration: Infinity   // lasting for the whole race
+                });
+            }
+            if (item === "Piece") {
+                this.effectManager.addEffect({
+                    type: "stamina",
+                    value: 0.5,          // Half stamina usage
+                    cycle: 4,            // Every 4 seconds,
+                    activeDuration: 2,   // active for 2 seconds,
+                    duration: Infinity   // lasting for the whole race
+                });
+            }
+            if (item === "Gold") {
+                this.effectManager.addEffect({
+                    type: "stamina",
+                    value: 0.5,          // Half stamina usage
+                    cycle: 5,            // Every 5 seconds,
+                    activeDuration: 4,   // active for 1 seconds,
+                    duration: Infinity   // lasting for the whole race
+                });
+            }
+            if (item === "Pound") {
+                this.effectManager.addEffect({
+                    type: "stamina",
+                    value: 0.5,          // Half stamina usage
+                    cycle: 5,            // Every 4 seconds,
+                    activeDuration: 4,   // active for 2 seconds,
+                    duration: Infinity   // lasting for the whole race
+                });
+            }
+            if (item === "Booty") {
+                this.effectManager.addEffect({
+                    type: "stamina",
+                    value: 0.5,          // Half stamina usage
+                    cycle: 4,            // Every 5 seconds,
+                    activeDuration: 3,   // active for 1 seconds,
+                    duration: Infinity   // lasting for the whole race
+                });
+            }
+            // Similarly, if "Ginger" gives a permanent 10% reduction in depletion:
+            if (item === "Ginger") {
+                this.effectManager.addEffect({
+                    type: "stamina",
+                    value: 0.9,          // 10% slower depletion (multiply by 0.9)
+                    duration: Infinity
+                });
+            }
+            // You can add additional items for speed, cooldown, etc.
+
             // Create a rectangle above the icon to display the cooldown progress.
             // We'll start with a full bar (width = iconSize) and a height of 4 pixels.
+            let cooldownCycle = null;
+
+            // If the item is "Coin" or "Ruby_Amulet", set cooldownCycle accordingly.
+            if (item === "Coin") {
+                cooldownCycle = GameConfig.itemData.Coin.cycle;
+            }
+            else if (item === "Bit") {
+                cooldownCycle = GameConfig.itemData.Bit.cycle;
+            }
+            else if (item === "Copper") {
+                cooldownCycle = GameConfig.itemData.Copper.cycle;
+            } 
+            else if (item === "CopperStack") {
+                cooldownCycle = GameConfig.itemData.Copper.cycle;
+            }else if (item === "Silver") {
+                cooldownCycle = GameConfig.itemData.Silver.cycle;
+            }
+            else if (item === "Dubloon") {
+                cooldownCycle = GameConfig.itemData.Dubloon.cycle;
+            } 
+            else if (item === "Piece") {
+                cooldownCycle = GameConfig.itemData.Piece.cycle;
+            }else if (item === "Gold") {
+                cooldownCycle = GameConfig.itemData.Gold.cycle;
+            }
+            else if (item === "Pound") {
+                cooldownCycle = GameConfig.itemData.Pound.cycle;
+            } 
+            else if (item === "Booty") {
+                cooldownCycle = GameConfig.itemData.Booty.cycle;
+            }
+            
+            else if (item === "Ruby_Amulet") {
+                cooldownCycle = GameConfig.itemData.Ruby_Amulet.interval;
+            }
+
+            let frameIndex = getItemFrameIndex(item);
+            let x = startX + index * (iconSize + spacing);
+            let icon = this.add.image(x, iconY, 'bulkItems', frameIndex).setScale(iconScale);
+            // Optional: add tooltip on hover.
+            icon.setInteractive();
+            icon.on('pointerover', () => {
+                let tooltip = this.add.text(x, iconY - iconSize - 10, GameConfig.itemDescriptions[item], {
+                    fontSize: '14px',
+                    fill: '#fff',
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    padding: { x: 5, y: 5 }
+                }).setOrigin(0.5, 1);
+                this.children.bringToTop(tooltip);
+                icon.tooltip = tooltip;
+            });
+            icon.on('pointerout', () => {
+                if (icon.tooltip) {
+                    icon.tooltip.destroy();
+                    icon.tooltip = null;
+                }
+            });
+            // Create a rectangle above the icon to display the cooldown progress.
             let cooldownBar = this.add.rectangle(x, iconY - iconSize / 2 - 6, iconSize, 4, 0xff0000);
             // Save reference for update.
             this.itemDisplays.push({
@@ -187,7 +464,7 @@ class RaceScene extends Phaser.Scene {
             icon.setInteractive();
             icon.on('pointerover', () => {
                 // For example, position the tooltip just above the icon:
-                let tooltipX = x;
+                let tooltipX = startX;
                 let tooltipY = iconY + 20; // adjust this value as needed
                 console.log("Tooltip should appear at:", tooltipX, tooltipY);
 
@@ -298,50 +575,26 @@ class RaceScene extends Phaser.Scene {
         let delta = 0.1; // each tick represents 0.1 seconds
         this.elapsedTime += delta;
 
-        // Update dino’s horizontal position from start (50) to finish (750).
+        // Update our effect manager with delta.
+        this.effectManager.update(delta);
+
+        // Compute net multipliers from active effects.
+        let staminaMultiplier = this.effectManager.getNetMultiplier("stamina");
+        let speedMultiplier = this.effectManager.getNetMultiplier("speed");
+        // If no speed effects are present, speedMultiplier remains 1.
+
+        // Use the speedMultiplier when computing the effective elapsed time.
+        let effectiveTime = this.elapsedTime * speedMultiplier;
         let startX = 50;
         let endX = 750;
-        let effectiveTime = this.elapsedTime * this.speedMultiplier;
         let progress = Phaser.Math.Clamp(effectiveTime / this.raceTime, 0, 1);
         this.dino.x = Phaser.Math.Interpolation.Linear([startX, endX], progress);
 
-        // Calculate effective stamina depletion multiplier based on equipped items.
-        let multiplier = 1;
-        if (GameState.equippedItems.includes("Beehive")) {
-            multiplier *= (1 - GameConfig.itemEffects.Beehive.reduction);
-        }
-        // Coin: every cycle, half stamina usage for the first few seconds.
-        if (GameState.equippedItems.includes("Coin")) {
-            let cycle = GameConfig.itemEffects.Coin.cycle;
-            if (GameState.equippedItems.includes("Bomb")) {
-                cycle = cycle * (1 - GameConfig.itemEffects.Bomb.cooldownReduction);
-            }
-            let phase = this.elapsedTime % cycle;
-            if (phase < GameConfig.itemEffects.Coin.halfDuration) {
-                multiplier *= 0.5;
-            }
-        }
-
-        // Deplete stamina linearly over base time (modified by multiplier).
+        // Use the staminaMultiplier for depletion.
         let depletionRate = GameState.maxStamina / GameConfig.baseStaminaTime;
-        this.stamina -= depletionRate * multiplier * delta;
-
-        // Target: every interval, recover a bit of stamina.
-        if (GameState.equippedItems.includes("Target")) {
-            let TargetInterval = GameConfig.itemEffects.Target.interval;
-            if (GameState.equippedItems.includes("Bomb")) {
-                TargetInterval = TargetInterval * (1 - GameConfig.itemEffects.Bomb.cooldownReduction);
-            }
-            // When elapsedTime is nearly a multiple of the interval, add recovery.
-            if (Math.abs(this.elapsedTime % TargetInterval) < delta) {
-                this.stamina += GameConfig.itemEffects.Target.recover;
-            }
-        }
-
-        // Clamp stamina between 0 and max.
+        // For example, if multiplier is 0.5, stamina depletes at half the normal rate.
+        this.stamina -= depletionRate * staminaMultiplier * delta;
         this.stamina = Phaser.Math.Clamp(this.stamina, 0, GameState.maxStamina);
-
-        // Update the stamina bar’s width (300 pixels represents full stamina).
         let newWidth = (this.stamina / GameState.maxStamina) * 300;
         this.staminaBar.width = newWidth;
         this.staminaText.setText(`${Math.floor(this.stamina)}/${GameState.maxStamina} (${Math.floor((this.stamina / GameState.maxStamina) * 100)}%)`);
@@ -510,7 +763,7 @@ class ShopScene extends Phaser.Scene {
             GameState.equippedItems.forEach((item, index) => {
                 let frameIndex = getItemFrameIndex(item);
                 let x = startX + index * (iconSize + spacing);
-                let icon = this.add.image(x, iconY, 'items', frameIndex).setScale(iconScale);
+                let icon = this.add.image(x, iconY, 'bulkItems', frameIndex).setScale(iconScale);
                 // Optional: add tooltip on hover.
                 icon.setInteractive();
                 icon.on('pointerover', () => {
@@ -540,239 +793,183 @@ class ShopScene extends Phaser.Scene {
         this.add.text(250, 100, "Select one item to add to your item slots", { fontSize: '20px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
 
         // Randomly pick 3 unique items from the available list.
-        let allItems = Object.keys(GameConfig.itemEffects);
+        let allItems = Object.keys(GameConfig.itemData);
         Phaser.Utils.Array.Shuffle(allItems);
         let availableItems = allItems.slice(0, 3);
 
         let startY = 150;
         availableItems.forEach(item => {
-    // Create a container for the item icon, description, and price.
-    let container = this.add.container(200, startY);
-    
-    let frameIndex = getItemFrameIndex(item);
-    let icon = this.add.image(0, 0, 'items', frameIndex).setScale(2);
-    let price = GameConfig.itemPrices[item];
-    
-    // Create price text to the left of the icon.
-    let priceText = this.add.text(-50, 0, `$${price}`, {
-        fontSize: '16px',
-        fill: '#fff',
-        backgroundColor: 'rgba(0,0,0,0.7)',
-        padding: { x: 5, y: 2 }
-    }).setOrigin(0.5);
-    
-    let descText = this.add.text(40, -8, `${item}: ${GameConfig.itemDescriptions[item]}`, {
-        fontSize: '16px',
-        fill: '#fff',
-        backgroundColor: 'rgba(0,0,0,0.7)'
-    });
-    
-    container.add([priceText, icon, descText]);
-    container.setSize(300, 20);
-    container.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 20), Phaser.Geom.Rectangle.Contains);
-    
-    container.on('pointerdown', () => {
-        if (GameState.money >= price) {
-            // Deduct the price and update cash display.
-            GameState.money -= price;
-            this.cashText.setText(`$${GameState.money}`);
-    
-            // Add the item if there's an available slot (max 5).
-            if (GameState.equippedItems.length < 5) {
-                GameState.equippedItems.push(item);
-                if (item === "Log") {
-                    GameState.maxStamina = 100 * (1 + GameConfig.itemEffects.Log.staminaIncrease + GameState.wins * GameConfig.itemEffects.Log.winBonus);
-                }
-            }
-    
-            // Optionally, show a temporary "You Bought {item}" message.
-            let tipX = container.x + container.width / 2;
-            let tipY = container.y + 30;
-            let shoptip = this.add.text(tipX, tipY, `You Bought ${item}`, {
-                fontSize: '14px',
-                fill: '#fff',
-                backgroundColor: 'rgba(0,0,0,0.7)',
-                padding: { x: 5, y: 5 }
-            }).setOrigin(0.5);
-            this.time.delayedCall(1500, () => {
-                if (shoptip && shoptip.active) {
-                    shoptip.destroy();
-                }
-            });
-    
-            // Remove the store item from the display.
-            container.destroy();
-    
-            // Refresh the inventory display to include the newly purchased item.
-            this.updateInventoryDisplay();
-    
-        } else {
-            console.log("Not enough cash to buy " + item);
-            let tipX = container.x + container.width / 2;
-            let tipY = container.y + 30;
-            let shoptip = this.add.text(tipX, tipY, `Not enough cash, stranger`, {
-                fontSize: '14px',
-                fill: '#fff',
-                backgroundColor: 'rgba(0,0,0,0.7)',
-                padding: { x: 5, y: 5 }
-            }).setOrigin(0.5);
-            this.time.delayedCall(1500, () => {
-                if (shoptip && shoptip.active) {
-                    shoptip.destroy();
-                }
-            });
-        }
-    });
-    let leaveShopButton = this.add.text(this.cameras.main.centerX, this.game.config.height - 50, "Leave Shop", {
-        fontSize: '20px',
-        fill: '#fff',
-        backgroundColor: 'rgba(0,0,0,0.7)',
-        padding: { x: 10, y: 5 }
-    }).setOrigin(0.5).setInteractive();
-    
-    leaveShopButton.on('pointerdown', () => {
-        this.scene.start('RaceScene');
-    });
-    startY += 40;
-});
-// ----- Consumables Section -----
-let consStartY = startY + 40; // Use the current startY (from items) plus an offset
+            // Create a container for the item icon, description, and price.
+            let container = this.add.container(200, startY);
 
-// Add a header for the consumables section
-this.add.text(300, consStartY, "Consumables", {
-    fontSize: '28px',
-    fill: '#fff',
-    backgroundColor: 'rgba(0,0,0,0.7)'
-}).setOrigin(0.5);
-consStartY += 40; // move down for listing consumables
-
-// Define available consumables
-let availableConsumables = ['apple', 'Orange', 'Beer'];
-// Define fixed prices for consumables if not already defined:
-GameConfig.consumablePrices = {
-    apple: 1,
-    Orange: 2,
-    Beer: 3
-};
-
-availableConsumables.forEach(consumable => {
-    // Create a container for each consumable option
-    let container = this.add.container(200, consStartY);
-
-    // Get the frame index from the consumable sprite sheet using your helper
-    let frameIndex = getConsumableFrame(consumable);
-    let icon = this.add.image(0, 0, 'consumableSprites', frameIndex).setScale(2);
-
-    // Get the price for this consumable
-    let price = GameConfig.consumablePrices[consumable];
-    // Create price text to the left of the icon
-    let priceText = this.add.text(-50, 0, `$${price}`, {
-        fontSize: '16px',
-        fill: '#fff',
-        backgroundColor: 'rgba(0,0,0,0.7)',
-        padding: { x: 5, y: 2 }
-    }).setOrigin(0.5);
-
-    // Create description text (here simply the consumable name)
-    let descText = this.add.text(40, -8, `${consumable}: ${GameConfig.consumableDescriptions[consumable]}`, {
-        fontSize: '16px',
-        fill: '#fff',
-        backgroundColor: 'rgba(0,0,0,0.7)'
-    });
-    container.add([priceText, icon, descText]);
-    container.setSize(300, 20);
-    container.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 20), Phaser.Geom.Rectangle.Contains);
-
-    container.on('pointerdown', () => {
-        if (GameState.money >= price) {
-            // Deduct the price and update cash display.
-            GameState.money -= price;
-            this.cashText.setText(`$${GameState.money}`);
-
-            // Add the consumable to the player's consumables inventory.
-            GameState.consumables.push(consumable);
-
-            // Optionally, show a temporary "You Bought {consumable}" message.
-            let tipX = container.x + container.width / 2;
-            let tipY = container.y + 30;
-            let shoptip = this.add.text(tipX, tipY, `You Bought ${consumable}`, {
-                fontSize: '14px',
-                fill: '#fff',
-                backgroundColor: 'rgba(0,0,0,0.7)',
-                padding: { x: 5, y: 5 }
-            }).setOrigin(0.5);
-            this.time.delayedCall(3000, () => {
-                if (shoptip && shoptip.active) {
-                    shoptip.destroy();
-                }
-            });
-
-            // Remove this consumable option from the shop display.
-            container.destroy();
-        } else {
-            console.log("Not enough cash to buy " + consumable);
-        }
-    });
-
-    consStartY += 40; // Move down for the next consumable option.
-});
-
-
-        /*// --- Display Equipped Items at Top Middle in ShopScene ---
-        this.itemDisplays = [];
-        let numItems = GameState.equippedItems.length;
-        let iconScale = 2;
-        let iconSize = 16 * iconScale;  // same dimensions as in RaceScene
-        let itemspacing = 10;
-        let totalWidth = numItems * iconSize + (numItems - 1) * itemspacing;
-        let itemstartX = (this.game.config.width - totalWidth) / 2 + iconSize / 2;
-        let iconY = 30; // same Y position as in RaceScene
-
-        // Loop over each equipped item and display its icon
-        GameState.equippedItems.forEach((item, index) => {
             let frameIndex = getItemFrameIndex(item);
-            let x = itemstartX + index * (iconSize + itemspacing);
-            let icon = this.add.image(x, iconY, 'items', frameIndex).setScale(iconScale);
-            // Make icon interactive for tooltip
-            icon.setInteractive();
-            icon.on('pointerover', () => {
-                // For example, position the tooltip just above the icon:
-                let tooltipX = x;
-                let tooltipY = iconY + 20; // adjust this value as needed
-                console.log("Tooltip should appear at:", tooltipX, tooltipY);
+            let icon = this.add.image(0, 0, 'bulkItems', frameIndex).setScale(2);
+            let price = GameConfig.itemPrices[item];
 
-                let tooltip = this.add.text(tooltipX, tooltipY, GameConfig.itemDescriptions[item], {
-                    fontSize: '14px',
-                    fill: '#fff',
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    padding: { x: 5, y: 5 }
-                }).setOrigin(0.5, 1);
-                this.children.bringToTop(tooltip);
-                icon.tooltip = tooltip;
+            // Create price text to the left of the icon.
+            let priceText = this.add.text(-50, 0, `$${price}`, {
+                fontSize: '16px',
+                fill: '#fff',
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                padding: { x: 5, y: 2 }
+            }).setOrigin(0.5);
+
+            let descText = this.add.text(40, -8, `${item}: ${GameConfig.itemDescriptions[item]}`, {
+                fontSize: '16px',
+                fill: '#fff',
+                backgroundColor: 'rgba(0,0,0,0.7)'
             });
-            icon.on('pointerout', () => {
-                if (icon.tooltip) {
-                    icon.tooltip.destroy();
-                    icon.tooltip = null;
+
+            container.add([priceText, icon, descText]);
+            container.setSize(300, 20);
+            container.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 20), Phaser.Geom.Rectangle.Contains);
+
+            container.on('pointerdown', () => {
+                if (GameState.money >= price) {
+                    // Deduct the price and update cash display.
+                    GameState.money -= price;
+                    this.cashText.setText(`$${GameState.money}`);
+
+                    // Add the item if there's an available slot (max 5).
+                    if (GameState.equippedItems.length < 5) {
+                        GameState.equippedItems.push(item);
+                        if (item === "Candle") {
+                            GameState.maxStamina = 100 * (1 + GameConfig.itemData.Candle.staminaIncrease + GameState.wins * GameConfig.itemData.Candle.winBonus);
+                        }
+                    }
+
+                    // Optionally, show a temporary "You Bought {item}" message.
+                    let tipX = container.x + container.width / 2;
+                    let tipY = container.y + 30;
+                    let shoptip = this.add.text(tipX, tipY, `You Bought ${item}`, {
+                        fontSize: '14px',
+                        fill: '#fff',
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        padding: { x: 5, y: 5 }
+                    }).setOrigin(0.5);
+                    this.time.delayedCall(1500, () => {
+                        if (shoptip && shoptip.active) {
+                            shoptip.destroy();
+                        }
+                    });
+
+                    // Remove the store item from the display.
+                    container.destroy();
+
+                    // Refresh the inventory display to include the newly purchased item.
+                    this.updateInventoryDisplay();
+
+                } else {
+                    console.log("Not enough cash to buy " + item);
+                    let tipX = container.x + container.width / 2;
+                    let tipY = container.y + 30;
+                    let shoptip = this.add.text(tipX, tipY, `Not enough cash, stranger`, {
+                        fontSize: '14px',
+                        fill: '#fff',
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        padding: { x: 5, y: 5 }
+                    }).setOrigin(0.5);
+                    this.time.delayedCall(1500, () => {
+                        if (shoptip && shoptip.active) {
+                            shoptip.destroy();
+                        }
+                    });
                 }
             });
-            // Optionally, if you want to display a cooldown bar above the icon:
-            let cooldownCycle = null;
-            if (item === "Coin") {
-                cooldownCycle = GameConfig.itemEffects.Coin.cycle;
-            } else if (item === "Target") {
-                cooldownCycle = GameConfig.itemEffects.Target.interval;
-            }
-            let cooldownBar = this.add.rectangle(x, iconY - iconSize / 2 - 6, iconSize, 4, 0xff0000);
+            let leaveShopButton = this.add.text(this.cameras.main.centerX, this.game.config.height - 50, "Leave Shop", {
+                fontSize: '20px',
+                fill: '#fff',
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                padding: { x: 10, y: 5 }
+            }).setOrigin(0.5).setInteractive();
 
-            // Save the display info for potential updates (if needed later)
-            this.itemDisplays.push({
-                itemName: item,
-                cooldownCycle: cooldownCycle,
-                cooldownBar: cooldownBar,
-                maxWidth: iconSize
+            leaveShopButton.on('pointerdown', () => {
+                this.scene.start('RaceScene');
             });
-        });*/
+            startY += 40;
+        });
+        // ----- Consumables Section -----
+        let consStartY = startY + 40; // Use the current startY (from items) plus an offset
+
+        // Add a header for the consumables section
+        this.add.text(300, consStartY, "Consumables", {
+            fontSize: '28px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)'
+        }).setOrigin(0.5);
+        consStartY += 40; // move down for listing consumables
+
+        // Define available consumables
+        let availableConsumables = ['apple', 'Orange', 'Beer'];
+        // Define fixed prices for consumables if not already defined:
+        GameConfig.consumablePrices = {
+            apple: 1,
+            Orange: 2,
+            Beer: 3
+        };
+
+        availableConsumables.forEach(consumable => {
+            // Create a container for each consumable option
+            let container = this.add.container(200, consStartY);
+
+            // Get the frame index from the consumable sprite sheet using your helper
+            let frameIndex = getConsumableFrame(consumable);
+            let icon = this.add.image(0, 0, 'consumableSprites', frameIndex).setScale(2);
+
+            // Get the price for this consumable
+            let price = GameConfig.consumablePrices[consumable];
+            // Create price text to the left of the icon
+            let priceText = this.add.text(-50, 0, `$${price}`, {
+                fontSize: '16px',
+                fill: '#fff',
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                padding: { x: 5, y: 2 }
+            }).setOrigin(0.5);
+
+            // Create description text (here simply the consumable name)
+            let descText = this.add.text(40, -8, `${consumable}: ${GameConfig.consumableDescriptions[consumable]}`, {
+                fontSize: '16px',
+                fill: '#fff',
+                backgroundColor: 'rgba(0,0,0,0.7)'
+            });
+            container.add([priceText, icon, descText]);
+            container.setSize(300, 20);
+            container.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 20), Phaser.Geom.Rectangle.Contains);
+
+            container.on('pointerdown', () => {
+                if (GameState.money >= price) {
+                    // Deduct the price and update cash display.
+                    GameState.money -= price;
+                    this.cashText.setText(`$${GameState.money}`);
+
+                    // Add the consumable to the player's consumables inventory.
+                    GameState.consumables.push(consumable);
+
+                    // Optionally, show a temporary "You Bought {consumable}" message.
+                    let tipX = container.x + container.width / 2;
+                    let tipY = container.y + 30;
+                    let shoptip = this.add.text(tipX, tipY, `You Bought ${consumable}`, {
+                        fontSize: '14px',
+                        fill: '#fff',
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        padding: { x: 5, y: 5 }
+                    }).setOrigin(0.5);
+                    this.time.delayedCall(3000, () => {
+                        if (shoptip && shoptip.active) {
+                            shoptip.destroy();
+                        }
+                    });
+
+                    // Remove this consumable option from the shop display.
+                    container.destroy();
+                } else {
+                    console.log("Not enough cash to buy " + consumable);
+                }
+            });
+
+            consStartY += 40; // Move down for the next consumable option.
+        });
+
 
         // --- Consumables Panel at Bottom ---
         this.consumablesPanel = this.add.container(0, this.game.config.height - 50);  // Position 50 pixels from the bottom
@@ -890,6 +1087,20 @@ function applyConsumableEffect(consumable, scene) {
         default:
             console.log(`No effect defined for ${consumable}.`);
     }
+}
+
+function getWeightedRandomItem() {
+    // Create an array of items with weighted entries.
+    let weightedItems = [];
+    Object.keys(GameConfig.itemData).forEach(itemName => {
+        let rarity = GameConfig.itemData[itemName].rarity;
+        let weight = GameConfig.rarityWeights[rarity] || 1;
+        for (let i = 0; i < weight; i++) {
+            weightedItems.push(itemName);
+        }
+    });
+    // Pick a random item from the weighted list.
+    return Phaser.Utils.Array.GetRandom(weightedItems);
 }
 
 
