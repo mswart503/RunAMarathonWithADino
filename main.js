@@ -17,6 +17,7 @@ class EffectManager {
     addEffect(effect) {
         effect.elapsed = 0; // Initialize elapsed time.
         // If duration is not specified, assume effect lasts for the whole race.
+        effect.lastCycleCount = 0;
         effect.duration = effect.duration || Infinity;
         this.effects.push(effect);
     }
@@ -65,6 +66,35 @@ class EffectManager {
         });
         return multiplier;
     }
+    /**
+    * Computes the total periodic addition for a given effect type.
+    * For example, for "staminaRecovery" effects, each effect has:
+    *   - value: fraction of max stamina to recover per cycle (e.g., 0.05)
+    *   - cycle: period in seconds (e.g., 5)
+    * This function calculates how many cycles have completed since the last update,
+    * sums up the addition, and updates each effect's lastCycleCount.
+    *
+    * @param {String} type - e.g., "staminaRecovery"
+    * @param {Number} maxValue - the value on which the percentage applies (e.g., max stamina)
+    * @param {Number} delta - time passed this frame in seconds
+    * @returns {Number} total amount to add
+    */
+    getPeriodicAddition(type, maxValue, delta) {
+        let addition = 0;
+        this.effects.forEach(effect => {
+            if (effect.type === type && effect.cycle) {
+                // Calculate how many full cycles have passed up to the current elapsed time.
+                let newCycleCount = Math.floor(effect.elapsed / effect.cycle);
+                let cyclesPassed = newCycleCount - effect.lastCycleCount;
+                if (cyclesPassed > 0) {
+                    addition += cyclesPassed * effect.value * maxValue;
+                    // Update lastCycleCount for this effect.
+                    effect.lastCycleCount = newCycleCount;
+                }
+            }
+        });
+        return addition;
+    }
 }
 
 var GameConfig = {
@@ -81,6 +111,7 @@ var GameConfig = {
     maxDistance: 6300, // now maximum is level 63 (6300m)
 
     itemData: {
+        //Flow state: Halve stamina usage
         Coin: { rarity: "Common", cycle: 3 },
         Bit: { rarity: "Common", cycle: 4 },
         Copper: { rarity: "Common", cycle: 5 },
@@ -92,8 +123,19 @@ var GameConfig = {
         Pound: { rarity: "Rare", cycle: 3 },
         Booty: { rarity: "Rare", cycle: 5 },
 
+        //Recover Stamina every x seconds
+        RubyAmulet: { rarity: "Common", cycle: 5 },
+        SapphireAmulet: { rarity: "Common", cycle: 4 },
+        AmethystAmulet: { rarity: "Common", cycle: 3 },
+        EmeraldAmulet: { rarity: "Common", cycle: 2 },
+        PharaohsAmulet: { rarity: "Common", cycle: 5 },
+        DeceiversAmulet: { rarity: "Common", cycle: 4 },
+        HolyAmulet: { rarity: "Common", cycle: 5 },
+        MessiahAmulet: { rarity: "Common", cycle: 1 },
+        UnderworldAmulet: { rarity: "Common", cycle: 2 },
+        ShiningAmulet: { rarity: "Common", cycle: 3 },
+        AmbixAmulet: { rarity: "Common", cycle: 4 },
 
-        Ruby_Amulet: { cycle: 5 }
     },
 
     rarityWeights: {
@@ -120,8 +162,24 @@ var GameConfig = {
         Pound: "Halves stamina usage for 2 sec every 3 sec.",
         Booty: "Halves stamina usage for 3 sec every 4 sec.",
 
+        RubyAmulet: "Recovers 1% stamina every 5 sec.",
+        SapphireAmulet: "Recovers 1% stamina every 4 sec.",
+        AmethystAmulet: "Recovers 1% stamina every 3 sec.",
+        EmeraldAmulet: "Recovers 1% stamina every 2 sec.",
+        BlessedRubyAmulet: "Recovers 2% stamina every 5 sec.",
+        BlessedSapphireAmulet: "Recovers 2% stamina every 4 sec.",
+        BlessedAmethystAmulet: "Recovers 2% stamina every 3 sec.",
+        BlessedEmeraldAmulet: "Recovers 3% stamina every 5 sec.",
+
+        PharaohsAmulet: "Recovers 4% stamina every 5 sec.",
+        DeceiversAmulet: "Recovers 3% stamina every 4 sec.",
+        HolyAmulet: "Recovers 5% stamina every 5 sec.",
+        MessiahAmulet: "Recovers 1% stamina every 1 sec.",        
+        UnderworldAmulet: "Recovers 2% stamina every 2 sec.",
+        ShiningAmulet: "Recovers 3% stamina every 3 sec.",
+        AmbixAmulet: "Recovers 3% stamina every 3 sec.",
+
         Ginger: "Stamina depletes 10% slower.",
-        Ruby_Amulet: "Recovers 5% stamina every 5 sec.",
         Ring: "Reduces item cooldowns by 1%.",
         Candle: "Increases max stamina by 2% (plus bonus per win)."
     },
@@ -139,8 +197,24 @@ var GameConfig = {
         Pound: { col: 10, row: 9 },
         Booty: { col: 13, row: 9 },
 
+        RubyAmulet: { col: 11, row: 6 },
+        SapphireAmulet: { col: 12, row: 6 },
+        AmethystAmulet: { col: 13, row: 6 },
+        EmeraldAmulet: { col: 14, row: 6 },
+        BlessedRubyAmulet: { col: 1, row: 6 },
+        BlessedSapphireAmulet: { col: 2, row: 6 },
+        BlessedAmethystAmulet: { col: 3, row: 6 },
+        BlessedEmeraldAmulet: { col: 4, row: 6 },
+        PharaohsAmulet: { col: 16, row: 6 },
+        DeceiversAmulet: { col: 18, row: 6 },
+        HolyAmulet: { col: 22, row: 6 },
+        MessiahAmulet: { col: 30, row: 6 },
+        UnderworldAmulet: { col: 21, row: 6 },
+        ShiningAmulet: { col: 20, row: 6 },
+        AmbixAmulet: { col: 31, row: 6 },
+
+
         Ginger: { col: 1, row: 10 },
-        Ruby_Amulet: { col: 1, row: 6 },
         Ring: { col: 1, row: 5 },
         Candle: { col: 1, row: 12 }
     },
@@ -156,8 +230,24 @@ var GameConfig = {
         Gold: 3,
         Pound: 3,
         Booty: 3,
+        RubyAmulet: 1,
+        SapphireAmulet: 1,
+        AmethystAmulet: 1,
+        EmeraldAmulet: 1,
+        BlessedRubyAmulet: 1,
+        BlessedSapphireAmulet: 1,
+        BlessedAmethystAmulet: 1,
+        BlessedEmeraldAmulet: 1,
+        PharaohsAmulet: 2,
+        DeceiversAmulet: 2,
+        HolyAmulet: 2,
+        MessiahAmulet: 3,
+        UnderworldAmulet: 3,
+        ShiningAmulet: 3,
+        AmbixAmulet: 3,
+
+
         Ginger: 2,
-        Ruby_Amulet: 2,
         Ring: 2,
         Candle: 2
     },
@@ -391,13 +481,138 @@ class RaceScene extends Phaser.Scene {
                     duration: Infinity
                 });
             }
+
+            if (item === "RubyAmulet") {
+                this.effectManager.addEffect({
+                    type: "staminaRecovery",
+                    value: 0.01,       // 1% of max stamina per cycle
+                    cycle: 5,          // every 5 seconds
+                    duration: Infinity // or a finite duration if needed
+                });
+            }
+            if (item === "SapphireAmulet") {
+                this.effectManager.addEffect({
+                    type: "staminaRecovery",
+                    value: 0.01,       // 1% of max stamina per cycle
+                    cycle: 4,          // every 4 seconds
+                    duration: Infinity // or a finite duration if needed
+                });
+            }
+            if (item === "AmethystAmulet") {
+                this.effectManager.addEffect({
+                    type: "staminaRecovery",
+                    value: 0.01,       // 1% of max stamina per cycle
+                    cycle: 3,          // every 3 seconds
+                    duration: Infinity // or a finite duration if needed
+                });
+            }
+            if (item === "EmeraldAmulet") {
+                this.effectManager.addEffect({
+                    type: "staminaRecovery",
+                    value: 0.01,       // 1% of max stamina per cycle
+                    cycle: 2,          // every 2 seconds
+                    duration: Infinity // or a finite duration if needed
+                });
+            }
+
+            if (item === "BlessedRubyAmulet") {
+                this.effectManager.addEffect({
+                    type: "staminaRecovery",
+                    value: 0.02,       // 2% of max stamina per cycle
+                    cycle: 5,          // every 5 seconds
+                    duration: Infinity // or a finite duration if needed
+                });
+            }
+            if (item === "BlessedSapphireAmulet") {
+                this.effectManager.addEffect({
+                    type: "staminaRecovery",
+                    value: 0.02,       // 2% of max stamina per cycle
+                    cycle: 4,          // every 4 seconds
+                    duration: Infinity // or a finite duration if needed
+                });
+            }
+            if (item === "BlessedAmethystAmulet") {
+                this.effectManager.addEffect({
+                    type: "staminaRecovery",
+                    value: 0.02,       // 2% of max stamina per cycle
+                    cycle: 3,          // every 3 seconds
+                    duration: Infinity // or a finite duration if needed
+                });
+            }
+            if (item === "BlessedEmeraldAmulet") {
+                this.effectManager.addEffect({
+                    type: "staminaRecovery",
+                    value: 0.03,       // 3% of max stamina per cycle
+                    cycle: 5,          // every 5 seconds
+                    duration: Infinity // or a finite duration if needed
+                });
+            }
+
+            if (item === "PharaohsAmulet") {
+                this.effectManager.addEffect({
+                    type: "staminaRecovery",
+                    value: 0.04,       // 4% of max stamina per cycle
+                    cycle: 5,          // every 5 seconds
+                    duration: Infinity // or a finite duration if needed
+                });
+            }
+            if (item === "DeceiversAmulet") {
+                this.effectManager.addEffect({
+                    type: "staminaRecovery",
+                    value: 0.03,       // 3% of max stamina per cycle
+                    cycle: 4,          // every 4 seconds
+                    duration: Infinity // or a finite duration if needed
+                });
+            }
+            if (item === "HolyAmulet") {
+                this.effectManager.addEffect({
+                    type: "staminaRecovery",
+                    value: 0.05,       // 5% of max stamina per cycle
+                    cycle: 5,          // every 3 seconds
+                    duration: Infinity // or a finite duration if needed
+                });
+            }
+            if (item === "MessiahAmulet") {
+                this.effectManager.addEffect({
+                    type: "staminaRecovery",
+                    value: 0.01,       // 1% of max stamina per cycle
+                    cycle: 1,          // every 1 seconds
+                    duration: Infinity // or a finite duration if needed
+                });
+            }
+            if (item === "UnderworldAmulet") {
+                this.effectManager.addEffect({
+                    type: "staminaRecovery",
+                    value: 0.02,       // 2% of max stamina per cycle
+                    cycle: 2,          // every 2 seconds
+                    duration: Infinity // or a finite duration if needed
+                });
+            }
+            if (item === "ShiningAmulet") {
+                this.effectManager.addEffect({
+                    type: "staminaRecovery",
+                    value: 0.03,       // 3% of max stamina per cycle
+                    cycle: 3,          // every 3 seconds
+                    duration: Infinity // or a finite duration if needed
+                });
+            }
+            if (item === "AmbixAmulet") {
+                this.effectManager.addEffect({
+                    type: "staminaRecovery",
+                    value: 0.04,       // 4% of max stamina per cycle
+                    cycle: 4,          // every 4 seconds
+                    duration: Infinity // or a finite duration if needed
+                });
+            }
+
+
+
             // You can add additional items for speed, cooldown, etc.
 
             // Create a rectangle above the icon to display the cooldown progress.
             // We'll start with a full bar (width = iconSize) and a height of 4 pixels.
             let cooldownCycle = null;
 
-            // If the item is "Coin" or "Ruby_Amulet", set cooldownCycle accordingly.
             if (item === "Coin") {
                 cooldownCycle = GameConfig.itemData.Coin.cycle;
             }
@@ -406,30 +621,73 @@ class RaceScene extends Phaser.Scene {
             }
             else if (item === "Copper") {
                 cooldownCycle = GameConfig.itemData.Copper.cycle;
-            } 
+            }
             else if (item === "CopperStack") {
                 cooldownCycle = GameConfig.itemData.Copper.cycle;
-            }else if (item === "Silver") {
+            } else if (item === "Silver") {
                 cooldownCycle = GameConfig.itemData.Silver.cycle;
             }
             else if (item === "Dubloon") {
                 cooldownCycle = GameConfig.itemData.Dubloon.cycle;
-            } 
+            }
             else if (item === "Piece") {
                 cooldownCycle = GameConfig.itemData.Piece.cycle;
-            }else if (item === "Gold") {
+            } else if (item === "Gold") {
                 cooldownCycle = GameConfig.itemData.Gold.cycle;
             }
             else if (item === "Pound") {
                 cooldownCycle = GameConfig.itemData.Pound.cycle;
-            } 
+            }
             else if (item === "Booty") {
                 cooldownCycle = GameConfig.itemData.Booty.cycle;
             }
-            
-            else if (item === "Ruby_Amulet") {
-                cooldownCycle = GameConfig.itemData.Ruby_Amulet.interval;
+
+            else if (item === "RubyAmulet") {
+                cooldownCycle = GameConfig.itemData.RubyAmulet.cycle;
             }
+            else if (item === "SapphireAmulet") {
+                cooldownCycle = GameConfig.itemData.SapphireAmulet.cycle;
+            }
+            else if (item === "AmethystAmulet") {
+                cooldownCycle = GameConfig.itemData.AmethystAmulet.cycle;
+            }
+            else if (item === "EmeraldAmulet") {
+                cooldownCycle = GameConfig.itemData.EmeraldAmulet.cycle;
+            }
+            else if (item === "BlessedRubyAmulet") {
+                cooldownCycle = GameConfig.itemData.BlessedRubyAmulet.cycle;
+            }
+            else if (item === "BlessedSapphireAmulet") {
+                cooldownCycle = GameConfig.itemData.BlessedSapphireAmulet.cycle;
+            }
+            else if (item === "BlessedAmethystAmulet") {
+                cooldownCycle = GameConfig.itemData.BlessedAmethystAmulet.cycle;
+            }
+            else if (item === "BlessedEmeraldAmulet") {
+                cooldownCycle = GameConfig.itemData.BlessedEmeraldAmulet.cycle;
+            }
+            else if (item === "PharaohsAmulet") {
+                cooldownCycle = GameConfig.itemData.PharaohsAmulet.cycle;
+            }
+            else if (item === "DeceiversAmulet") {
+                cooldownCycle = GameConfig.itemData.DeceiversAmulet.cycle;
+            }
+            else if (item === "HolyAmulet") {
+                cooldownCycle = GameConfig.itemData.HolyAmulet.cycle;
+            }
+            else if (item === "MessiahAmulet") {
+                cooldownCycle = GameConfig.itemData.MessiahAmulet.cycle;
+            }
+            else if (item === "UnderworldAmulet") {
+                cooldownCycle = GameConfig.itemData.UnderworldAmulet.cycle;
+            }
+            else if (item === "ShiningAmulet") {
+                cooldownCycle = GameConfig.itemData.ShiningAmulet.cycle;
+            }
+            else if (item === "AmbixAmulet") {
+                cooldownCycle = GameConfig.itemData.AmbixAmulet.cycle;
+            }
+
 
             let frameIndex = getItemFrameIndex(item);
             let x = startX + index * (iconSize + spacing);
@@ -437,7 +695,7 @@ class RaceScene extends Phaser.Scene {
             // Optional: add tooltip on hover.
             icon.setInteractive();
             icon.on('pointerover', () => {
-                let tooltip = this.add.text(x, iconY - iconSize - 10, GameConfig.itemDescriptions[item], {
+                let tooltip = this.add.text(x, iconY - iconSize + 75, GameConfig.itemDescriptions[item], {
                     fontSize: '14px',
                     fill: '#fff',
                     backgroundColor: 'rgba(0,0,0,0.7)',
@@ -461,7 +719,7 @@ class RaceScene extends Phaser.Scene {
                 cooldownBar: cooldownBar,
                 maxWidth: iconSize
             });
-            icon.setInteractive();
+           /* icon.setInteractive();
             icon.on('pointerover', () => {
                 // For example, position the tooltip just above the icon:
                 let tooltipX = startX;
@@ -482,7 +740,7 @@ class RaceScene extends Phaser.Scene {
                     icon.tooltip.destroy();
                     icon.tooltip = null;
                 }
-            });
+            });*/
 
         });
 
@@ -582,6 +840,10 @@ class RaceScene extends Phaser.Scene {
         let staminaMultiplier = this.effectManager.getNetMultiplier("stamina");
         let speedMultiplier = this.effectManager.getNetMultiplier("speed");
         // If no speed effects are present, speedMultiplier remains 1.
+
+        // Apply periodic stamina recovery.
+        let recovery = this.effectManager.getPeriodicAddition("staminaRecovery", GameState.maxStamina, delta);
+        this.stamina = Math.min(this.stamina + recovery, GameState.maxStamina);
 
         // Use the speedMultiplier when computing the effective elapsed time.
         let effectiveTime = this.elapsedTime * speedMultiplier;
@@ -750,7 +1012,11 @@ class ShopScene extends Phaser.Scene {
         this.inventoryContainer = this.add.container(0, 0);
         this.updateInventoryDisplay = () => {
             // Clear any existing icons.
-            this.inventoryContainer.removeAll(true);
+            if (!this.inventoryContainer) {
+                this.inventoryContainer = this.add.container(0, 0);
+            } else {
+                this.inventoryContainer.removeAll(true); // remove and destroy all children
+            }
 
             let numItems = GameState.equippedItems.length;
             let iconScale = 2;
@@ -767,7 +1033,7 @@ class ShopScene extends Phaser.Scene {
                 // Optional: add tooltip on hover.
                 icon.setInteractive();
                 icon.on('pointerover', () => {
-                    let tooltip = this.add.text(x, iconY - iconSize - 10, GameConfig.itemDescriptions[item], {
+                    let tooltip = this.add.text(x, iconY - iconSize + 75, GameConfig.itemDescriptions[item], {
                         fontSize: '14px',
                         fill: '#fff',
                         backgroundColor: 'rgba(0,0,0,0.7)',
@@ -781,6 +1047,46 @@ class ShopScene extends Phaser.Scene {
                         icon.tooltip.destroy();
                         icon.tooltip = null;
                     }
+                });
+
+                // NEW: Add pointerdown event to prompt selling the item.
+                icon.on('pointerdown', () => {
+                    // Calculate the sell value: half the purchase price, rounded down (minimum $1).
+                    let purchasePrice = GameConfig.itemPrices[item];
+                    let sellValue = Math.max(Math.floor(purchasePrice / 2), 1);
+
+                    // Create a tooltip for selling just below the icon.
+                    let sellTooltip = this.add.text(x, iconY + iconSize + 10, `Sell ${item} for $${sellValue}?`, {
+                        fontSize: '14px',
+                        fill: '#fff',
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        padding: { x: 5, y: 5 }
+                    }).setOrigin(0.5, 0);
+                    this.children.bringToTop(sellTooltip);
+                    sellTooltip.setInteractive();
+
+                    // When the tooltip is clicked, process the sale.
+                    sellTooltip.on('pointerdown', () => {
+                        // Add the sell value to the player's cash.
+                        GameState.money += sellValue;
+                        this.cashText.setText(`$${GameState.money}`);
+
+                        // Remove the item from the equipped items.
+                        Phaser.Utils.Array.Remove(GameState.equippedItems, item);
+
+                        // Destroy the tooltip.
+                        sellTooltip.destroy();
+
+                        // Refresh the inventory display.
+                        this.updateInventoryDisplay();
+                    });
+
+                    // Optional: Remove the sell tooltip automatically after 3 seconds if not clicked.
+                    this.time.delayedCall(3000, () => {
+                        if (sellTooltip && sellTooltip.active) {
+                            sellTooltip.destroy();
+                        }
+                    });
                 });
                 this.inventoryContainer.add(icon);
             });
@@ -826,17 +1132,18 @@ class ShopScene extends Phaser.Scene {
 
             container.on('pointerdown', () => {
                 if (GameState.money >= price) {
+                    if (GameState.equippedItems.length < 5) {
                     // Deduct the price and update cash display.
                     GameState.money -= price;
                     this.cashText.setText(`$${GameState.money}`);
 
                     // Add the item if there's an available slot (max 5).
-                    if (GameState.equippedItems.length < 5) {
+                    
                         GameState.equippedItems.push(item);
                         if (item === "Candle") {
                             GameState.maxStamina = 100 * (1 + GameConfig.itemData.Candle.staminaIncrease + GameState.wins * GameConfig.itemData.Candle.winBonus);
                         }
-                    }
+                    
 
                     // Optionally, show a temporary "You Bought {item}" message.
                     let tipX = container.x + container.width / 2;
@@ -858,7 +1165,22 @@ class ShopScene extends Phaser.Scene {
 
                     // Refresh the inventory display to include the newly purchased item.
                     this.updateInventoryDisplay();
-
+                }else {
+                    console.log("Not enough cash to buy " + item);
+                    let tipX = container.x + container.width / 2;
+                    let tipY = container.y + 30;
+                    let shoptip = this.add.text(tipX, tipY, `Not enough space, stranger`, {
+                        fontSize: '14px',
+                        fill: '#fff',
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        padding: { x: 5, y: 5 }
+                    }).setOrigin(0.5);
+                    this.time.delayedCall(1500, () => {
+                        if (shoptip && shoptip.active) {
+                            shoptip.destroy();
+                        }
+                    });
+                }
                 } else {
                     console.log("Not enough cash to buy " + item);
                     let tipX = container.x + container.width / 2;
