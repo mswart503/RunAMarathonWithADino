@@ -197,7 +197,7 @@ class MainMenuScene extends Phaser.Scene {
         this.load.image('flag', 'assets/flag.png');
         this.load.spritesheet('items', 'assets/items.png', { frameWidth: 16, frameHeight: 16, spacing: 1 });
         this.load.spritesheet('consumableSprites', 'assets/consumableSprites.png', { frameWidth: 16, frameHeight: 16, spacing: 0 });
-        this.load.spritesheet('bulkItems', 'assets/bulkitems.png', { frameWidth: 16, frameHeight: 16, spacing: 0 })
+        this.load.spritesheet('bulkItems', 'Run A Marathon With A Dino/assets/bulkitems.png', { frameWidth: 16, frameHeight: 16, spacing: 0 })
     }
     create() {
         // Add background image
