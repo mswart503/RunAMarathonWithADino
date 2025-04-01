@@ -174,7 +174,7 @@ var GameConfig = {
         PharaohsAmulet: "Recovers 4% stamina every 5 sec.",
         DeceiversAmulet: "Recovers 3% stamina every 4 sec.",
         HolyAmulet: "Recovers 5% stamina every 5 sec.",
-        MessiahAmulet: "Recovers 1% stamina every 1 sec.",        
+        MessiahAmulet: "Recovers 1% stamina every 1 sec.",
         UnderworldAmulet: "Recovers 2% stamina every 2 sec.",
         ShiningAmulet: "Recovers 3% stamina every 3 sec.",
         AmbixAmulet: "Recovers 3% stamina every 3 sec.",
@@ -302,6 +302,8 @@ class MainMenuScene extends Phaser.Scene {
         // List the 5 available items.
         //const items = Object.keys(GameConfig.itemDescriptions);
         let startY = 250;
+        GameState.consumables = ['apple', 'Orange', 'Beer'];
+
         availableItems.forEach(item => {
             // Create a container for the icon and the text.
             let container = this.add.container(200, startY);
@@ -719,28 +721,7 @@ class RaceScene extends Phaser.Scene {
                 cooldownBar: cooldownBar,
                 maxWidth: iconSize
             });
-           /* icon.setInteractive();
-            icon.on('pointerover', () => {
-                // For example, position the tooltip just above the icon:
-                let tooltipX = startX;
-                let tooltipY = iconY + 20; // adjust this value as needed
-                console.log("Tooltip should appear at:", tooltipX, tooltipY);
 
-                let tooltip = this.add.text(tooltipX, tooltipY, GameConfig.itemDescriptions[item], {
-                    fontSize: '14px',
-                    fill: '#fff',
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    padding: { x: 5, y: 5 }
-                }).setOrigin(0.5, 1);
-                this.children.bringToTop(tooltip);
-                icon.tooltip = tooltip;
-            });
-            icon.on('pointerout', () => {
-                if (icon.tooltip) {
-                    icon.tooltip.destroy();
-                    icon.tooltip = null;
-                }
-            });*/
 
         });
 
@@ -827,10 +808,63 @@ class RaceScene extends Phaser.Scene {
             callback: this.updateRace,
             callbackScope: this
         });
+
+        // ----- Fast Forward Controls -----
+        this.fastForward = 1;  // Reset fast forward multiplier to 1 at the start of each race
+
+        // Create a label for the fast forward section in the bottom left.
+        let ffLabel = this.add.text(20, this.game.config.height - 80, "Fast Forward:", {
+            fontSize: '18px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 5, y: 5 }
+        });
+
+        // Create a minus button. It will lower the multiplier but not below 1.
+        let minusButton = this.add.text(20, this.game.config.height - 50, "–", {
+            fontSize: '24px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 5, y: 5 }
+        }).setInteractive();
+
+        // Create a plus button. It will raise the multiplier up to 20.
+        let plusButton = this.add.text(60, this.game.config.height - 50, "+", {
+            fontSize: '24px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 5, y: 5 }
+        }).setInteractive();
+
+        // Create a display for the current fast forward value.
+        let ffDisplay = this.add.text(110, this.game.config.height - 50, this.fastForward.toFixed(1), {
+            fontSize: '24px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 5, y: 5 }
+        });
+
+        // When the minus button is clicked, decrease the multiplier (not below 1).
+        minusButton.on('pointerdown', () => {
+            if (this.fastForward > 1) {
+                this.fastForward = Math.max(1, this.fastForward - 3);
+                ffDisplay.setText(this.fastForward.toFixed(1));
+            }
+        });
+
+        // When the plus button is clicked, increase the multiplier (up to 20).
+        plusButton.on('pointerdown', () => {
+            if (this.fastForward < 20) {
+                this.fastForward = Math.min(20, this.fastForward + 3);
+                ffDisplay.setText(this.fastForward.toFixed(1));
+            }
+        });
+
     }
 
     updateRace() {
-        let delta = 0.1; // each tick represents 0.1 seconds
+        let baseDelta = 0.1; // each tick represents 0.1 seconds
+        let delta = baseDelta * this.fastForward;
         this.elapsedTime += delta;
 
         // Update our effect manager with delta.
@@ -1133,54 +1167,54 @@ class ShopScene extends Phaser.Scene {
             container.on('pointerdown', () => {
                 if (GameState.money >= price) {
                     if (GameState.equippedItems.length < 5) {
-                    // Deduct the price and update cash display.
-                    GameState.money -= price;
-                    this.cashText.setText(`$${GameState.money}`);
+                        // Deduct the price and update cash display.
+                        GameState.money -= price;
+                        this.cashText.setText(`$${GameState.money}`);
 
-                    // Add the item if there's an available slot (max 5).
-                    
+                        // Add the item if there's an available slot (max 5).
+
                         GameState.equippedItems.push(item);
                         if (item === "Candle") {
                             GameState.maxStamina = 100 * (1 + GameConfig.itemData.Candle.staminaIncrease + GameState.wins * GameConfig.itemData.Candle.winBonus);
                         }
-                    
 
-                    // Optionally, show a temporary "You Bought {item}" message.
-                    let tipX = container.x + container.width / 2;
-                    let tipY = container.y + 30;
-                    let shoptip = this.add.text(tipX, tipY, `You Bought ${item}`, {
-                        fontSize: '14px',
-                        fill: '#fff',
-                        backgroundColor: 'rgba(0,0,0,0.7)',
-                        padding: { x: 5, y: 5 }
-                    }).setOrigin(0.5);
-                    this.time.delayedCall(1500, () => {
-                        if (shoptip && shoptip.active) {
-                            shoptip.destroy();
-                        }
-                    });
 
-                    // Remove the store item from the display.
-                    container.destroy();
+                        // Optionally, show a temporary "You Bought {item}" message.
+                        let tipX = container.x + container.width / 2;
+                        let tipY = container.y + 30;
+                        let shoptip = this.add.text(tipX, tipY, `You Bought ${item}`, {
+                            fontSize: '14px',
+                            fill: '#fff',
+                            backgroundColor: 'rgba(0,0,0,0.7)',
+                            padding: { x: 5, y: 5 }
+                        }).setOrigin(0.5);
+                        this.time.delayedCall(1500, () => {
+                            if (shoptip && shoptip.active) {
+                                shoptip.destroy();
+                            }
+                        });
 
-                    // Refresh the inventory display to include the newly purchased item.
-                    this.updateInventoryDisplay();
-                }else {
-                    console.log("Not enough cash to buy " + item);
-                    let tipX = container.x + container.width / 2;
-                    let tipY = container.y + 30;
-                    let shoptip = this.add.text(tipX, tipY, `Not enough space, stranger`, {
-                        fontSize: '14px',
-                        fill: '#fff',
-                        backgroundColor: 'rgba(0,0,0,0.7)',
-                        padding: { x: 5, y: 5 }
-                    }).setOrigin(0.5);
-                    this.time.delayedCall(1500, () => {
-                        if (shoptip && shoptip.active) {
-                            shoptip.destroy();
-                        }
-                    });
-                }
+                        // Remove the store item from the display.
+                        container.destroy();
+
+                        // Refresh the inventory display to include the newly purchased item.
+                        this.updateInventoryDisplay();
+                    } else {
+                        console.log("Not enough cash to buy " + item);
+                        let tipX = container.x + container.width / 2;
+                        let tipY = container.y + 30;
+                        let shoptip = this.add.text(tipX, tipY, `Not enough space, stranger`, {
+                            fontSize: '14px',
+                            fill: '#fff',
+                            backgroundColor: 'rgba(0,0,0,0.7)',
+                            padding: { x: 5, y: 5 }
+                        }).setOrigin(0.5);
+                        this.time.delayedCall(1500, () => {
+                            if (shoptip && shoptip.active) {
+                                shoptip.destroy();
+                            }
+                        });
+                    }
                 } else {
                     console.log("Not enough cash to buy " + item);
                     let tipX = container.x + container.width / 2;
