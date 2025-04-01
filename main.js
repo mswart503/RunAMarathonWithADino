@@ -136,6 +136,19 @@ var GameConfig = {
         ShiningAmulet: { rarity: "Common", cycle: 3 },
         AmbixAmulet: { rarity: "Common", cycle: 4 },
 
+        //Flat Speed Increase
+        Shoes: { rarity: "Common", flatSpeedIncrease: 0.5 },
+        CowboyBoots: { rarity: "Common", flatSpeedIncrease: 0.6 },
+        Galoshes: { rarity: "Common", flatSpeedIncrease: 0.7 },
+        Sneakers: { rarity: "Common", flatSpeedIncrease: 0.8 },
+        Nikes: { rarity: "Common", flatSpeedIncrease: 0.9 },
+        NiceShoes: { rarity: "Uncommon", flatSpeedIncrease: 1.0 },
+        SuedeCowboyBoots: { rarity: "Uncommon", flatSpeedIncrease: 1.1 },
+        ToughGaloshes: { rarity: "Uncommon", flatSpeedIncrease: 1.2 },
+        Hokas: { rarity: "Rare", flatSpeedIncrease: 1.3 },
+        BestGaloshes: { rarity: "Rare", flatSpeedIncrease: 1.4 },
+
+
     },
 
     rarityWeights: {
@@ -170,7 +183,6 @@ var GameConfig = {
         BlessedSapphireAmulet: "Recovers 2% stamina every 4 sec.",
         BlessedAmethystAmulet: "Recovers 2% stamina every 3 sec.",
         BlessedEmeraldAmulet: "Recovers 3% stamina every 5 sec.",
-
         PharaohsAmulet: "Recovers 4% stamina every 5 sec.",
         DeceiversAmulet: "Recovers 3% stamina every 4 sec.",
         HolyAmulet: "Recovers 5% stamina every 5 sec.",
@@ -178,6 +190,17 @@ var GameConfig = {
         UnderworldAmulet: "Recovers 2% stamina every 2 sec.",
         ShiningAmulet: "Recovers 3% stamina every 3 sec.",
         AmbixAmulet: "Recovers 3% stamina every 3 sec.",
+
+        Shoes: "Increase Speed by 50%",
+        CowboyBoots: "Increase Speed by 60%",
+        Galoshes: "Increase Speed by 70%",
+        Sneakers: "Increase Speed by 80%",
+        Nikes: "Increase Speed by 90%",
+        NiceShoes: "Increase Speed by 100%",
+        SuedeCowboyBoots: "Increase Speed by 110%",
+        ToughGaloshes: "Increase Speed by 120%",
+        Hokas: "Increase Speed by 130%",
+        BestGaloshes: "Increase Speed by 140%",
 
         Ginger: "Stamina depletes 10% slower.",
         Ring: "Reduces item cooldowns by 1%.",
@@ -213,6 +236,16 @@ var GameConfig = {
         ShiningAmulet: { col: 20, row: 6 },
         AmbixAmulet: { col: 31, row: 6 },
 
+        Shoes: { col: 21, row: 31 },
+        CowboyBoots: { col: 22, row: 31 },
+        Galoshes: { col: 23, row: 31 },
+        Sneakers: { col: 24, row: 31 },
+        Nikes: { col: 24, row: 32 },
+        NiceShoes: { col: 21, row: 32 },
+        SuedeCowboyBoots: { col: 22, row: 32 },
+        ToughGaloshes: { col: 23, row: 32 },
+        Hokas: { col: 24, row: 33 },
+        BestGaloshes: { col: 23, row: 33 },
 
         Ginger: { col: 1, row: 10 },
         Ring: { col: 1, row: 5 },
@@ -245,7 +278,16 @@ var GameConfig = {
         UnderworldAmulet: 3,
         ShiningAmulet: 3,
         AmbixAmulet: 3,
-
+        Shoes: 1,
+        CowboyBoots: 1,
+        Galoshes: 1,
+        Sneakers: 1,
+        Nikes: 1,
+        NiceShoes: 2,
+        SuedeCowboyBoots: 2,
+        ToughGaloshes: 2,
+        Hokas: 3,
+        BestGaloshes: 3,
 
         Ginger: 2,
         Ring: 2,
@@ -354,7 +396,7 @@ class RaceScene extends Phaser.Scene {
         let iconY = 30;
         // --- Status Menu ---
         this.statusMenu = this.add.container(this.game.config.width - 160, this.game.config.height - 120);
-        this.speedText = this.add.text(0, 0, "Speed: 0", { fontSize: '16px', fill: '#fff' });
+        this.speedText = this.add.text(0, 0, "Speed: 20 m/s", { fontSize: '16px', fill: '#fff' });
         this.weightText = this.add.text(0, 20, "Weight: 100", { fontSize: '16px', fill: '#fff' });
         this.intoxText = this.add.text(0, 40, "Intox: 0%", { fontSize: '16px', fill: '#fff' });
         this.wellRestedText = this.add.text(0, 80, "Well Rested: 0%", { fontSize: '16px', fill: '#fff' });
@@ -617,30 +659,23 @@ class RaceScene extends Phaser.Scene {
 
             if (item === "Coin") {
                 cooldownCycle = GameConfig.itemData.Coin.cycle;
-            }
-            else if (item === "Bit") {
+            } else if (item === "Bit") {
                 cooldownCycle = GameConfig.itemData.Bit.cycle;
-            }
-            else if (item === "Copper") {
+            } else if (item === "Copper") {
                 cooldownCycle = GameConfig.itemData.Copper.cycle;
-            }
-            else if (item === "CopperStack") {
+            } else if (item === "CopperStack") {
                 cooldownCycle = GameConfig.itemData.Copper.cycle;
             } else if (item === "Silver") {
                 cooldownCycle = GameConfig.itemData.Silver.cycle;
-            }
-            else if (item === "Dubloon") {
+            } else if (item === "Dubloon") {
                 cooldownCycle = GameConfig.itemData.Dubloon.cycle;
-            }
-            else if (item === "Piece") {
+            } else if (item === "Piece") {
                 cooldownCycle = GameConfig.itemData.Piece.cycle;
             } else if (item === "Gold") {
                 cooldownCycle = GameConfig.itemData.Gold.cycle;
-            }
-            else if (item === "Pound") {
+            } else if (item === "Pound") {
                 cooldownCycle = GameConfig.itemData.Pound.cycle;
-            }
-            else if (item === "Booty") {
+            } else if (item === "Booty") {
                 cooldownCycle = GameConfig.itemData.Booty.cycle;
             }
 
@@ -729,7 +764,8 @@ class RaceScene extends Phaser.Scene {
         this.roundIndex = GameState.currentLevel;
         this.distance = GameConfig.rounds[this.roundIndex];
         // Calculate the race’s duration based on distance (e.g. 100m = 5 sec).
-        this.raceTime = (this.distance / 100) * GameConfig.baseTimePer100m;
+        //let finalSpeedMultiplier = baseSpeedMultiplier * (1 + flatBonus)
+        this.raceTime = (this.distance / 100) * (GameConfig.baseTimePer100m);
         this.elapsedTime = 0;
 
         // Smooth scaling of the dino based on race distance.
@@ -867,6 +903,8 @@ class RaceScene extends Phaser.Scene {
         let delta = baseDelta * this.fastForward;
         this.elapsedTime += delta;
 
+
+
         // Update our effect manager with delta.
         this.effectManager.update(delta);
 
@@ -875,16 +913,34 @@ class RaceScene extends Phaser.Scene {
         let speedMultiplier = this.effectManager.getNetMultiplier("speed");
         // If no speed effects are present, speedMultiplier remains 1.
 
+        // Sum flat speed bonuses from equipped items.
+
+        let flatBonus = 0;
+        GameState.equippedItems.forEach(item => {
+            let data = GameConfig.itemData[item];
+            if (data && data.flatSpeedIncrease) {
+                flatBonus += data.flatSpeedIncrease;
+            }
+        });
+
+        // Combine base speed multiplier and flat bonus.
+        let finalSpeedMultiplier = speedMultiplier * (1 + flatBonus);
+        //console.log(flatBonus)
         // Apply periodic stamina recovery.
         let recovery = this.effectManager.getPeriodicAddition("staminaRecovery", GameState.maxStamina, delta);
         this.stamina = Math.min(this.stamina + recovery, GameState.maxStamina);
 
         // Use the speedMultiplier when computing the effective elapsed time.
-        let effectiveTime = this.elapsedTime * speedMultiplier;
+        let effectiveTime = this.elapsedTime * finalSpeedMultiplier;
+        //console.log(effectiveTime)
+        let speedText = (GameConfig.baseTimePer100m*4)*finalSpeedMultiplier;
+        this.speedText.setText(`Speed: ${speedText.toFixed(1)} m/s`);
+
         let startX = 50;
         let endX = 750;
         let progress = Phaser.Math.Clamp(effectiveTime / this.raceTime, 0, 1);
         this.dino.x = Phaser.Math.Interpolation.Linear([startX, endX], progress);
+
 
         // Use the staminaMultiplier for depletion.
         let depletionRate = GameState.maxStamina / GameConfig.baseStaminaTime;
@@ -894,6 +950,7 @@ class RaceScene extends Phaser.Scene {
         let newWidth = (this.stamina / GameState.maxStamina) * 300;
         this.staminaBar.width = newWidth;
         this.staminaText.setText(`${Math.floor(this.stamina)}/${GameState.maxStamina} (${Math.floor((this.stamina / GameState.maxStamina) * 100)}%)`);
+        //let baseSpeedMultiplier = this.effectManager.getNetMultiplier("speed");
 
         // Update cooldown bars for equipped items.
         this.itemDisplays.forEach(display => {
@@ -902,12 +959,14 @@ class RaceScene extends Phaser.Scene {
                 let progress = (this.elapsedTime % display.cooldownCycle) / display.cooldownCycle;
                 display.cooldownBar.width = progress * display.maxWidth;
                 // Center the bar on the icon.
-                display.cooldownBar.x = display.cooldownBar.x = display.cooldownBar.x = display.cooldownBar.x; // (left as computed from initial x)
+                //display.cooldownBar.x = display.cooldownBar.x = display.cooldownBar.x = display.cooldownBar.x; // (left as computed from initial x)
             } else {
                 // For passive items, keep the bar full.
                 display.cooldownBar.width = display.maxWidth;
             }
+
         });
+
         // If no effect is active, update the cooldown timers by delta (0.1 sec per tick)
         if (!this.isTripping && !this.isBoosting) {
             this.intoxCooldown += delta;
@@ -920,18 +979,18 @@ class RaceScene extends Phaser.Scene {
             // If the random roll is less than or equal to the current intoxication percentage, trigger trip effect
             if (roll <= this.currentIntox) {
                 // Save current speed multiplier and trigger trip effect
-                let originalSpeed = this.speedMultiplier;
-                this.speedMultiplier = 0;  // dino stops
+                let originalSpeed = this.finalSpeedMultiplier;
+                this.finalSpeedMultiplier = 0;  // dino stops
                 this.dino.play('trip');      // play trip animation
                 this.isTripping = true;
                 // After 1 second, resume at half speed
                 this.time.delayedCall(1000, () => {
-                    this.speedMultiplier = originalSpeed * 0.5;
+                    this.finalSpeedMultiplier = originalSpeed * 0.5;
                     // Optionally revert animation back to run if needed:
                     this.dino.play('run');
                     // After 3 seconds, restore original speed and reset effect
                     this.time.delayedCall(3000, () => {
-                        this.speedMultiplier = originalSpeed;
+                        this.finalSpeedMultiplier = originalSpeed;
                         this.isTripping = false;
                         // Reset both cooldown timers
                         this.intoxCooldown = 0;
@@ -948,13 +1007,13 @@ class RaceScene extends Phaser.Scene {
         if (!this.isTripping && !this.isBoosting && this.wellRestedCooldown >= 2) {
             let roll = Phaser.Math.Between(1, 100);
             if (roll <= this.currentWellRested) {
-                let originalSpeed = this.speedMultiplier;
+                let originalSpeed = this.finalSpeedMultiplier;
                 // Trigger boost: double the speed for 3 seconds.
-                this.speedMultiplier = originalSpeed * 2;
+                this.finalSpeedMultiplier = originalSpeed * 2;
                 this.dino.play('dash');  // play dash animation
                 this.isBoosting = true;
                 this.time.delayedCall(3000, () => {
-                    this.speedMultiplier = originalSpeed;
+                    this.finalSpeedMultiplier = originalSpeed;
                     this.isBoosting = false;
                     // Reset both cooldown timers
                     this.intoxCooldown = 0;
@@ -984,9 +1043,11 @@ class RaceScene extends Phaser.Scene {
         if (percentLeft >= 75) {
             reward = 5;
         } else if (percentLeft >= 50) {
+            reward = 4;
+        } else if (percentLeft >= 25){
             reward = 3;
         } else {
-            reward = 1;
+            reward = 2;
         }
         GameState.money += reward;
         GameState.wins += 1;
@@ -1130,7 +1191,7 @@ class ShopScene extends Phaser.Scene {
         this.updateInventoryDisplay();
 
         this.add.text(300, 50, "Shop", { fontSize: '28px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
-        this.add.text(250, 100, "Select one item to add to your item slots", { fontSize: '20px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
+        this.add.text(50, 100, "Click an item to buy it, click an item in your inventory to sell it", { fontSize: '18px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
 
         // Randomly pick 3 unique items from the available list.
         let allItems = Object.keys(GameConfig.itemData);
