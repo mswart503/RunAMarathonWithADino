@@ -202,9 +202,9 @@ var GameConfig = {
         Hokas: "Increase Speed by 130%",
         BestGaloshes: "Increase Speed by 140%",
 
-        Ginger: "Stamina depletes 10% slower.",
-        Ring: "Reduces item cooldowns by 1%.",
-        Candle: "Increases max stamina by 2% (plus bonus per win)."
+        //Ginger: "Stamina depletes 10% slower.",
+        //Ring: "Reduces item cooldowns by 1%.",
+        //Candle: "Increases max stamina by 2% (plus bonus per win)."
     },
     // Items sprite sheet now has 12 columns.
     itemSpriteSheetColumns: 64,
@@ -247,9 +247,9 @@ var GameConfig = {
         Hokas: { col: 24, row: 33 },
         BestGaloshes: { col: 23, row: 33 },
 
-        Ginger: { col: 1, row: 10 },
-        Ring: { col: 1, row: 5 },
-        Candle: { col: 1, row: 12 }
+        //Ginger: { col: 1, row: 10 },
+        //Ring: { col: 1, row: 5 },
+        //Candle: { col: 1, row: 12 }
     },
     // Define fixed item purchase prices (hard-coded values between $3 and $7)
     itemPrices: {
@@ -289,9 +289,9 @@ var GameConfig = {
         Hokas: 3,
         BestGaloshes: 3,
 
-        Ginger: 2,
-        Ring: 2,
-        Candle: 2
+        //Ginger: 2,
+        //Ring: 2,
+        //Candle: 2
     },
     consumableDescriptions: {
         apple: "5% stamina refill",
@@ -364,9 +364,9 @@ class MainMenuScene extends Phaser.Scene {
                 // Save the chosen item.
                 GameState.equippedItems.push(item);
                 // If Candle is chosen, update max stamina.
-                if (item === "Candle") {
+                /*if (item === "Candle") {
                     GameState.maxStamina = 100 * (1 + GameConfig.itemData.Candle.staminaIncrease);
-                }
+                }*/
                 this.scene.start('RaceScene');
             });
 
@@ -395,6 +395,15 @@ class RaceScene extends Phaser.Scene {
         let totalWidth = numItems * iconSize + (numItems - 1) * spacing;
         let startX = (this.game.config.width - totalWidth) / 2 + iconSize / 2;
         let iconY = 30;
+        // --- Timer ---
+        this.timerText = this.add.text(300, 200, "Time: 0.0 sec", {
+            fontSize: '20px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 10, y: 5 }
+        });
+        
+
         // --- Status Menu ---
         this.statusMenu = this.add.container(this.game.config.width - 160, this.game.config.height - 120);
         this.speedText = this.add.text(0, 0, "Speed: 20 m/s", { fontSize: '16px', fill: '#fff' });
@@ -519,13 +528,13 @@ class RaceScene extends Phaser.Scene {
                 });
             }
             // Similarly, if "Ginger" gives a permanent 10% reduction in depletion:
-            if (item === "Ginger") {
+            /*if (item === "Ginger") {
                 this.effectManager.addEffect({
                     type: "stamina",
                     value: 0.9,          // 10% slower depletion (multiply by 0.9)
                     duration: Infinity
                 });
-            }
+            }*/
 
             if (item === "RubyAmulet") {
                 this.effectManager.addEffect({
@@ -951,7 +960,7 @@ class RaceScene extends Phaser.Scene {
         let newWidth = (this.stamina / GameState.maxStamina) * 300;
         this.staminaBar.width = newWidth;
         this.staminaText.setText(`${Math.floor(this.stamina)}/${GameState.maxStamina} (${Math.floor((this.stamina / GameState.maxStamina) * 100)}%)`);
-        //let baseSpeedMultiplier = this.effectManager.getNetMultiplier("speed");
+        this.timerText.setText("Time: " + this.elapsedTime.toFixed(1) + " sec");
 
         // Update cooldown bars for equipped items.
         this.itemDisplays.forEach(display => {
@@ -1037,6 +1046,10 @@ class RaceScene extends Phaser.Scene {
     }
 
     raceComplete() {
+    // Calculate the completion time in seconds (formatted with 1 decimal).
+
+        let completionTime = this.elapsedTime.toFixed(1);
+
         // Determine reward based on remaining stamina percentage.
         let reward;
         let percentLeft = (this.stamina / GameState.maxStamina) * 100;
@@ -1053,7 +1066,7 @@ class RaceScene extends Phaser.Scene {
         GameState.money += reward;
         GameState.wins += 1;
 
-        let summaryText = `Race Complete!\nStamina left: ${Math.floor(percentLeft)}%\nYou earned $${reward}`;
+        let summaryText = `Race Complete!\nStamina left: ${Math.floor(percentLeft)}%\nYou earned $${reward}\nTime: ${completionTime} sec`;
         this.add.text(300, 200, summaryText, { fontSize: '20px', fill: '#fff', backgroundColor: '#000' });
 
         // After a short delay, proceed to the Shop scene (or end game if rounds are finished).
@@ -1245,12 +1258,14 @@ class ShopScene extends Phaser.Scene {
                 container.on('pointerdown', () => {
 
                     if (GameState.money >= price) {
+                        console.log(GameState.maxItems)
                         if (GameState.equippedItems.length < GameState.maxItems) {
                             GameState.money -= price;
                             this.cashText.setText(`$${GameState.money}`);
 
 
                             GameState.equippedItems.push(item);
+                            this.updateInventoryDisplay();
 
                             // If needed, update other properties (e.g., max stamina for "Log").
                             if (item === "Log") {
@@ -1361,6 +1376,52 @@ class ShopScene extends Phaser.Scene {
             }
         });
 
+        // ----- New: Buy New Item Slot Button -----
+        this.newSlotButton = this.add.text(
+            20,
+            this.rerollButton.y + this.rerollButton.height + 10,
+            "Buy New \nItem Slot \n ($10)", {
+            fontSize: '15px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 10, y: 5 }
+        }).setInteractive();
+
+        this.newSlotButton.on('pointerdown', () => {
+            if (GameState.money >= 10) {
+                // Deduct cash and update display.
+                GameState.money -= 10;
+                this.cashText.setText(`$${GameState.money}`);
+                // Increase available item slots.
+                GameState.maxItems += 1;
+                // Show a confirmation tip.
+                let tip = this.add.text(
+                    this.newSlotButton.x + this.newSlotButton.width,
+                    this.newSlotButton.y - 20,
+                    "Item slot purchased!", {
+                    fontSize: '16px',
+                    fill: '#fff',
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    padding: { x: 5, y: 5 }
+                }).setOrigin(0.5);
+                this.time.delayedCall(2000, () => {
+                    tip.destroy();
+                });
+            } else {
+                let tip = this.add.text(
+                    this.newSlotButton.x + this.newSlotButton.width,
+                    this.newSlotButton.y + 20,
+                    "Not enough cash, stranger", {
+                    fontSize: '16px',
+                    fill: '#fff',
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    padding: { x: 5, y: 5 }
+                }).setOrigin(0.5);
+                this.time.delayedCall(2000, () => {
+                    tip.destroy();
+                });
+            }
+        });
 
         // ----- Consumables Section -----
         if (this.consumableContainer) {
