@@ -128,13 +128,17 @@ var GameConfig = {
         SapphireAmulet: { rarity: "Common", cycle: 4 },
         AmethystAmulet: { rarity: "Common", cycle: 3 },
         EmeraldAmulet: { rarity: "Common", cycle: 2 },
-        PharaohsAmulet: { rarity: "Common", cycle: 5 },
-        DeceiversAmulet: { rarity: "Common", cycle: 4 },
-        HolyAmulet: { rarity: "Common", cycle: 5 },
-        MessiahAmulet: { rarity: "Common", cycle: 1 },
-        UnderworldAmulet: { rarity: "Common", cycle: 2 },
-        ShiningAmulet: { rarity: "Common", cycle: 3 },
-        AmbixAmulet: { rarity: "Common", cycle: 4 },
+        BlessedRubyAmulet: { rarity: "Common", cycle: 5 },
+        BlessedSapphireAmulet: { rarity: "Common", cycle: 4 },
+        BlessedAmethystAmulet: { rarity: "Common", cycle: 3 },
+        BlessedEmeraldAmulet: { rarity: "Common", cycle: 5 },
+        PharaohsAmulet: { rarity: "Uncommon", cycle: 5 },
+        DeceiversAmulet: { rarity: "Uncommon", cycle: 4 },
+        HolyAmulet: { rarity: "Uncommon", cycle: 5 },
+        MessiahAmulet: { rarity: "Rare", cycle: 1 },
+        UnderworldAmulet: { rarity: "Rare", cycle: 2 },
+        ShiningAmulet: { rarity: "Rare", cycle: 3 },
+        AmbixAmulet: { rarity: "Rare", cycle: 4 },
 
         //Flat Speed Increase
         Shoes: { rarity: "Common", flatSpeedIncrease: 0.5 },
@@ -153,8 +157,8 @@ var GameConfig = {
 
     rarityWeights: {
         Rare: 1,
-        Uncommon: 5,
-        Common: 10
+        Uncommon: 20,
+        Common: 50
     },
 
     rarityColors: {
