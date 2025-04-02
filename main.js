@@ -311,7 +311,8 @@ var GameState = {
     maxStamina: 100,
     weight: 100,  // Starting weight
     // Add consumables array (you can pre-populate with sample names, e.g., "apple", "Pasta", etc.)
-    consumables: []
+    consumables: [],
+    maxItems: 5
 };
 GameState.consumables = ['apple', 'Orange', 'Beer'];
 
@@ -933,7 +934,7 @@ class RaceScene extends Phaser.Scene {
         // Use the speedMultiplier when computing the effective elapsed time.
         let effectiveTime = this.elapsedTime * finalSpeedMultiplier;
         //console.log(effectiveTime)
-        let speedText = (GameConfig.baseTimePer100m*4)*finalSpeedMultiplier;
+        let speedText = (GameConfig.baseTimePer100m * 4) * finalSpeedMultiplier;
         this.speedText.setText(`Speed: ${speedText.toFixed(1)} m/s`);
 
         let startX = 50;
@@ -1044,7 +1045,7 @@ class RaceScene extends Phaser.Scene {
             reward = 5;
         } else if (percentLeft >= 50) {
             reward = 4;
-        } else if (percentLeft >= 25){
+        } else if (percentLeft >= 25) {
             reward = 3;
         } else {
             reward = 2;
@@ -1192,79 +1193,109 @@ class ShopScene extends Phaser.Scene {
 
         this.add.text(300, 50, "Shop", { fontSize: '28px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
         this.add.text(50, 100, "Click an item to buy it, click an item in your inventory to sell it", { fontSize: '18px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
-
-        // Randomly pick 3 unique items from the available list.
-        let allItems = Object.keys(GameConfig.itemData);
-        Phaser.Utils.Array.Shuffle(allItems);
-        let availableItems = allItems.slice(0, 3);
-
-        let startY = 150;
-        availableItems.forEach(item => {
-            // Create a container for the item icon, description, and price.
-            let container = this.add.container(200, startY);
-
-            let frameIndex = getItemFrameIndex(item);
-            let icon = this.add.image(0, 0, 'bulkItems', frameIndex).setScale(2);
-            let price = GameConfig.itemPrices[item];
-
-            // Create price text to the left of the icon.
-            let priceText = this.add.text(-50, 0, `$${price}`, {
-                fontSize: '16px',
-                fill: '#fff',
-                backgroundColor: 'rgba(0,0,0,0.7)',
-                padding: { x: 5, y: 2 }
-            }).setOrigin(0.5);
-
-            let descText = this.add.text(40, -8, `${item}: ${GameConfig.itemDescriptions[item]}`, {
-                fontSize: '16px',
-                fill: '#fff',
-                backgroundColor: 'rgba(0,0,0,0.7)'
-            });
-
-            container.add([priceText, icon, descText]);
-            container.setSize(300, 20);
-            container.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 20), Phaser.Geom.Rectangle.Contains);
-
-            container.on('pointerdown', () => {
-                if (GameState.money >= price) {
-                    if (GameState.equippedItems.length < 5) {
-                        // Deduct the price and update cash display.
-                        GameState.money -= price;
-                        this.cashText.setText(`$${GameState.money}`);
-
-                        // Add the item if there's an available slot (max 5).
-
-                        GameState.equippedItems.push(item);
-                        if (item === "Candle") {
-                            GameState.maxStamina = 100 * (1 + GameConfig.itemData.Candle.staminaIncrease + GameState.wins * GameConfig.itemData.Candle.winBonus);
-                        }
+        let rerollCheck = false;
 
 
-                        // Optionally, show a temporary "You Bought {item}" message.
-                        let tipX = container.x + container.width / 2;
-                        let tipY = container.y + 30;
-                        let shoptip = this.add.text(tipX, tipY, `You Bought ${item}`, {
-                            fontSize: '14px',
-                            fill: '#fff',
-                            backgroundColor: 'rgba(0,0,0,0.7)',
-                            padding: { x: 5, y: 5 }
-                        }).setOrigin(0.5);
-                        this.time.delayedCall(1500, () => {
-                            if (shoptip && shoptip.active) {
-                                shoptip.destroy();
+        // Helper function to display shop items.
+        this.displayShopItems = () => {
+            // If the container exists, destroy it.
+            if (this.itemContainer) {
+                this.itemContainer.destroy(true);
+            }
+            // Create a container for shop items.
+            this.itemContainer = this.add.container(0, 150);
+
+            // Get all available items.
+            // (If you removed itemEffects, use itemDescriptions or your new config.)
+            let allItems = Object.keys(GameConfig.itemDescriptions);
+            // Shuffle the array.
+            Phaser.Utils.Array.Shuffle(allItems);
+            // Pick the first 3 items.
+            let availableItems = allItems.slice(0, 3);
+
+            // Starting Y position for each shop item within the container.
+            let startY = 0;
+            availableItems.forEach(item => {
+                // Create a container for each item (icon, price, and description).
+                let container = this.add.container(200, startY);
+
+                // Get the sprite frame.
+                let frameIndex = getItemFrameIndex(item);
+                let icon = this.add.image(0, 0, 'bulkItems', frameIndex).setScale(2);
+                let price = GameConfig.itemPrices[item];
+                // Create price text to the left of the icon.
+                let priceText = this.add.text(-50, 0, `$${price}`, {
+                    fontSize: '16px',
+                    fill: '#fff',
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    padding: { x: 5, y: 2 }
+                }).setOrigin(0.5);
+                // Create description text.
+                let descText = this.add.text(40, -8, `${item}: ${GameConfig.itemDescriptions[item]}`, {
+                    fontSize: '16px',
+                    fill: '#fff',
+                    backgroundColor: 'rgba(0,0,0,0.7)'
+                });
+
+                container.add([priceText, icon, descText]);
+                container.setSize(300, 20);
+                container.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 20), Phaser.Geom.Rectangle.Contains);
+
+                // Purchase logic for the item.
+                container.on('pointerdown', () => {
+
+                    if (GameState.money >= price) {
+                        if (GameState.equippedItems.length < GameState.maxItems) {
+                            GameState.money -= price;
+                            this.cashText.setText(`$${GameState.money}`);
+
+
+                            GameState.equippedItems.push(item);
+
+                            // If needed, update other properties (e.g., max stamina for "Log").
+                            if (item === "Log") {
+                                GameState.maxStamina = 100 * (1 + GameConfig.itemData.Log.staminaIncrease + GameState.wins * GameConfig.itemData.Log.winBonus);
                             }
-                        });
 
-                        // Remove the store item from the display.
-                        container.destroy();
 
-                        // Refresh the inventory display to include the newly purchased item.
-                        this.updateInventoryDisplay();
+                            // Optionally, show a temporary confirmation message.
+                            let tipX = container.x + container.width / 2;
+                            let tipY = container.y + 150;
+                            let shoptip = this.add.text(tipX, tipY, `You Bought ${item}`, {
+                                fontSize: '14px',
+                                fill: '#fff',
+                                backgroundColor: 'rgba(0,0,0,0.7)',
+                                padding: { x: 5, y: 5 }
+                            }).setOrigin(0.5);
+                            this.time.delayedCall(1500, () => {
+                                if (shoptip && shoptip.active) {
+                                    shoptip.destroy();
+                                }
+                            });
+
+                            // Remove the purchased item from the shop display.
+                            container.destroy();
+                            // Refresh the shop items display.
+                            //this.displayShopItems();
+                        } else {
+                            let tipX = container.x + container.width / 2;
+                            let tipY = container.y + 30;
+                            let shoptip = this.add.text(tipX, tipY, `Not enough space, stranger`, {
+                                fontSize: '14px',
+                                fill: '#fff',
+                                backgroundColor: 'rgba(0,0,0,0.7)',
+                                padding: { x: 5, y: 5 }
+                            }).setOrigin(0.5);
+                            this.time.delayedCall(1500, () => {
+                                if (shoptip && shoptip.active) {
+                                    shoptip.destroy();
+                                }
+                            });
+                        }
                     } else {
-                        console.log("Not enough cash to buy " + item);
                         let tipX = container.x + container.width / 2;
-                        let tipY = container.y + 30;
-                        let shoptip = this.add.text(tipX, tipY, `Not enough space, stranger`, {
+                        let tipY = container.y + 150;
+                        let shoptip = this.add.text(tipX, tipY, `Not enough cash, stranger`, {
                             fontSize: '14px',
                             fill: '#fff',
                             backgroundColor: 'rgba(0,0,0,0.7)',
@@ -1276,22 +1307,12 @@ class ShopScene extends Phaser.Scene {
                             }
                         });
                     }
-                } else {
-                    console.log("Not enough cash to buy " + item);
-                    let tipX = container.x + container.width / 2;
-                    let tipY = container.y + 30;
-                    let shoptip = this.add.text(tipX, tipY, `Not enough cash, stranger`, {
-                        fontSize: '14px',
-                        fill: '#fff',
-                        backgroundColor: 'rgba(0,0,0,0.7)',
-                        padding: { x: 5, y: 5 }
-                    }).setOrigin(0.5);
-                    this.time.delayedCall(1500, () => {
-                        if (shoptip && shoptip.active) {
-                            shoptip.destroy();
-                        }
-                    });
-                }
+
+                });
+
+
+                startY += 40;
+                this.itemContainer.add(container);
             });
             let leaveShopButton = this.add.text(this.cameras.main.centerX, this.game.config.height - 50, "Leave Shop", {
                 fontSize: '20px',
@@ -1303,29 +1324,76 @@ class ShopScene extends Phaser.Scene {
             leaveShopButton.on('pointerdown', () => {
                 this.scene.start('RaceScene');
             });
-            startY += 40;
-        });
-        // ----- Consumables Section -----
-        let consStartY = startY + 40; // Use the current startY (from items) plus an offset
+        };
 
-        // Add a header for the consumables section
-        this.add.text(300, consStartY, "Consumables", {
+        this.displayShopItems();
+
+        // Create a Reroll button in the bottom left of the shop section.
+        this.rerollButton = this.add.text(20, 150, "Reroll \n ($1)", {
+            fontSize: '20px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 10, y: 5 }
+        }).setInteractive();
+
+        this.rerollButton.on('pointerdown', () => {
+            if (GameState.money >= 1) {
+                GameState.money -= 1;
+                this.cashText.setText(`$${GameState.money}`);
+                rerollCheck = true;
+
+                // Re-display shop items.
+                this.displayShopItems();
+            } else {
+                let tipX = this.rerollButton.x + 50 + this.rerollButton.width / 2;
+                let tipY = this.rerollButton.y + 60;
+                let shoptip = this.add.text(tipX, tipY, `Not enough cash, stranger`, {
+                    fontSize: '14px',
+                    fill: '#fff',
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    padding: { x: 5, y: 5 }
+                }).setOrigin(0.5);
+                this.time.delayedCall(1500, () => {
+                    if (shoptip && shoptip.active) {
+                        shoptip.destroy();
+                    }
+                });
+            }
+        });
+
+
+        // ----- Consumables Section -----
+        if (this.consumableContainer) {
+            this.consumableContainer.destroy(true);
+        }
+        this.consumableContainer = this.add.container(0, 250); // Position below the item container
+
+        // Define header Y and initial start for items
+        let headerY = this.consumableContainer.y + 40;
+        this.add.text(300, headerY, "Consumables", {
             fontSize: '28px',
             fill: '#fff',
             backgroundColor: 'rgba(0,0,0,0.7)'
         }).setOrigin(0.5);
-        consStartY += 40; // move down for listing consumables
+        let consStartY = headerY - 200;
 
         // Define available consumables
         let availableConsumables = ['apple', 'Orange', 'Beer'];
-        // Define fixed prices for consumables if not already defined:
+        // Define fixed prices for consumables:
         GameConfig.consumablePrices = {
             apple: 1,
             Orange: 2,
             Beer: 3
         };
+        // And define descriptions (if not defined already)
+        GameConfig.consumableDescriptions = {
+            apple: "5% stamina refill",
+            Orange: "10% stamina refill",
+            Beer: "20% stamina refill"
+        };
 
         availableConsumables.forEach(consumable => {
+            console.log("Adding consumable: " + consumable + " at y=" + consStartY);
             // Create a container for each consumable option
             let container = this.add.container(200, consStartY);
 
@@ -1343,12 +1411,13 @@ class ShopScene extends Phaser.Scene {
                 padding: { x: 5, y: 2 }
             }).setOrigin(0.5);
 
-            // Create description text (here simply the consumable name)
+            // Create description text (using the description from GameConfig)
             let descText = this.add.text(40, -8, `${consumable}: ${GameConfig.consumableDescriptions[consumable]}`, {
                 fontSize: '16px',
                 fill: '#fff',
                 backgroundColor: 'rgba(0,0,0,0.7)'
             });
+
             container.add([priceText, icon, descText]);
             container.setSize(300, 20);
             container.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 20), Phaser.Geom.Rectangle.Contains);
@@ -1362,7 +1431,7 @@ class ShopScene extends Phaser.Scene {
                     // Add the consumable to the player's consumables inventory.
                     GameState.consumables.push(consumable);
 
-                    // Optionally, show a temporary "You Bought {consumable}" message.
+                    // Optionally, show a temporary confirmation message.
                     let tipX = container.x + container.width / 2;
                     let tipY = container.y + 30;
                     let shoptip = this.add.text(tipX, tipY, `You Bought ${consumable}`, {
@@ -1380,12 +1449,26 @@ class ShopScene extends Phaser.Scene {
                     // Remove this consumable option from the shop display.
                     container.destroy();
                 } else {
-                    console.log("Not enough cash to buy " + consumable);
+                    let tipX = container.x + container.width / 2;
+                    let tipY = container.y + 250;
+                    let shoptip = this.add.text(tipX, tipY, `Not enough cash, stranger`, {
+                        fontSize: '14px',
+                        fill: '#fff',
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        padding: { x: 5, y: 5 }
+                    }).setOrigin(0.5);
+                    this.time.delayedCall(1500, () => {
+                        if (shoptip && shoptip.active) {
+                            shoptip.destroy();
+                        }
+                    });
                 }
             });
 
             consStartY += 40; // Move down for the next consumable option.
+            this.consumableContainer.add(container);
         });
+
 
 
         // --- Consumables Panel at Bottom ---
@@ -1442,12 +1525,10 @@ class ShopScene extends Phaser.Scene {
 function getConsumableFrame(consumable) {
     // Map consumable names to frame indexes.
     const mapping = {
-        apple: 0,
+        Apple: 0,
         Orange: 1,
-        Banana: 2,
-        Pasta: 3,
-        Sandwich: 4,
         Beer: 5,
+
         // Add more consumables as needed.
     };
     // Return the mapped frame index, defaulting to 0 if not found.
