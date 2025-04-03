@@ -41,6 +41,7 @@ class EffectManager {
         });
     }
 
+
     /**
      * Computes the net multiplier for a given type.
      * Effects with a cycle apply only during their active phase.
@@ -67,33 +68,30 @@ class EffectManager {
         return multiplier;
     }
     /**
-    * Computes the total periodic addition for a given effect type.
-    * For example, for "staminaRecovery" effects, each effect has:
-    *   - value: fraction of max stamina to recover per cycle (e.g., 0.05)
-    *   - cycle: period in seconds (e.g., 5)
-    * This function calculates how many cycles have completed since the last update,
-    * sums up the addition, and updates each effect's lastCycleCount.
-    *
-    * @param {String} type - e.g., "staminaRecovery"
-    * @param {Number} maxValue - the value on which the percentage applies (e.g., max stamina)
-    * @param {Number} delta - time passed this frame in seconds
-    * @returns {Number} total amount to add
-    */
+ * Computes the total periodic addition for a given effect type.
+ * Returns an object with:
+ *   addition: the total amount to add,
+ *   cycles: total number of cycles triggered.
+ *
+ * For example, for "staminaRecovery" effects:
+ *   - effect.value is the fraction of max stamina to recover per cycle.
+ *   - effect.cycle is the period in seconds.
+ */
     getPeriodicAddition(type, maxValue, delta) {
         let addition = 0;
+        let totalCycles = 0;
         this.effects.forEach(effect => {
             if (effect.type === type && effect.cycle) {
-                // Calculate how many full cycles have passed up to the current elapsed time.
                 let newCycleCount = Math.floor(effect.elapsed / effect.cycle);
                 let cyclesPassed = newCycleCount - effect.lastCycleCount;
                 if (cyclesPassed > 0) {
                     addition += cyclesPassed * effect.value * maxValue;
-                    // Update lastCycleCount for this effect.
+                    totalCycles += cyclesPassed;
                     effect.lastCycleCount = newCycleCount;
                 }
             }
         });
-        return addition;
+        return { addition, cycles: totalCycles };
     }
 }
 
@@ -152,16 +150,26 @@ var GameConfig = {
         Hokas: { rarity: "Rare", flatSpeedIncrease: 1.3 },
         BestGaloshes: { rarity: "Rare", flatSpeedIncrease: 1.4 },
 
+        //Increase speed on each cooldown trigger:
+        Robe: { rarity: "Uncommon", cooldownSpeedBonus: 0.05 },
+        BloodRobe: { rarity: "Uncommon", cooldownSpeedBonus: 0.1 },
+        RegalRobe: { rarity: "Rare", cooldownSpeedBonus: 0.15 },
+        DarkRobe: { rarity: "Rare", cooldownSpeedBonus: 0.20 },
+
+
 
     },
 
     rarityWeights: {
         Rare: 1,
         Uncommon: 20,
-        Common: 50
+        Common: 50,
+        Testing: 10000,
+
     },
 
     rarityColors: {
+        Testing: "#000000",
         Common: "#0000FF",   // Blue
         Uncommon: "#FF0000", // Red
         Rare: "#FFD700"      // Gold
@@ -206,6 +214,10 @@ var GameConfig = {
         Hokas: "Increase Speed by 130%",
         BestGaloshes: "Increase Speed by 140%",
 
+        Robe: "Each cooldown trigger increases speed by 5%.",
+        BloodRobe: "Each cooldown trigger increases speed by 10%.",
+        RegalRobe: "Each cooldown trigger increases speed by 15%.",
+        DarkRobe: "Each cooldown trigger increases speed by 20%.",
         //Ginger: "Stamina depletes 10% slower.",
         //Ring: "Reduces item cooldowns by 1%.",
         //Candle: "Increases max stamina by 2% (plus bonus per win)."
@@ -251,6 +263,10 @@ var GameConfig = {
         Hokas: { col: 24, row: 33 },
         BestGaloshes: { col: 23, row: 33 },
 
+        Robe: { col:28, row: 18 },
+        BloodRobe: { col:28, row: 21 },
+        RegalRobe: { col:28, row: 22 },
+        DarkRobe: { col:28, row: 23 },
         //Ginger: { col: 1, row: 10 },
         //Ring: { col: 1, row: 5 },
         //Candle: { col: 1, row: 12 }
@@ -293,6 +309,10 @@ var GameConfig = {
         Hokas: 3,
         BestGaloshes: 3,
 
+        Robe: 4,
+        BloodRobe: 5,
+        RegalRobe: 6,
+        DarkRobe: 7,
         //Ginger: 2,
         //Ring: 2,
         //Candle: 2
@@ -317,6 +337,7 @@ var GameState = {
     // Add consumables array (you can pre-populate with sample names, e.g., "apple", "Pasta", etc.)
     consumables: [],
     maxItems: 5
+    
 };
 GameState.consumables = ['apple', 'Orange', 'Beer'];
 
@@ -390,6 +411,8 @@ class RaceScene extends Phaser.Scene {
         // Add background image.
         this.add.image(400, 300, 'background');
         GameState.newSlotButton = 20;
+        this.cooldownBonus = 0; // This bonus will accumulate over the race.
+        this.speedOverride = 1;
 
         // Create a display for equipped items (icons with cooldown bars) at the top middle.
         this.itemDisplays = [];
@@ -448,6 +471,7 @@ class RaceScene extends Phaser.Scene {
                     value: 0.5,          // Half stamina usage
                     cycle: 3,            // Every 3 seconds,
                     activeDuration: 1,   // active for 1 seconds,
+                    lastCycleCount: 0,
                     duration: Infinity   // lasting for the whole race
                 });
             }
@@ -457,6 +481,8 @@ class RaceScene extends Phaser.Scene {
                     value: 0.5,          // Half stamina usage
                     cycle: 4,            // Every 4 seconds,
                     activeDuration: 1,   // active for 1 seconds,
+                    lastCycleCount: 0,
+
                     duration: Infinity   // lasting for the whole race
                 });
             }
@@ -466,6 +492,8 @@ class RaceScene extends Phaser.Scene {
                     value: 0.5,          // Half stamina usage
                     cycle: 5,            // Every 5 seconds,
                     activeDuration: 1,   // active for 1 seconds,
+                    lastCycleCount: 0,
+
                     duration: Infinity   // lasting for the whole race
                 });
             }
@@ -475,6 +503,8 @@ class RaceScene extends Phaser.Scene {
                     value: 0.5,          // Half stamina usage
                     cycle: 5,            // Every 5 seconds,
                     activeDuration: 2,   // active for 1 seconds,
+                    lastCycleCount: 0,
+
                     duration: Infinity   // lasting for the whole race
                 });
             }
@@ -484,6 +514,8 @@ class RaceScene extends Phaser.Scene {
                     value: 0.5,          // Half stamina usage
                     cycle: 5,            // Every 5 seconds,
                     activeDuration: 3,   // active for 1 seconds,
+                    lastCycleCount: 0,
+
                     duration: Infinity   // lasting for the whole race
                 });
             }
@@ -493,6 +525,8 @@ class RaceScene extends Phaser.Scene {
                     value: 0.5,          // Half stamina usage
                     cycle: 2,            // Every 2 seconds,
                     activeDuration: 1,   // active for 1 seconds,
+                    lastCycleCount: 0,
+
                     duration: Infinity   // lasting for the whole race
                 });
             }
@@ -502,6 +536,8 @@ class RaceScene extends Phaser.Scene {
                     value: 0.5,          // Half stamina usage
                     cycle: 4,            // Every 4 seconds,
                     activeDuration: 2,   // active for 2 seconds,
+                    lastCycleCount: 0,
+
                     duration: Infinity   // lasting for the whole race
                 });
             }
@@ -511,6 +547,8 @@ class RaceScene extends Phaser.Scene {
                     value: 0.5,          // Half stamina usage
                     cycle: 5,            // Every 5 seconds,
                     activeDuration: 4,   // active for 1 seconds,
+                    lastCycleCount: 0,
+
                     duration: Infinity   // lasting for the whole race
                 });
             }
@@ -520,6 +558,8 @@ class RaceScene extends Phaser.Scene {
                     value: 0.5,          // Half stamina usage
                     cycle: 5,            // Every 4 seconds,
                     activeDuration: 4,   // active for 2 seconds,
+                    lastCycleCount: 0,
+
                     duration: Infinity   // lasting for the whole race
                 });
             }
@@ -529,6 +569,8 @@ class RaceScene extends Phaser.Scene {
                     value: 0.5,          // Half stamina usage
                     cycle: 4,            // Every 5 seconds,
                     activeDuration: 3,   // active for 1 seconds,
+                    lastCycleCount: 0,
+
                     duration: Infinity   // lasting for the whole race
                 });
             }
@@ -546,6 +588,8 @@ class RaceScene extends Phaser.Scene {
                     type: "staminaRecovery",
                     value: 0.01,       // 1% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
+                    lastCycleCount: 0,
+
                     duration: Infinity // or a finite duration if needed
                 });
             }
@@ -554,6 +598,8 @@ class RaceScene extends Phaser.Scene {
                     type: "staminaRecovery",
                     value: 0.01,       // 1% of max stamina per cycle
                     cycle: 4,          // every 4 seconds
+                    lastCycleCount: 0,
+
                     duration: Infinity // or a finite duration if needed
                 });
             }
@@ -562,6 +608,8 @@ class RaceScene extends Phaser.Scene {
                     type: "staminaRecovery",
                     value: 0.01,       // 1% of max stamina per cycle
                     cycle: 3,          // every 3 seconds
+                    lastCycleCount: 0,
+
                     duration: Infinity // or a finite duration if needed
                 });
             }
@@ -570,6 +618,8 @@ class RaceScene extends Phaser.Scene {
                     type: "staminaRecovery",
                     value: 0.01,       // 1% of max stamina per cycle
                     cycle: 2,          // every 2 seconds
+                    lastCycleCount: 0,
+
                     duration: Infinity // or a finite duration if needed
                 });
             }
@@ -579,6 +629,8 @@ class RaceScene extends Phaser.Scene {
                     type: "staminaRecovery",
                     value: 0.02,       // 2% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
+                    lastCycleCount: 0,
+
                     duration: Infinity // or a finite duration if needed
                 });
             }
@@ -587,6 +639,8 @@ class RaceScene extends Phaser.Scene {
                     type: "staminaRecovery",
                     value: 0.02,       // 2% of max stamina per cycle
                     cycle: 4,          // every 4 seconds
+                    lastCycleCount: 0,
+
                     duration: Infinity // or a finite duration if needed
                 });
             }
@@ -595,6 +649,8 @@ class RaceScene extends Phaser.Scene {
                     type: "staminaRecovery",
                     value: 0.02,       // 2% of max stamina per cycle
                     cycle: 3,          // every 3 seconds
+                    lastCycleCount: 0,
+
                     duration: Infinity // or a finite duration if needed
                 });
             }
@@ -603,6 +659,8 @@ class RaceScene extends Phaser.Scene {
                     type: "staminaRecovery",
                     value: 0.03,       // 3% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
+                    lastCycleCount: 0,
+
                     duration: Infinity // or a finite duration if needed
                 });
             }
@@ -612,6 +670,8 @@ class RaceScene extends Phaser.Scene {
                     type: "staminaRecovery",
                     value: 0.04,       // 4% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
+                    lastCycleCount: 0,
+
                     duration: Infinity // or a finite duration if needed
                 });
             }
@@ -620,6 +680,8 @@ class RaceScene extends Phaser.Scene {
                     type: "staminaRecovery",
                     value: 0.03,       // 3% of max stamina per cycle
                     cycle: 4,          // every 4 seconds
+                    lastCycleCount: 0,
+
                     duration: Infinity // or a finite duration if needed
                 });
             }
@@ -628,6 +690,8 @@ class RaceScene extends Phaser.Scene {
                     type: "staminaRecovery",
                     value: 0.05,       // 5% of max stamina per cycle
                     cycle: 5,          // every 3 seconds
+                    lastCycleCount: 0,
+
                     duration: Infinity // or a finite duration if needed
                 });
             }
@@ -636,6 +700,8 @@ class RaceScene extends Phaser.Scene {
                     type: "staminaRecovery",
                     value: 0.01,       // 1% of max stamina per cycle
                     cycle: 1,          // every 1 seconds
+                    lastCycleCount: 0,
+
                     duration: Infinity // or a finite duration if needed
                 });
             }
@@ -644,6 +710,8 @@ class RaceScene extends Phaser.Scene {
                     type: "staminaRecovery",
                     value: 0.02,       // 2% of max stamina per cycle
                     cycle: 2,          // every 2 seconds
+                    lastCycleCount: 0,
+
                     duration: Infinity // or a finite duration if needed
                 });
             }
@@ -652,6 +720,8 @@ class RaceScene extends Phaser.Scene {
                     type: "staminaRecovery",
                     value: 0.03,       // 3% of max stamina per cycle
                     cycle: 3,          // every 3 seconds
+                    lastCycleCount: 0,
+
                     duration: Infinity // or a finite duration if needed
                 });
             }
@@ -660,6 +730,8 @@ class RaceScene extends Phaser.Scene {
                     type: "staminaRecovery",
                     value: 0.04,       // 4% of max stamina per cycle
                     cycle: 4,          // every 4 seconds
+                    lastCycleCount: 0,
+
                     duration: Infinity // or a finite duration if needed
                 });
             }
@@ -932,6 +1004,16 @@ class RaceScene extends Phaser.Scene {
         let speedMultiplier = this.effectManager.getNetMultiplier("speed");
         // If no speed effects are present, speedMultiplier remains 1.
 
+        // Apply periodic stamina recovery.
+        let recoveryObj = this.effectManager.getPeriodicAddition("staminaRecovery", GameState.maxStamina, delta);
+        //console.log("Recovery Object:", recoveryObj);
+
+        this.stamina = Math.min(this.stamina + recoveryObj.addition, GameState.maxStamina);
+
+        // If any recovery cycles triggered, also trigger the bonus.
+        if (recoveryObj.cycles > 0) {
+            this.triggerCooldownBonus();
+        }
         // Sum flat speed bonuses from equipped items.
 
         let flatBonus = 0;
@@ -943,11 +1025,11 @@ class RaceScene extends Phaser.Scene {
         });
 
         // Combine base speed multiplier and flat bonus.
-        let finalSpeedMultiplier = speedMultiplier * (1 + flatBonus);
+        let finalSpeedMultiplier = speedMultiplier * (1 + flatBonus + this.cooldownBonus) * this.speedOverride;
         //console.log(flatBonus)
         // Apply periodic stamina recovery.
-        let recovery = this.effectManager.getPeriodicAddition("staminaRecovery", GameState.maxStamina, delta);
-        this.stamina = Math.min(this.stamina + recovery, GameState.maxStamina);
+        //let recovery = this.effectManager.getPeriodicAddition("staminaRecovery", GameState.maxStamina, delta);
+        //this.stamina = Math.min(this.stamina + recovery, GameState.maxStamina);
 
         // Use the speedMultiplier when computing the effective elapsed time.
         let effectiveTime = this.elapsedTime * finalSpeedMultiplier;
@@ -995,32 +1077,27 @@ class RaceScene extends Phaser.Scene {
         // Check intoxication effect if its cooldown has reached 2 seconds
         if (!this.isTripping && !this.isBoosting && this.intoxCooldown >= 2) {
             let roll = Phaser.Math.Between(1, 100);
-            // If the random roll is less than or equal to the current intoxication percentage, trigger trip effect
             if (roll <= this.currentIntox) {
-                // Save current speed multiplier and trigger trip effect
-                let originalSpeed = this.finalSpeedMultiplier;
-                this.finalSpeedMultiplier = 0;  // dino stops
-                this.dino.play('trip');      // play trip animation
+                let originalOverride = this.speedOverride;
+                this.speedOverride = 0;  // Stop dino
+                this.dino.play('trip');
                 this.isTripping = true;
-                // After 1 second, resume at half speed
+                this.triggerCooldownBonus(); // Make sure to call it as a function!
                 this.time.delayedCall(1000, () => {
-                    this.finalSpeedMultiplier = originalSpeed * 0.5;
-                    // Optionally revert animation back to run if needed:
+                    this.speedOverride = originalOverride * 0.5;
                     this.dino.play('run');
-                    // After 3 seconds, restore original speed and reset effect
                     this.time.delayedCall(3000, () => {
-                        this.finalSpeedMultiplier = originalSpeed;
+                        this.speedOverride = originalOverride;
                         this.isTripping = false;
-                        // Reset both cooldown timers
                         this.intoxCooldown = 0;
                         this.wellRestedCooldown = 0;
                     });
                 });
             } else {
-                // If no effect triggered, reset intoxCooldown
                 this.intoxCooldown = 0;
             }
         }
+        
 
         // Check well-rested effect if its cooldown has reached 2 seconds
         if (!this.isTripping && !this.isBoosting && this.wellRestedCooldown >= 2) {
@@ -1028,9 +1105,11 @@ class RaceScene extends Phaser.Scene {
             if (roll <= this.currentWellRested) {
                 let originalSpeed = this.finalSpeedMultiplier;
                 // Trigger boost: double the speed for 3 seconds.
-                this.finalSpeedMultiplier = originalSpeed * 2;
+                finalSpeedMultiplier = originalSpeed * 2;
                 this.dino.play('dash');  // play dash animation
                 this.isBoosting = true;
+                this.triggerCooldownBonus();
+
                 this.time.delayedCall(3000, () => {
                     this.finalSpeedMultiplier = originalSpeed;
                     this.isBoosting = false;
@@ -1051,6 +1130,20 @@ class RaceScene extends Phaser.Scene {
         } else if (this.stamina <= 0) {
             this.timerEvent.remove();
             this.raceLost();
+        }
+    }
+
+    triggerCooldownBonus() {
+        let bonusFromItems = 0;
+        GameState.equippedItems.forEach(item => {
+            let data = GameConfig.itemData[item];
+            if (data && data.cooldownSpeedBonus) {
+                bonusFromItems += data.cooldownSpeedBonus;
+            }
+        });
+        if (bonusFromItems > 0) {
+            this.cooldownBonus += bonusFromItems;
+            console.log("Cooldown bonus added: " + bonusFromItems + ". Total bonus: " + this.cooldownBonus);
         }
     }
 
