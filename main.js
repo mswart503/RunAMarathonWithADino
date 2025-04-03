@@ -389,6 +389,7 @@ class RaceScene extends Phaser.Scene {
     create() {
         // Add background image.
         this.add.image(400, 300, 'background');
+        GameState.newSlotButton = 20;
 
         // Create a display for equipped items (icons with cooldown bars) at the top middle.
         this.itemDisplays = [];
@@ -406,7 +407,7 @@ class RaceScene extends Phaser.Scene {
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
         });
-        
+
 
         // --- Status Menu ---
         this.statusMenu = this.add.container(this.game.config.width - 160, this.game.config.height - 120);
@@ -783,8 +784,12 @@ class RaceScene extends Phaser.Scene {
         this.elapsedTime = 0;
 
         // Smooth scaling of the dino based on race distance.
-        let baseScale = Phaser.Math.Linear(1, 0.2, (this.distance - GameConfig.minDistance) / (GameConfig.maxDistance - GameConfig.minDistance));
-        let dinoScale = baseScale * 3;  // Starting scale is doubled.
+        let t = (this.distance - GameConfig.minDistance) / (GameConfig.maxDistance - GameConfig.minDistance);
+        // Apply a power to slow growth (e.g., 0.5 makes it grow slower)
+        t = Math.pow(t, 0.5);
+        t = Phaser.Math.Clamp(t, 0, 1);
+        let baseScale = Phaser.Math.Linear(1, 0.2, t);
+        let dinoScale = baseScale * 4;
         //dinoScale *= (1 + (GameState.weight - 100) * 0.01);
 
         // Create the dino sprite from its sprite sheet.
@@ -1050,7 +1055,7 @@ class RaceScene extends Phaser.Scene {
     }
 
     raceComplete() {
-    // Calculate the completion time in seconds (formatted with 1 decimal).
+        // Calculate the completion time in seconds (formatted with 1 decimal).
 
         let completionTime = this.elapsedTime.toFixed(1);
 
@@ -1079,8 +1084,10 @@ class RaceScene extends Phaser.Scene {
             if (GameState.currentLevel < GameConfig.totalRounds) {
                 this.scene.start('ShopScene');
             } else {
-                // End of game; restart at Main Menu (you can later add a final summary).
-                this.scene.start('MainMenuScene');
+                // Pass the final time to the next scene via the registry.
+                this.registry.set("finalTime", completionTime);
+                // Transition to the win screen.
+                this.scene.start('WinScreenScene');
             }
         });
     }
@@ -1094,6 +1101,8 @@ class RaceScene extends Phaser.Scene {
         GameState.wins = 0;
         GameState.equippedItems = [];
         GameState.maxStamina = 100;
+        GameState.newSlotPrice = 20;
+
         this.time.delayedCall(2000, () => {
             this.scene.start('MainMenuScene');
         });
@@ -1113,6 +1122,12 @@ class ShopScene extends Phaser.Scene {
 
         // Add background image.
         this.add.image(400, 300, 'background');
+        // At the beginning of ShopScene.create(), reset reroll price:
+        this.rerollPrice = 2;
+        if (GameState.newSlotPrice === undefined) {
+            GameState.newSlotPrice = 20;
+        }
+
         // --- Cash Display ---
         // Create a cash display box in the top right corner.
         this.cashText = this.add.text(this.game.config.width - 20, 20, `$${GameState.money}`, {
@@ -1348,7 +1363,7 @@ class ShopScene extends Phaser.Scene {
         this.displayShopItems();
 
         // Create a Reroll button in the bottom left of the shop section.
-        this.rerollButton = this.add.text(20, 150, "Reroll \n ($1)", {
+        this.rerollButton = this.add.text(20, 150, "Reroll \n ($" + this.rerollPrice + ")", {
             fontSize: '20px',
             fill: '#fff',
             backgroundColor: 'rgba(0,0,0,0.7)',
@@ -1356,10 +1371,13 @@ class ShopScene extends Phaser.Scene {
         }).setInteractive();
 
         this.rerollButton.on('pointerdown', () => {
-            if (GameState.money >= 1) {
-                GameState.money -= 1;
+            if (GameState.money >= this.rerollPrice) {
+                GameState.money -= this.rerollPrice;
                 this.cashText.setText(`$${GameState.money}`);
-                rerollCheck = true;
+                // Increase the reroll price by $1.
+                this.rerollPrice += 1;
+                // Update the reroll button text.
+                this.rerollButton.setText("Reroll \n ($" + this.rerollPrice + ")");
 
                 // Re-display shop items.
                 this.displayShopItems();
@@ -1384,7 +1402,7 @@ class ShopScene extends Phaser.Scene {
         this.newSlotButton = this.add.text(
             20,
             this.rerollButton.y + this.rerollButton.height + 10,
-            "Buy New \nItem Slot \n ($10)", {
+            "Buy New \nItem Slot \n ($" + GameState.newSlotPrice + ")", {
             fontSize: '15px',
             fill: '#fff',
             backgroundColor: 'rgba(0,0,0,0.7)',
@@ -1392,12 +1410,14 @@ class ShopScene extends Phaser.Scene {
         }).setInteractive();
 
         this.newSlotButton.on('pointerdown', () => {
-            if (GameState.money >= 10) {
+            if (GameState.money >= GameState.newSlotPrice) {
                 // Deduct cash and update display.
-                GameState.money -= 10;
+                GameState.money -= GameState.newSlotPrice;
                 this.cashText.setText(`$${GameState.money}`);
                 // Increase available item slots.
                 GameState.maxItems += 1;
+                GameState.newSlotPrice += 20;
+                this.newSlotButton.setText("Buy New \nItem Slot \n ($" + GameState.newSlotPrice + ")");
                 // Show a confirmation tip.
                 let tip = this.add.text(
                     this.newSlotButton.x + this.newSlotButton.width,
@@ -1587,6 +1607,58 @@ class ShopScene extends Phaser.Scene {
 
     }
 }
+
+
+class WinScreenScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'WinScreenScene' });
+    }
+
+    create() {
+        // Optional: Add a background image.
+        this.add.image(400, 300, 'background');
+
+        // Retrieve stats you want to show.
+        // You could store these in GameState or pass via the scene's registry.
+        // Here we'll assume final race time was stored in a variable before transitioning.
+        let finalTime = this.registry.get("finalTime") || "N/A";
+        let finalMoney = GameState.money;
+        let totalWins = GameState.wins;
+
+        // Build a stats message.
+        let statsText = `Congratulations!\nYou completed the final race!\n\nStats:\nTime: ${finalTime} sec\nMoney: $${finalMoney}\nWins: ${totalWins}`;
+
+        // Display the stats in the center of the screen.
+        this.add.text(400, 200, statsText, {
+            fontSize: '24px',
+            fill: '#fff',
+            align: 'center',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 10, y: 10 }
+        }).setOrigin(0.5);
+
+        // Create a "New Run" button.
+        let newRunButton = this.add.text(400, 400, "New Run", {
+            fontSize: '32px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 20, y: 10 }
+        }).setOrigin(0.5).setInteractive();
+
+        newRunButton.on('pointerdown', () => {
+            // Reset any necessary game state for a new run.
+            GameState.currentLevel = 0;
+            GameState.money = 0;
+            GameState.wins = 0;
+            // Also, reset any temporary variables you need to restart (like newSlotPrice, etc.)
+            GameState.newSlotPrice = 20;
+            // Optionally, reset other persistent stats.
+            // Transition to the ShopScene (or your starting scene for a new run).
+            this.scene.start('MainMenuScene');
+        });
+    }
+}
+
 function getConsumableFrame(consumable) {
     // Map consumable names to frame indexes.
     const mapping = {
@@ -1674,7 +1746,7 @@ var phaserConfig = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
-    scene: [MainMenuScene, RaceScene, ShopScene]
+    scene: [MainMenuScene, RaceScene, ShopScene, WinScreenScene]
 };
 
 var game = new Phaser.Game(phaserConfig);
