@@ -85,7 +85,7 @@ class EffectManager {
                 let newCycleCount = Math.floor(effect.elapsed / effect.cycle);
                 let cyclesPassed = newCycleCount - effect.lastCycleCount;
                 if (cyclesPassed > 0) {
-                    if (effect.type === "staminaRecovery"){
+                    if (effect.type === "staminaRecovery") {
                         addition += cyclesPassed * effect.value * maxValue;
                     }
                     totalCycles += cyclesPassed;
@@ -885,7 +885,7 @@ class RaceScene extends Phaser.Scene {
         // Background bar.
         this.staminaBarBg = this.add.rectangle(400, 580, 300, 20, 0x555555);
         // Green bar showing current stamina.
-        this.staminaBar = this.add.rectangle(250, 580, 300, 20, 0x00ff00);
+        this.staminaBar = this.add.rectangle(250, 580, 300, 20, 0x24DBAB);
         this.staminaBar.setOrigin(0, 0.5)
         this.staminaText = this.add.text(250, 580, "", { fontSize: '14px', fill: '#fff' }).setOrigin(0, 0.5);
 
@@ -1008,7 +1008,7 @@ class RaceScene extends Phaser.Scene {
         // If no speed effects are present, speedMultiplier remains 1.
 
         // Apply periodic stamina recovery.
-        let recoveryObj = this.effectManager.getPeriodicAddition(["staminaRecovery", "stamina"],  GameState.maxStamina, delta);
+        let recoveryObj = this.effectManager.getPeriodicAddition(["staminaRecovery", "stamina"], GameState.maxStamina, delta);
         this.stamina = Math.min(this.stamina + recoveryObj.addition, GameState.maxStamina);
 
         // If any recovery cycles triggered, also trigger the bonus.
@@ -1057,6 +1057,19 @@ class RaceScene extends Phaser.Scene {
         this.stamina -= depletionRate * staminaMultiplier * delta;
         this.stamina = Phaser.Math.Clamp(this.stamina, 0, GameState.maxStamina);
         let newWidth = (this.stamina / GameState.maxStamina) * 300;
+
+        // Determine stamina bar color.
+        let staminaBarColor = 0x24DBAB; // default green
+        this.effectManager.effects.forEach(effect => {
+            if (effect.type === "stamina" && effect.cycle && effect.activeDuration) {
+                let phase = effect.elapsed % effect.cycle;
+                if (phase < effect.activeDuration) {
+                    staminaBarColor = 0x2454DB; // blue when active
+                }
+            }
+        });
+        this.staminaBar.fillColor = staminaBarColor;
+
         this.staminaBar.width = newWidth;
         this.staminaText.setText(`${Math.floor(this.stamina)}/${GameState.maxStamina} (${Math.floor((this.stamina / GameState.maxStamina) * 100)}%)`);
         this.timerText.setText("Time: " + this.elapsedTime.toFixed(1) + " sec");
