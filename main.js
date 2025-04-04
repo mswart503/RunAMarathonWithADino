@@ -415,6 +415,7 @@ class RaceScene extends Phaser.Scene {
         GameState.newSlotButton = 20;
         this.cooldownBonus = 0; // This bonus will accumulate over the race.
         this.speedOverride = 1;
+        this.currentSpeedMultiplier = 1; // start at a baseline multiplier
 
         // Create a display for equipped items (icons with cooldown bars) at the top middle.
         this.itemDisplays = [];
@@ -1028,13 +1029,18 @@ class RaceScene extends Phaser.Scene {
 
         // Combine base speed multiplier and flat bonus.
         let finalSpeedMultiplier = speedMultiplier * (1 + flatBonus + this.cooldownBonus) * this.speedOverride;
-        //console.log(flatBonus)
-        // Apply periodic stamina recovery.
-        //let recovery = this.effectManager.getPeriodicAddition("staminaRecovery", GameState.maxStamina, delta);
-        //this.stamina = Math.min(this.stamina + recovery, GameState.maxStamina);
+        // Choose an acceleration factor (per second); adjust as needed.
+        let accelerationFactor = 0.5; // This means 50% of the difference is closed per second.
+
+        // Gradually update the current speed multiplier toward finalSpeedMultiplier.
+        this.currentSpeedMultiplier = Phaser.Math.Linear(
+            this.currentSpeedMultiplier,
+            finalSpeedMultiplier,
+            accelerationFactor * delta
+        );
 
         // Use the speedMultiplier when computing the effective elapsed time.
-        let effectiveTime = this.elapsedTime * finalSpeedMultiplier;
+        let effectiveTime = this.elapsedTime * this.currentSpeedMultiplier;
         //console.log(effectiveTime)
         let speedText = (GameConfig.baseTimePer100m * 4) * finalSpeedMultiplier;
         this.speedText.setText(`Speed: ${speedText.toFixed(2)} m/s`);
