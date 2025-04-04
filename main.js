@@ -151,10 +151,10 @@ var GameConfig = {
         BestGaloshes: { rarity: "Rare", flatSpeedIncrease: 1.4 },
 
         //Increase speed on each cooldown trigger:
-        Robe: { rarity: "Uncommon", cooldownSpeedBonus: 0.05 },
-        BloodRobe: { rarity: "Uncommon", cooldownSpeedBonus: 0.1 },
-        RegalRobe: { rarity: "Rare", cooldownSpeedBonus: 0.15 },
-        DarkRobe: { rarity: "Rare", cooldownSpeedBonus: 0.20 },
+        Cape: { rarity: "Uncommon", cooldownSpeedBonus: 0.05 },
+        BloodCape: { rarity: "Uncommon", cooldownSpeedBonus: 0.1 },
+        RegalCape: { rarity: "Rare", cooldownSpeedBonus: 0.15 },
+        DarkCape: { rarity: "Rare", cooldownSpeedBonus: 0.20 },
 
 
 
@@ -214,10 +214,10 @@ var GameConfig = {
         Hokas: "Increase Speed by 130%",
         BestGaloshes: "Increase Speed by 140%",
 
-        Robe: "Each cooldown trigger increases speed by 5%.",
-        BloodRobe: "Each cooldown trigger increases speed by 10%.",
-        RegalRobe: "Each cooldown trigger increases speed by 15%.",
-        DarkRobe: "Each cooldown trigger increases speed by 20%.",
+        Cape: "Each cooldown trigger increases speed by 5%.",
+        BloodCape: "Each cooldown trigger increases speed by 10%.",
+        RegalCape: "Each cooldown trigger increases speed by 15%.",
+        DarkCape: "Each cooldown trigger increases speed by 20%.",
         //Ginger: "Stamina depletes 10% slower.",
         //Ring: "Reduces item cooldowns by 1%.",
         //Candle: "Increases max stamina by 2% (plus bonus per win)."
@@ -263,10 +263,10 @@ var GameConfig = {
         Hokas: { col: 24, row: 33 },
         BestGaloshes: { col: 23, row: 33 },
 
-        Robe: { col: 28, row: 18 },
-        BloodRobe: { col: 28, row: 21 },
-        RegalRobe: { col: 28, row: 22 },
-        DarkRobe: { col: 28, row: 23 },
+        Cape: { col: 28, row: 18 },
+        BloodCape: { col: 28, row: 21 },
+        RegalCape: { col: 28, row: 22 },
+        DarkCape: { col: 28, row: 23 },
         //Ginger: { col: 1, row: 10 },
         //Ring: { col: 1, row: 5 },
         //Candle: { col: 1, row: 12 }
@@ -309,10 +309,10 @@ var GameConfig = {
         Hokas: 3,
         BestGaloshes: 3,
 
-        Robe: 4,
-        BloodRobe: 5,
-        RegalRobe: 6,
-        DarkRobe: 7,
+        Cape: 4,
+        BloodCape: 5,
+        RegalCape: 6,
+        DarkCape: 7,
         //Ginger: 2,
         //Ring: 2,
         //Candle: 2
@@ -434,7 +434,7 @@ class RaceScene extends Phaser.Scene {
 
         // --- Status Menu ---
         this.statusMenu = this.add.container(this.game.config.width - 160, this.game.config.height - 120);
-        this.speedText = this.add.text(0, 0, "Speed: 20 m/s", { fontSize: '16px', fill: '#fff' });
+        this.speedText = this.add.text(0, 0, "Speed: 00.0 m/s", { fontSize: '16px', fill: '#fff' });
         this.weightText = this.add.text(0, 20, "Weight: 100", { fontSize: '16px', fill: '#fff' });
         this.intoxText = this.add.text(0, 40, "Intox: 0%", { fontSize: '16px', fill: '#fff' });
         this.wellRestedText = this.add.text(0, 80, "Well Rested: 0%", { fontSize: '16px', fill: '#fff' });
@@ -1012,7 +1012,7 @@ class RaceScene extends Phaser.Scene {
 
         // If any recovery cycles triggered, also trigger the bonus.
         if (recoveryObj.cycles > 0) {
-            this.triggerCooldownBonus();
+            this.triggerCooldownBonus(recoveryObj.cycles);
         }
         // Sum flat speed bonuses from equipped items.
 
@@ -1035,7 +1035,7 @@ class RaceScene extends Phaser.Scene {
         let effectiveTime = this.elapsedTime * finalSpeedMultiplier;
         //console.log(effectiveTime)
         let speedText = (GameConfig.baseTimePer100m * 4) * finalSpeedMultiplier;
-        this.speedText.setText(`Speed: ${speedText.toFixed(1)} m/s`);
+        this.speedText.setText(`Speed: ${speedText.toFixed(2)} m/s`);
 
         let startX = 50;
         let endX = 750;
@@ -1133,7 +1133,7 @@ class RaceScene extends Phaser.Scene {
         }
     }
 
-    triggerCooldownBonus() {
+    triggerCooldownBonus(cycles) {
         let bonusFromItems = 0;
         GameState.equippedItems.forEach(item => {
             let data = GameConfig.itemData[item];
@@ -1142,7 +1142,7 @@ class RaceScene extends Phaser.Scene {
             }
         });
         if (bonusFromItems > 0) {
-            this.cooldownBonus += bonusFromItems;
+            this.cooldownBonus += bonusFromItems * cycles;
             console.log("Cooldown bonus added: " + bonusFromItems + ". Total bonus: " + this.cooldownBonus);
         }
     }
@@ -1273,7 +1273,7 @@ class ShopScene extends Phaser.Scene {
 
                 // NEW: Add pointerdown event to prompt selling the item.
                 icon.on('pointerdown', () => {
-                    
+
                     icon.tooltipPersistent = true;
 
                     // Destroy any previous tooltips on this icon.
@@ -1368,14 +1368,14 @@ class ShopScene extends Phaser.Scene {
             // Create a container for shop items.
             this.itemContainer = this.add.container(0, 150);
 
-            // Get all available items.
-            // (If you removed itemEffects, use itemDescriptions or your new config.)
-            let allItems = Object.keys(GameConfig.itemDescriptions);
-            // Shuffle the array.
+            // Get all items from your configuration, but filter out those already in the player's inventory.
+            let allItems = Object.keys(GameConfig.itemDescriptions).filter(item => {
+                return !GameState.equippedItems.includes(item);
+            });
             Phaser.Utils.Array.Shuffle(allItems);
+
             // Pick the first 3 items.
             let availableItems = allItems.slice(0, 3);
-
             // Starting Y position for each shop item within the container.
             let startY = 0;
             availableItems.forEach(item => {
