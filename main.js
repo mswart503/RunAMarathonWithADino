@@ -263,10 +263,10 @@ var GameConfig = {
         Hokas: { col: 24, row: 33 },
         BestGaloshes: { col: 23, row: 33 },
 
-        Robe: { col:28, row: 18 },
-        BloodRobe: { col:28, row: 21 },
-        RegalRobe: { col:28, row: 22 },
-        DarkRobe: { col:28, row: 23 },
+        Robe: { col: 28, row: 18 },
+        BloodRobe: { col: 28, row: 21 },
+        RegalRobe: { col: 28, row: 22 },
+        DarkRobe: { col: 28, row: 23 },
         //Ginger: { col: 1, row: 10 },
         //Ring: { col: 1, row: 5 },
         //Candle: { col: 1, row: 12 }
@@ -337,7 +337,7 @@ var GameState = {
     // Add consumables array (you can pre-populate with sample names, e.g., "apple", "Pasta", etc.)
     consumables: [],
     maxItems: 5
-    
+
 };
 GameState.consumables = ['apple', 'Orange', 'Beer'];
 
@@ -819,7 +819,7 @@ class RaceScene extends Phaser.Scene {
             // Optional: add tooltip on hover.
             icon.setInteractive();
             icon.on('pointerover', () => {
-                let tooltip = this.add.text(x, iconY - iconSize + 75, GameConfig.itemDescriptions[item], {
+                let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemDescriptions[item]}`, {
                     fontSize: '14px',
                     fill: '#fff',
                     backgroundColor: 'rgba(0,0,0,0.7)',
@@ -1097,7 +1097,7 @@ class RaceScene extends Phaser.Scene {
                 this.intoxCooldown = 0;
             }
         }
-        
+
 
         // Check well-rested effect if its cooldown has reached 2 seconds
         if (!this.isTripping && !this.isBoosting && this.wellRestedCooldown >= 2) {
@@ -1251,10 +1251,10 @@ class ShopScene extends Phaser.Scene {
                 let frameIndex = getItemFrameIndex(item);
                 let x = startX + index * (iconSize + spacing);
                 let icon = this.add.image(x, iconY, 'bulkItems', frameIndex).setScale(iconScale);
-                // Optional: add tooltip on hover.
+                // Optional: add tooltip on hover.`${item}: ${GameConfig.itemDescriptions[item]}`
                 icon.setInteractive();
                 icon.on('pointerover', () => {
-                    let tooltip = this.add.text(x, iconY - iconSize + 75, GameConfig.itemDescriptions[item], {
+                    let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemDescriptions[item]}`, {
                         fontSize: '14px',
                         fill: '#fff',
                         backgroundColor: 'rgba(0,0,0,0.7)',
@@ -1263,19 +1263,41 @@ class ShopScene extends Phaser.Scene {
                     this.children.bringToTop(tooltip);
                     icon.tooltip = tooltip;
                 });
-                icon.on('pointerout', () => {
+                /*icon.on('pointerout', () => {
                     if (icon.tooltip) {
                         icon.tooltip.destroy();
                         icon.tooltip = null;
                     }
-                });
+                });*/
+
 
                 // NEW: Add pointerdown event to prompt selling the item.
                 icon.on('pointerdown', () => {
+                    
+                    icon.tooltipPersistent = true;
+
+                    // Destroy any previous tooltips on this icon.
+                    if (icon.tooltip) {
+                        icon.tooltip.destroy();
+                        icon.tooltip = null;
+                    }
+                    if (icon.sellTooltip) {
+                        icon.sellTooltip.destroy();
+                        icon.sellTooltip = null;
+                    }
+
                     // Calculate the sell value: half the purchase price, rounded down (minimum $1).
                     let purchasePrice = GameConfig.itemPrices[item];
                     let sellValue = Math.max(Math.floor(purchasePrice / 2), 1);
 
+                    let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemDescriptions[item]}`, {
+                        fontSize: '14px',
+                        fill: '#fff',
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        padding: { x: 5, y: 5 }
+                    }).setOrigin(0.5, 1);
+                    this.children.bringToTop(tooltip);
+                    icon.tooltip = tooltip;
                     // Create a tooltip for selling just below the icon.
                     let sellTooltip = this.add.text(x, iconY + iconSize + 10, `Sell ${item} for $${sellValue}?`, {
                         fontSize: '14px',
@@ -1285,6 +1307,7 @@ class ShopScene extends Phaser.Scene {
                     }).setOrigin(0.5, 0);
                     this.children.bringToTop(sellTooltip);
                     sellTooltip.setInteractive();
+                    icon.sellTooltip = sellTooltip;
 
                     // When the tooltip is clicked, process the sale.
                     sellTooltip.on('pointerdown', () => {
@@ -1297,17 +1320,32 @@ class ShopScene extends Phaser.Scene {
 
                         // Destroy the tooltip.
                         sellTooltip.destroy();
-
+                        tooltip.destroy();
+                        icon.sellTooltip = null;
+                        icon.tooltip = null;
+                        icon.tooltipPersistent = false;
                         // Refresh the inventory display.
                         this.updateInventoryDisplay();
                     });
 
                     // Optional: Remove the sell tooltip automatically after 3 seconds if not clicked.
                     this.time.delayedCall(3000, () => {
-                        if (sellTooltip && sellTooltip.active) {
+                        if (icon.sellTooltip) {
                             sellTooltip.destroy();
+                            icon.sellTooltip = null;
                         }
+                        if (icon.tooltip) {
+                            tooltip.destroy();
+                            icon.tooltip = null;
+                        }
+                        icon.tooltipPersistent = false;
                     });
+                });
+                icon.on('pointerout', () => {
+                    if (!icon.tooltipPersistent && icon.tooltip) {
+                        icon.tooltip.destroy();
+                        icon.tooltip = null;
+                    }
                 });
                 this.inventoryContainer.add(icon);
             });
