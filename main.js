@@ -415,7 +415,7 @@ class RaceScene extends Phaser.Scene {
         GameState.newSlotButton = 20;
         this.cooldownBonus = 0; // This bonus will accumulate over the race.
         this.speedOverride = 1;
-        this.currentSpeedMultiplier = 1; // start at a baseline multiplier
+        this.currentSpeedMultiplier = 0; // start at a baseline multiplier
 
         // Create a display for equipped items (icons with cooldown bars) at the top middle.
         this.itemDisplays = [];
@@ -436,20 +436,21 @@ class RaceScene extends Phaser.Scene {
 
 
         // --- Status Menu ---
-        this.statusMenu = this.add.container(this.game.config.width - 160, this.game.config.height - 120);
-        this.speedText = this.add.text(0, 0, "Speed: 00.0 m/s", { fontSize: '16px', fill: '#fff' });
-        this.weightText = this.add.text(0, 20, "Weight: 100", { fontSize: '16px', fill: '#fff' });
-        this.intoxText = this.add.text(0, 40, "Intox: 0%", { fontSize: '16px', fill: '#fff' });
-        this.wellRestedText = this.add.text(0, 80, "Well Rested: 0%", { fontSize: '16px', fill: '#fff' });
-        this.statusMenu.add([this.speedText, this.weightText, this.intoxText, this.wellRestedText]);
+        this.statusMenu = this.add.container(this.game.config.width - 200, this.game.config.height - 140);
+        this.currentSpeedText = this.add.text(0, 0, "Speed: 00.0 m/s", { fontSize: '16px', fill: '#fff' });
+        this.speedText = this.add.text(0, 20, "Top Speed: 00.0 m/s", { fontSize: '16px', fill: '#fff' });
+        this.weightText = this.add.text(0, 40, "Weight: 100", { fontSize: '16px', fill: '#fff' });
+        this.intoxText = this.add.text(0, 60, "Intox: 0%", { fontSize: '16px', fill: '#fff' });
+        this.wellRestedText = this.add.text(0, 100, "Well Rested: 0%", { fontSize: '16px', fill: '#fff' });
+        this.statusMenu.add([this.currentSpeedText, this.speedText, this.weightText, this.intoxText, this.wellRestedText]);
         // After creating the dino, for example:
-        this.speedMultiplier = 1;  // default speed multiplier
+        this.speedMultiplier = 0;  // default speed multiplier
         this.currentIntox = 0;     // current intoxication level (in %)
         this.currentWellRested = 0; // For testing, set to 50%
 
         // Cooldown bars for intoxication and well-rested (100 pixels wide)
-        this.intoxBar = this.add.rectangle(0, 65, 100, 10, 0xff0000).setOrigin(0, 0.5);
-        this.wellRestedBar = this.add.rectangle(0, 105, 100, 10, 0x00ff00).setOrigin(0, 0.5);
+        this.intoxBar = this.add.rectangle(0, 85, 100, 10, 0xff0000).setOrigin(0, 0.5);
+        this.wellRestedBar = this.add.rectangle(0, 125, 100, 10, 0x00ff00).setOrigin(0, 0.5);
         this.statusMenu.add([this.intoxBar, this.wellRestedBar]);
 
         // Initialize intoxication and well-rested cooldown timers
@@ -462,9 +463,6 @@ class RaceScene extends Phaser.Scene {
         // Create an EffectManager instance.
         this.effectManager = new EffectManager();
 
-        // Initialize base properties.
-        this.speedMultiplier = 1;   // Base speed multiplier.
-        // (Your stamina value is already set from GameState.maxStamina, etc.)
 
         // Add effects for each equipped item.
         GameState.equippedItems.forEach((item, index) => {
@@ -854,7 +852,7 @@ class RaceScene extends Phaser.Scene {
         this.roundIndex = GameState.currentLevel;
         this.distance = GameConfig.rounds[this.roundIndex];
         // Calculate the race’s duration based on distance (e.g. 100m = 5 sec).
-        //let finalSpeedMultiplier = baseSpeedMultiplier * (1 + flatBonus)
+
         this.raceTime = (this.distance / 100) * (GameConfig.baseTimePer100m);
         this.elapsedTime = 0;
 
@@ -1042,8 +1040,10 @@ class RaceScene extends Phaser.Scene {
         // Use the speedMultiplier when computing the effective elapsed time.
         let effectiveTime = this.elapsedTime * this.currentSpeedMultiplier;
         //console.log(effectiveTime)
+        let currentSpeedText = (GameConfig.baseTimePer100m * 4) * this.currentSpeedMultiplier;
         let speedText = (GameConfig.baseTimePer100m * 4) * finalSpeedMultiplier;
-        this.speedText.setText(`Speed: ${speedText.toFixed(2)} m/s`);
+        this.currentSpeedText.setText(`Speed: ${currentSpeedText.toFixed(2)} m/s`);
+        this.speedText.setText(`Top Speed: ${speedText.toFixed(2)} m/s`);
 
         let startX = 50;
         let endX = 750;
@@ -1484,7 +1484,7 @@ class ShopScene extends Phaser.Scene {
                             //this.displayShopItems();
                         } else {
                             let tipX = container.x + container.width / 2;
-                            let tipY = container.y + 30;
+                            let tipY = container.y + 150;
                             let shoptip = this.add.text(tipX, tipY, `Not enough space, stranger`, {
                                 fontSize: '14px',
                                 fill: '#fff',
