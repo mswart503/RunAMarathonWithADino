@@ -77,15 +77,17 @@ class EffectManager {
  *   - effect.value is the fraction of max stamina to recover per cycle.
  *   - effect.cycle is the period in seconds.
  */
-    getPeriodicAddition(type, maxValue, delta) {
+    getPeriodicAddition(types, maxValue, delta) {
         let addition = 0;
         let totalCycles = 0;
         this.effects.forEach(effect => {
-            if (effect.type === type && effect.cycle) {
+            if (types.includes(effect.type) && effect.cycle) {
                 let newCycleCount = Math.floor(effect.elapsed / effect.cycle);
                 let cyclesPassed = newCycleCount - effect.lastCycleCount;
                 if (cyclesPassed > 0) {
-                    addition += cyclesPassed * effect.value * maxValue;
+                    if (effect.type === "staminaRecovery"){
+                        addition += cyclesPassed * effect.value * maxValue;
+                    }
                     totalCycles += cyclesPassed;
                     effect.lastCycleCount = newCycleCount;
                 }
@@ -436,7 +438,7 @@ class RaceScene extends Phaser.Scene {
 
 
         // --- Status Menu ---
-        this.statusMenu = this.add.container(this.game.config.width - 200, this.game.config.height - 140);
+        this.statusMenu = this.add.container(this.game.config.width - 210, this.game.config.height - 140);
         this.currentSpeedText = this.add.text(0, 0, "Speed: 00.0 m/s", { fontSize: '16px', fill: '#fff' });
         this.speedText = this.add.text(0, 20, "Top Speed: 00.0 m/s", { fontSize: '16px', fill: '#fff' });
         this.weightText = this.add.text(0, 40, "Weight: 100", { fontSize: '16px', fill: '#fff' });
@@ -1006,9 +1008,7 @@ class RaceScene extends Phaser.Scene {
         // If no speed effects are present, speedMultiplier remains 1.
 
         // Apply periodic stamina recovery.
-        let recoveryObj = this.effectManager.getPeriodicAddition("staminaRecovery", GameState.maxStamina, delta);
-        //console.log("Recovery Object:", recoveryObj);
-
+        let recoveryObj = this.effectManager.getPeriodicAddition(["staminaRecovery", "stamina"],  GameState.maxStamina, delta);
         this.stamina = Math.min(this.stamina + recoveryObj.addition, GameState.maxStamina);
 
         // If any recovery cycles triggered, also trigger the bonus.
