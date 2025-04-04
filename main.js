@@ -201,7 +201,7 @@ var GameConfig = {
         MessiahAmulet: "Recovers 1% stamina every 1 sec.",
         UnderworldAmulet: "Recovers 2% stamina every 2 sec.",
         ShiningAmulet: "Recovers 3% stamina every 3 sec.",
-        AmbixAmulet: "Recovers 3% stamina every 3 sec.",
+        AmbixAmulet: "Recovers 3% stamina every 4 sec.",
 
         Shoes: "Increase Speed by 50%",
         CowboyBoots: "Increase Speed by 60%",
@@ -331,7 +331,7 @@ var GameState = {
     money: 0,
     bonds: 0,  // For investment: each bond adds $1 per race
     equippedItems: [],  // Max 5 item slots
-    wins: 0,
+    winCount: 0,
     maxStamina: 100,
     weight: 100,  // Starting weight
     // Add consumables array (you can pre-populate with sample names, e.g., "apple", "Pasta", etc.)
@@ -356,6 +356,8 @@ class MainMenuScene extends Phaser.Scene {
         this.load.spritesheet('items', 'assets/items.png', { frameWidth: 16, frameHeight: 16, spacing: 1 });
         this.load.spritesheet('consumableSprites', 'assets/consumableSprites.png', { frameWidth: 16, frameHeight: 16, spacing: 0 });
         this.load.spritesheet('bulkItems', 'assets/bulkItems.png', { frameWidth: 16, frameHeight: 16, spacing: 0 })
+        this.load.image('confetti', 'assets/confetti.png');
+
     }
     create() {
         // Add background image
@@ -1166,7 +1168,12 @@ class RaceScene extends Phaser.Scene {
             reward = 2;
         }
         GameState.money += reward;
-        GameState.wins += 1;
+        GameState.winCount += 1;
+
+        // Determine intensity: for example, base intensity of 5, plus 3 additional particles per win.
+        let intensity = 5 + (GameState.winCount * 3);
+        // Trigger the confetti effect.
+        this.createConfetti(intensity);
 
         let summaryText = `Race Complete!\nStamina left: ${Math.floor(percentLeft)}%\nYou earned $${reward}\nTime: ${completionTime} sec`;
         this.add.text(300, 200, summaryText, { fontSize: '20px', fill: '#fff', backgroundColor: '#000' });
@@ -1184,6 +1191,33 @@ class RaceScene extends Phaser.Scene {
             }
         });
     }
+    createConfetti(intensity) {
+        // Create a Particle Emitter Manager for confetti.
+        let particles = this.add.particles('confetti');
+
+        let emitter = particles.createEmitter({
+            x: { min: 0, max: this.game.config.width },
+            y: 0,
+            speedY: { min: 200, max: 400 },
+            speedX: { min: -200, max: 200 },
+            angle: { min: 0, max: 360 },
+            lifespan: { min: 1000, max: 2000 },
+            gravityY: 300,
+            quantity: intensity,  // More intensity means more particles.
+            scale: { start: 1, end: 0 },
+            blendMode: 'ADD'
+        });
+
+        // Let the emitter emit for a short time then stop and destroy.
+        this.time.delayedCall(5000, () => {
+            emitter.stop();
+            // Optionally, destroy the particle manager after a delay.
+            this.time.delayedCall(1000, () => {
+                particles.destroy();
+            });
+        });
+    }
+
 
     raceLost() {
         // Display a loss message then reset the game state and return to Main Menu.
@@ -1191,7 +1225,7 @@ class RaceScene extends Phaser.Scene {
         // Reset game progress.
         GameState.currentLevel = 0;
         GameState.money = 0;
-        GameState.wins = 0;
+        GameState.winCount = 0;
         GameState.equippedItems = [];
         GameState.maxStamina = 100;
         GameState.newSlotPrice = 20;
@@ -1419,7 +1453,7 @@ class ShopScene extends Phaser.Scene {
 
                             // If needed, update other properties (e.g., max stamina for "Log").
                             if (item === "Log") {
-                                GameState.maxStamina = 100 * (1 + GameConfig.itemData.Log.staminaIncrease + GameState.wins * GameConfig.itemData.Log.winBonus);
+                                GameState.maxStamina = 100 * (1 + GameConfig.itemData.Log.staminaIncrease + GameState.winCount * GameConfig.itemData.Log.winBonus);
                             }
 
 
@@ -1754,10 +1788,10 @@ class WinScreenScene extends Phaser.Scene {
         // Here we'll assume final race time was stored in a variable before transitioning.
         let finalTime = this.registry.get("finalTime") || "N/A";
         let finalMoney = GameState.money;
-        let totalWins = GameState.wins;
+        let totalWins = GameState.winCount;
 
         // Build a stats message.
-        let statsText = `Congratulations!\nYou completed the final race!\n\nStats:\nTime: ${finalTime} sec\nMoney: $${finalMoney}\nWins: ${totalWins}`;
+        let statsText = `Congratulations!\nYou completed the final race!\n\nStats:\nTime: ${finalTime} sec\nMoney: $${finalMoney}\nwinCount: ${totalWins}`;
 
         // Display the stats in the center of the screen.
         this.add.text(400, 200, statsText, {
@@ -1780,7 +1814,7 @@ class WinScreenScene extends Phaser.Scene {
             // Reset any necessary game state for a new run.
             GameState.currentLevel = 0;
             GameState.money = 0;
-            GameState.wins = 0;
+            GameState.winCount = 0;
             // Also, reset any temporary variables you need to restart (like newSlotPrice, etc.)
             GameState.newSlotPrice = 20;
             // Optionally, reset other persistent stats.
