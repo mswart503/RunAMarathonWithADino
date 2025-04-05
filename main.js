@@ -382,7 +382,7 @@ class MainMenuScene extends Phaser.Scene {
             // Get the frame index from the sprite sheet using our mapping.
             let frameIndex = getItemFrameIndex(item);
             let icon = this.add.image(0, 0, 'bulkItems', frameIndex).setScale(2);
-            let desc = GameConfig.itemDescriptions[item];
+            let desc = GameConfig.itemData[item].description;
             let text = this.add.text(40, -8, `${item}: ${desc}`, { fontSize: '16px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
             container.add([icon, text]);
 
@@ -391,10 +391,7 @@ class MainMenuScene extends Phaser.Scene {
             container.on('pointerdown', () => {
                 // Save the chosen item.
                 GameState.equippedItems.push(item);
-                // If Candle is chosen, update max stamina.
-                /*if (item === "Candle") {
-                    GameState.maxStamina = 100 * (1 + GameConfig.itemData.Candle.staminaIncrease);
-                }*/
+
                 this.scene.start('RaceScene');
             });
 
@@ -821,7 +818,7 @@ class RaceScene extends Phaser.Scene {
             // Optional: add tooltip on hover.
             icon.setInteractive();
             icon.on('pointerover', () => {
-                let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemDescriptions[item]}`, {
+                let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemData[item].description}`, {
                     fontSize: '14px',
                     fill: '#fff',
                     backgroundColor: 'rgba(0,0,0,0.7)',
@@ -1306,7 +1303,7 @@ class ShopScene extends Phaser.Scene {
 
                 icon.setInteractive();
                 icon.on('pointerover', () => {
-                    let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemDescriptions[item]}`, {
+                    let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemData[item].description}`, {
                         fontSize: '14px',
                         fill: '#fff',
                         backgroundColor: 'rgba(0,0,0,0.7)',
@@ -1342,7 +1339,7 @@ class ShopScene extends Phaser.Scene {
                     let purchasePrice = GameConfig.itemPrices[item];
                     let sellValue = Math.max(Math.floor(purchasePrice / 2), 1);
 
-                    let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemDescriptions[item]}`, {
+                    let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemData[item].description}`, {
                         fontSize: '14px',
                         fill: '#fff',
                         backgroundColor: 'rgba(0,0,0,0.7)',
@@ -1421,7 +1418,7 @@ class ShopScene extends Phaser.Scene {
             this.itemContainer = this.add.container(0, 150);
 
             // Get all items from your configuration, but filter out those already in the player's inventory.
-            let allItems = Object.keys(GameConfig.itemDescriptions).filter(item => {
+            let allItems = Object.keys(GameConfig.itemData).filter(item => {
                 return !GameState.equippedItems.includes(item);
             });
             Phaser.Utils.Array.Shuffle(allItems);
@@ -1446,7 +1443,7 @@ class ShopScene extends Phaser.Scene {
                     padding: { x: 5, y: 2 }
                 }).setOrigin(0.5);
                 // Create description text.
-                let descText = this.add.text(40, -8, `${item}: ${GameConfig.itemDescriptions[item]}`, {
+                let descText = this.add.text(40, -8, `${item}: ${GameConfig.itemData[item].description}`, {
                     fontSize: '16px',
                     fill: '#fff',
                     backgroundColor: 'rgba(0,0,0,0.7)'
