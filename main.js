@@ -252,8 +252,8 @@ var GameConfig = {
 
     rarityWeights: {
         Rare: 1,
-        Uncommon: 20,
-        Common: 50,
+        Uncommon: 40,
+        Common: 100,
         Testing: 10000,
 
     },
