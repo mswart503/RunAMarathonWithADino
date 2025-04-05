@@ -97,6 +97,11 @@ class EffectManager {
     }
 }
 
+const commonPrice = 2;
+const uncommonPrice = 4;
+const rarePrice = 6;
+const elitePrice = 8;
+
 var GameConfig = {
     totalRounds: 63,
     // Define 63 rounds that scale from a short sprint to a full marathon.
@@ -114,133 +119,133 @@ var GameConfig = {
     minDistance: 100,
     maxDistance: 6300, // now maximum is level 63 (6300m)
 
+
     itemData: {
         //Flow state: Halve stamina usage
         Coin: { rarity: "Common", cycle: 3, 
             description: "Halves stamina usage for 1 sec every 3 sec.",
-        image: { col: 23, row: 9 } },
+            image: { col: 23, row: 9 }, price: commonPrice},
         Bit: { rarity: "Common", cycle: 4, 
             description:"Halves stamina usage for 1 sec every 4 sec.",
-            image: { col: 26, row: 9 } },
-            
+            image: { col: 26, row: 9 }, price: commonPrice},
         Copper: { rarity: "Common", cycle: 5, 
             description: "Halves stamina usage for 1 sec every 5 sec.",
-            image:{ col: 32, row: 9 } },
+            image:{ col: 32, row: 9 }, price: commonPrice},
         CopperStack: { rarity: "Common", cycle: 5, 
             description: "Halves stamina usage for 2 sec every 5 sec.",
-            image: { col: 34, row: 9 }},
+            image: { col: 34, row: 9 }, price: commonPrice},
         Silver: { rarity: "Uncommon", cycle: 5, 
             description: "Halves stamina usage for 3 sec every 5 sec.",
-            image: { col: 18, row: 9 }},
+            image: { col: 18, row: 9 }, price: uncommonPrice},
         Dubloon: { rarity: "Uncommon", cycle: 2, 
             description: "Halves stamina usage for 1 sec every 2 sec.",
-            image: { col: 15, row: 9 }},
+            image: { col: 15, row: 9 }, price: uncommonPrice},
         Piece: { rarity: "Uncommon", cycle: 4, 
             description: "Halves stamina usage for 2 sec every 4 sec.",
-            image: { col: 12, row: 9 }},
+            image: { col: 12, row: 9 }, price: uncommonPrice},
         Gold: { rarity: "Rare", cycle: 5, 
             description: "Halves stamina usage for 4 sec every 5 sec.",
-            image: { col: 3, row: 9 }},
+            image: { col: 3, row: 9 }, price: rarePrice},
         Pound: { rarity: "Rare", cycle: 3, 
             description: "Halves stamina usage for 2 sec every 3 sec.",
-            image: { col: 10, row: 9 }},
+            image: { col: 10, row: 9 }, price: rarePrice},
         Booty: { rarity: "Rare", cycle: 5, 
             description: "Halves stamina usage for 3 sec every 4 sec.",
-            image: { col: 13, row: 9 }},
+            image: { col: 13, row: 9 }, price: rarePrice},
 
 
         //Recovers stamina periodically
         RubyAmulet: { rarity: "Common", cycle: 5, 
             description: "Recovers 1% stamina every 5 sec.",
-            image:{ col: 11, row: 6 }},
+            image:{ col: 11, row: 6 }, price: commonPrice},
         SapphireAmulet: { rarity: "Common", cycle: 4, 
             description: "Recovers 1% stamina every 4 sec.",
-            image:{ col: 12, row: 6 }},
+            image:{ col: 12, row: 6 }, price: commonPrice},
         AmethystAmulet: { rarity: "Common", cycle: 3, 
             description: "Recovers 1% stamina every 3 sec.",
-            image:{ col: 13, row: 6 }},
+            image:{ col: 13, row: 6 }, price: commonPrice},
         EmeraldAmulet: { rarity: "Common", cycle: 2, 
             description: "Recovers 1% stamina every 2 sec.",
-            image:{ col: 14, row: 6 }},
+            image:{ col: 14, row: 6 }, price: commonPrice},
         BlessedRubyAmulet: { rarity: "Common", cycle: 5, 
             description: "Recovers 2% stamina every 5 sec.",
-            image:{ col: 1, row: 6 }},
+            image:{ col: 1, row: 6 }, price: commonPrice},
         BlessedSapphireAmulet: { rarity: "Common", cycle: 4, 
             description: "Recovers 2% stamina every 4 sec.",
-            image:{ col: 2, row: 6 }},
+            image:{ col: 2, row: 6 }, price: commonPrice},
         BlessedAmethystAmulet: { rarity: "Common", cycle: 3, 
             description: "Recovers 2% stamina every 3 sec.",
-            image:{ col: 3, row: 6 }},
+            image:{ col: 3, row: 6 }, price: commonPrice},
         BlessedEmeraldAmulet: { rarity: "Common", cycle: 5, 
             description: "Recovers 3% stamina every 5 sec.",
-            image:{ col: 4, row: 6 }},
+            image:{ col: 4, row: 6 }, price: commonPrice},
         PharaohsAmulet: { rarity: "Uncommon", cycle: 5, 
             description: "Recovers 4% stamina every 5 sec.",
-            image: { col: 16, row: 6 }},
+            image: { col: 16, row: 6 }, price: uncommonPrice},
         DeceiversAmulet: { rarity: "Uncommon", cycle: 4, 
             description: "Recovers 3% stamina every 4 sec.",
-            image:{ col: 18, row: 6 }},
+            image:{ col: 18, row: 6 }, price: uncommonPrice},
         HolyAmulet: { rarity: "Uncommon", cycle: 5, 
             description: "Recovers 5% stamina every 5 sec.",
-            image: { col: 22, row: 6 }},
+            image: { col: 22, row: 6 }, price: uncommonPrice},
         MessiahAmulet: { rarity: "Rare", cycle: 1, 
             description: "Recovers 1% stamina every 1 sec.",
-            image:{ col: 30, row: 6 }},
+            image:{ col: 30, row: 6 }, price: rarePrice},
         UnderworldAmulet: { rarity: "Rare", cycle: 2, 
             description: "Recovers 2% stamina every 2 sec.",
-            image: { col: 21, row: 6 }},
+            image: { col: 21, row: 6 }, price: rarePrice},
         ShiningAmulet: { rarity: "Rare", cycle: 3, 
             description: "Recovers 3% stamina every 3 sec.",
-            image:{ col: 20, row: 6 },},
+            image:{ col: 20, row: 6 }, price: rarePrice},
         AmbixAmulet: { rarity: "Rare", cycle: 4, 
             description: "Recovers 4% stamina every 4 sec.",
-            image:{ col: 31, row: 6 }},
+            image:{ col: 31, row: 6 }, price: rarePrice},
     
             //Flat Speed Increase
         Shoes: { rarity: "Common", flatSpeedIncrease: 0.5, 
             description: "Increase Speed by 50%",
-        image:{ col: 21, row: 31 }, },
+            image:{ col: 21, row: 31 }, price: commonPrice},
         CowboyBoots: { rarity: "Common", flatSpeedIncrease: 0.6, 
             description: "Increase Speed by 60%",
-            image: { col: 22, row: 31 }},
+            image: { col: 22, row: 31 }, price: commonPrice},
         Galoshes: { rarity: "Common", flatSpeedIncrease: 0.7, 
             description: "Increase Speed by 70%",
-            image: { col: 23, row: 31 }},
+            image: { col: 23, row: 31 }, price: commonPrice},
         Sneakers: { rarity: "Common", flatSpeedIncrease: 0.8, 
             description: "Increase Speed by 80%",
-            image: { col: 24, row: 31 }},
+            image: { col: 24, row: 31 }, price: commonPrice},
         Nikes: { rarity: "Common", flatSpeedIncrease: 0.9, 
             description: "Increase Speed by 90%",
-            image: { col: 24, row: 32 }},
+            image: { col: 24, row: 32 }, price: commonPrice},
         NiceShoes: { rarity: "Uncommon", flatSpeedIncrease: 1.0, 
             description: "Increase Speed by 100%",
-            image: { col: 21, row: 32 }},
+            image: { col: 21, row: 32 }, price: uncommonPrice},
         SuedeCowboyBoots: { rarity: "Uncommon", flatSpeedIncrease: 1.1, 
             description: "Increase Speed by 110%",
-            image: { col: 22, row: 32 }},
+            image: { col: 22, row: 32 }, price: uncommonPrice},
         ToughGaloshes: { rarity: "Uncommon", flatSpeedIncrease: 1.2,
              description: "Increase Speed by 120%",
-             image: { col: 23, row: 32 }},
+             image: { col: 23, row: 32 }, price: uncommonPrice},
         Hokas: { rarity: "Rare", flatSpeedIncrease: 1.3, 
             description: "Increase Speed by 130%",
-            image: { col: 24, row: 33 }},
+            image: { col: 24, row: 33 }, price: rarePrice},
         BestGaloshes: { rarity: "Rare", flatSpeedIncrease: 1.4, 
             description:"Increase Speed by 140%",
-            image: { col: 23, row: 33 }},
+            image: { col: 23, row: 33 }, price: rarePrice},
 
         //Increase speed on each cooldown trigger:
         Cape: { rarity: "Uncommon", cooldownSpeedBonus: 0.05, 
             description: "Each cooldown trigger increases speed by 5%.",
-            image: { col: 28, row: 18 }},
+            image: { col: 28, row: 18 }, price: rarePrice},
         BloodCape: { rarity: "Uncommon", cooldownSpeedBonus: 0.1, 
             description: "Each cooldown trigger increases speed by 10%.",
-            image: { col: 28, row: 21 }},
+            image: { col: 28, row: 21 }, price: rarePrice},
         RegalCape: { rarity: "Rare", cooldownSpeedBonus: 0.15, 
             description: "Each cooldown trigger increases speed by 15%.",
-            image: { col: 28, row: 22 }},
+            image: { col: 28, row: 22 }, price:elitePrice},
         DarkCape: { rarity: "Rare", cooldownSpeedBonus: 0.20, 
             description:"Each cooldown trigger increases speed by 20%.",
-            image: { col: 28, row: 23 }},
+            image: { col: 28, row: 23 }, price:elitePrice},
  
 
     },
@@ -1419,7 +1424,7 @@ class ShopScene extends Phaser.Scene {
                     }
 
                     // Calculate the sell value: half the purchase price, rounded down (minimum $1).
-                    let purchasePrice = GameConfig.itemPrices[item];
+                    let purchasePrice = GameConfig.itemData[item].price;
                     let sellValue = Math.max(Math.floor(purchasePrice / 2), 1);
 
                     let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemData[item].description}`, {
@@ -1517,7 +1522,7 @@ class ShopScene extends Phaser.Scene {
                 // Get the sprite frame.
                 let frameIndex = getItemFrameIndex(item);
                 let icon = this.add.image(0, 0, 'bulkItems', frameIndex).setScale(2);
-                let price = GameConfig.itemPrices[item];
+                let price = GameConfig.itemData[item].price;
                 // Create price text to the left of the icon.
                 let priceText = this.add.text(-50, 0, `$${price}`, {
                     fontSize: '16px',
