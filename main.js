@@ -112,51 +112,51 @@ var GameConfig = {
 
     itemData: {
         //Flow state: Halve stamina usage
-        Coin: { rarity: "Common", cycle: 3 },
-        Bit: { rarity: "Common", cycle: 4 },
-        Copper: { rarity: "Common", cycle: 5 },
-        CopperStack: { rarity: "Common", cycle: 5 },
-        Silver: { rarity: "Uncommon", cycle: 5 },
-        Dubloon: { rarity: "Uncommon", cycle: 2 },
-        Piece: { rarity: "Uncommon", cycle: 4 },
-        Gold: { rarity: "Rare", cycle: 5 },
-        Pound: { rarity: "Rare", cycle: 3 },
-        Booty: { rarity: "Rare", cycle: 5 },
+        Coin: { rarity: "Common", cycle: 3, description: "Halves stamina usage for 1 sec every 3 sec." },
+        Bit: { rarity: "Common", cycle: 4, description:"Halves stamina usage for 1 sec every 4 sec." },
+        Copper: { rarity: "Common", cycle: 5, description: "Halves stamina usage for 1 sec every 5 sec."},
+        CopperStack: { rarity: "Common", cycle: 5, description: "Halves stamina usage for 2 sec every 5 sec."},
+        Silver: { rarity: "Uncommon", cycle: 5, description: "Halves stamina usage for 3 sec every 5 sec."},
+        Dubloon: { rarity: "Uncommon", cycle: 2, description: "Halves stamina usage for 1 sec every 2 sec."},
+        Piece: { rarity: "Uncommon", cycle: 4, description: "Halves stamina usage for 2 sec every 4 sec."},
+        Gold: { rarity: "Rare", cycle: 5, description: "Halves stamina usage for 4 sec every 5 sec."},
+        Pound: { rarity: "Rare", cycle: 3, description: "Halves stamina usage for 2 sec every 3 sec."},
+        Booty: { rarity: "Rare", cycle: 5, description: "Halves stamina usage for 3 sec every 4 sec."},
 
-        //Recover Stamina every x seconds
-        RubyAmulet: { rarity: "Common", cycle: 5 },
-        SapphireAmulet: { rarity: "Common", cycle: 4 },
-        AmethystAmulet: { rarity: "Common", cycle: 3 },
-        EmeraldAmulet: { rarity: "Common", cycle: 2 },
-        BlessedRubyAmulet: { rarity: "Common", cycle: 5 },
-        BlessedSapphireAmulet: { rarity: "Common", cycle: 4 },
-        BlessedAmethystAmulet: { rarity: "Common", cycle: 3 },
-        BlessedEmeraldAmulet: { rarity: "Common", cycle: 5 },
-        PharaohsAmulet: { rarity: "Uncommon", cycle: 5 },
-        DeceiversAmulet: { rarity: "Uncommon", cycle: 4 },
-        HolyAmulet: { rarity: "Uncommon", cycle: 5 },
-        MessiahAmulet: { rarity: "Rare", cycle: 1 },
-        UnderworldAmulet: { rarity: "Rare", cycle: 2 },
-        ShiningAmulet: { rarity: "Rare", cycle: 3 },
-        AmbixAmulet: { rarity: "Rare", cycle: 4 },
+
+        RubyAmulet: { rarity: "Common", cycle: 5, description: "Recovers 1% stamina every 5 sec."},
+        SapphireAmulet: { rarity: "Common", cycle: 4, description: "Recovers 1% stamina every 4 sec."},
+        AmethystAmulet: { rarity: "Common", cycle: 3, description: "Recovers 1% stamina every 3 sec."},
+        EmeraldAmulet: { rarity: "Common", cycle: 2, description: "Recovers 1% stamina every 2 sec."},
+        BlessedRubyAmulet: { rarity: "Common", cycle: 5, description: "Recovers 2% stamina every 5 sec."},
+        BlessedSapphireAmulet: { rarity: "Common", cycle: 4, description: "Recovers 2% stamina every 4 sec."},
+        BlessedAmethystAmulet: { rarity: "Common", cycle: 3, description: "Recovers 2% stamina every 3 sec."},
+        BlessedEmeraldAmulet: { rarity: "Common", cycle: 5, description: "Recovers 3% stamina every 5 sec."},
+        PharaohsAmulet: { rarity: "Uncommon", cycle: 5, description: "Recovers 4% stamina every 5 sec."},
+        DeceiversAmulet: { rarity: "Uncommon", cycle: 4, description: "Recovers 3% stamina every 4 sec."},
+        HolyAmulet: { rarity: "Uncommon", cycle: 5, description: "Recovers 5% stamina every 5 sec."},
+        MessiahAmulet: { rarity: "Rare", cycle: 1, description: "Recovers 1% stamina every 1 sec."},
+        UnderworldAmulet: { rarity: "Rare", cycle: 2, description: "Recovers 2% stamina every 2 sec."},
+        ShiningAmulet: { rarity: "Rare", cycle: 3, description: "Recovers 3% stamina every 3 sec."},
+        AmbixAmulet: { rarity: "Rare", cycle: 4, description: "Recovers 4% stamina every 4 sec."},
 
         //Flat Speed Increase
-        Shoes: { rarity: "Common", flatSpeedIncrease: 0.5 },
-        CowboyBoots: { rarity: "Common", flatSpeedIncrease: 0.6 },
-        Galoshes: { rarity: "Common", flatSpeedIncrease: 0.7 },
-        Sneakers: { rarity: "Common", flatSpeedIncrease: 0.8 },
-        Nikes: { rarity: "Common", flatSpeedIncrease: 0.9 },
-        NiceShoes: { rarity: "Uncommon", flatSpeedIncrease: 1.0 },
-        SuedeCowboyBoots: { rarity: "Uncommon", flatSpeedIncrease: 1.1 },
-        ToughGaloshes: { rarity: "Uncommon", flatSpeedIncrease: 1.2 },
-        Hokas: { rarity: "Rare", flatSpeedIncrease: 1.3 },
-        BestGaloshes: { rarity: "Rare", flatSpeedIncrease: 1.4 },
+        Shoes: { rarity: "Common", flatSpeedIncrease: 0.5, description: "Increase Speed by 50%"},
+        CowboyBoots: { rarity: "Common", flatSpeedIncrease: 0.6, description: "Increase Speed by 60%"},
+        Galoshes: { rarity: "Common", flatSpeedIncrease: 0.7, description: "Increase Speed by 70%"},
+        Sneakers: { rarity: "Common", flatSpeedIncrease: 0.8, description: "Increase Speed by 80%"},
+        Nikes: { rarity: "Common", flatSpeedIncrease: 0.9, description: "Increase Speed by 90%"},
+        NiceShoes: { rarity: "Uncommon", flatSpeedIncrease: 1.0, description: "Increase Speed by 100%"},
+        SuedeCowboyBoots: { rarity: "Uncommon", flatSpeedIncrease: 1.1, description: "Increase Speed by 110%"},
+        ToughGaloshes: { rarity: "Uncommon", flatSpeedIncrease: 1.2, description: "Increase Speed by 120%"},
+        Hokas: { rarity: "Rare", flatSpeedIncrease: 1.3, description: "Increase Speed by 130%"},
+        BestGaloshes: { rarity: "Rare", flatSpeedIncrease: 1.4, description:"Increase Speed by 140%" },
 
         //Increase speed on each cooldown trigger:
-        Cape: { rarity: "Uncommon", cooldownSpeedBonus: 0.05 },
-        BloodCape: { rarity: "Uncommon", cooldownSpeedBonus: 0.1 },
-        RegalCape: { rarity: "Rare", cooldownSpeedBonus: 0.15 },
-        DarkCape: { rarity: "Rare", cooldownSpeedBonus: 0.20 },
+        Cape: { rarity: "Uncommon", cooldownSpeedBonus: 0.05, description: "Each cooldown trigger increases speed by 5%."},
+        BloodCape: { rarity: "Uncommon", cooldownSpeedBonus: 0.1, description: "Each cooldown trigger increases speed by 10%."},
+        RegalCape: { rarity: "Rare", cooldownSpeedBonus: 0.15, description: "Each cooldown trigger increases speed by 15%."},
+        DarkCape: { rarity: "Rare", cooldownSpeedBonus: 0.20, description:"Each cooldown trigger increases speed by 20%." },
 
 
 
@@ -203,7 +203,7 @@ var GameConfig = {
         MessiahAmulet: "Recovers 1% stamina every 1 sec.",
         UnderworldAmulet: "Recovers 2% stamina every 2 sec.",
         ShiningAmulet: "Recovers 3% stamina every 3 sec.",
-        AmbixAmulet: "Recovers 3% stamina every 4 sec.",
+        AmbixAmulet: "Recovers 4% stamina every 4 sec.",
 
         Shoes: "Increase Speed by 50%",
         CowboyBoots: "Increase Speed by 60%",
@@ -372,7 +372,6 @@ class MainMenuScene extends Phaser.Scene {
         Phaser.Utils.Array.Shuffle(allItems);
         let availableItems = allItems.slice(0, 5);
         // List the 5 available items.
-        //const items = Object.keys(GameConfig.itemDescriptions);
         let startY = 250;
         GameState.consumables = ['apple', 'Orange', 'Beer'];
 
@@ -1304,7 +1303,7 @@ class ShopScene extends Phaser.Scene {
                 let frameIndex = getItemFrameIndex(item);
                 let x = startX + index * (iconSize + spacing);
                 let icon = this.add.image(x, iconY, 'bulkItems', frameIndex).setScale(iconScale);
-                // Optional: add tooltip on hover.`${item}: ${GameConfig.itemDescriptions[item]}`
+
                 icon.setInteractive();
                 icon.on('pointerover', () => {
                     let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemDescriptions[item]}`, {
