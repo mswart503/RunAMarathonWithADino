@@ -120,7 +120,7 @@ var GameConfig = {
     baseTimePer100m: 5,      // seconds per 100m remains unchanged
     baseStaminaTime: 10,
     minDistance: 100,
-    maxDistance: 6300, // now maximum is level 63 (6300m)
+    maxDistance: 42195,
 
 
     itemData: {
@@ -1028,6 +1028,7 @@ class RaceScene extends Phaser.Scene {
         // Determine current race parameters.
         this.roundIndex = GameState.currentLevel;
         this.distance = GameConfig.rounds[this.roundIndex];
+
         // Calculate the race’s duration based on distance (e.g. 100m = 5 sec).
 
         this.raceTime = (this.distance / 100) * (GameConfig.baseTimePer100m);
@@ -1104,7 +1105,10 @@ class RaceScene extends Phaser.Scene {
         this.stamina = GameState.maxStamina;
 
         // Display current race distance.
-        this.distanceText = this.add.text(10, 10, `Distance: ${this.distance}m`, { fontSize: '20px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
+        this.roundText = this.add.text(10, 10, `Round: ${this.roundIndex+1} / ${GameConfig.rounds.length}`, { fontSize: '20px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
+
+        // Display current race distance.
+        this.distanceText = this.add.text(10, 32, `Distance: ${this.distance}m`, { fontSize: '20px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
 
         // Set up a timer event to update the race simulation every 100ms.
         this.timerEvent = this.time.addEvent({
@@ -1715,6 +1719,10 @@ class ShopScene extends Phaser.Scene {
                 startY += 40;
                 this.itemContainer.add(container);
             });
+
+            this.nextRoundText = this.add.text(this.cameras.main.centerX/2, this.game.config.height - 85, `Next Round: ${this.distance}m`, { fontSize: '20px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
+
+
             let leaveShopButton = this.add.text(this.cameras.main.centerX, this.game.config.height - 50, "Leave Shop", {
                 fontSize: '20px',
                 fill: '#fff',
