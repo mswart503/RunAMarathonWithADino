@@ -593,6 +593,15 @@ class RaceScene extends Phaser.Scene {
         let totalWidth = numItems * iconSize + (numItems - 1) * spacing;
         let startX = (this.game.config.width - totalWidth) / 2 + iconSize / 2;
         let iconY = 30;
+
+        // --- Distance Tracker ---
+        this.distanceProgressText = this.add.text(300, 170, "Distance: 0m / 0m", {
+            fontSize: '20px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 10, y: 5 }
+        });
+
         // --- Timer ---
         this.timerText = this.add.text(300, 200, "Time: 0.0 sec", {
             fontSize: '20px',
@@ -1105,7 +1114,7 @@ class RaceScene extends Phaser.Scene {
         this.stamina = GameState.maxStamina;
 
         // Display current race distance.
-        this.roundText = this.add.text(10, 10, `Round: ${this.roundIndex+1} / ${GameConfig.rounds.length}`, { fontSize: '20px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
+        this.roundText = this.add.text(10, 10, `Round: ${this.roundIndex + 1} / ${GameConfig.rounds.length}`, { fontSize: '20px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
 
         // Display current race distance.
         this.distanceText = this.add.text(10, 32, `Distance: ${this.distance}m`, { fontSize: '20px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
@@ -1229,6 +1238,9 @@ class RaceScene extends Phaser.Scene {
         let progress = Phaser.Math.Clamp(effectiveTime / this.raceTime, 0, 1);
         this.dino.x = Phaser.Math.Interpolation.Linear([startX, endX], progress);
 
+        // After calculating progress in updateRace():
+        let runDistance = this.distance * progress;
+        this.distanceProgressText.setText(`Distance: ${Math.floor(runDistance)}m / ${this.distance}m`);
 
         // Use the staminaMultiplier for depletion.
         let depletionRate = GameState.maxStamina / GameConfig.baseStaminaTime;
@@ -1728,7 +1740,7 @@ class ShopScene extends Phaser.Scene {
                 backgroundColor: 'rgba(0,0,0,0.7)',
                 padding: { x: 10, y: 5 }
             }).setOrigin(0.5).setInteractive();
-            this.nextRoundText = this.add.text(leaveShopButton.x-90, this.game.config.height - 85, `Next Round: ${GameConfig.rounds[GameState.currentLevel]}m`, { fontSize: '20px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
+            this.nextRoundText = this.add.text(leaveShopButton.x - 90, this.game.config.height - 85, `Next Round: ${GameConfig.rounds[GameState.currentLevel]}m`, { fontSize: '20px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
             console.log(GameState.currentLevel)
             leaveShopButton.on('pointerdown', () => {
                 this.scene.start('RaceScene');
