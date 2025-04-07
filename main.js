@@ -1720,7 +1720,6 @@ class ShopScene extends Phaser.Scene {
                 this.itemContainer.add(container);
             });
 
-            this.nextRoundText = this.add.text(this.cameras.main.centerX/2, this.game.config.height - 85, `Next Round: ${this.distance}m`, { fontSize: '20px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
 
 
             let leaveShopButton = this.add.text(this.cameras.main.centerX, this.game.config.height - 50, "Leave Shop", {
@@ -1729,7 +1728,8 @@ class ShopScene extends Phaser.Scene {
                 backgroundColor: 'rgba(0,0,0,0.7)',
                 padding: { x: 10, y: 5 }
             }).setOrigin(0.5).setInteractive();
-
+            this.nextRoundText = this.add.text(leaveShopButton.x-90, this.game.config.height - 85, `Next Round: ${GameConfig.rounds[GameState.currentLevel]}m`, { fontSize: '20px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
+            console.log(GameState.currentLevel)
             leaveShopButton.on('pointerdown', () => {
                 this.scene.start('RaceScene');
             });
