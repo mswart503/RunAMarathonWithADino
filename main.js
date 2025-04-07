@@ -1,3 +1,7 @@
+//const Phaser = require("phaser");
+
+//import Phaser from 'https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js';
+
 // Global Configuration and Game State – adjust these during development!
 class EffectManager {
     constructor() {
@@ -507,17 +511,43 @@ var GameState = {
     weight: 100,  // Starting weight
     // Add consumables array (you can pre-populate with sample names, e.g., "apple", "Pasta", etc.)
     consumables: [],
-    maxItems: 5
+    maxItems: 5,
+    devMode: false
 
 };
 GameState.consumables = ['apple', 'Orange', 'Beer'];
 
 //
-// MAIN MENU SCENE – lets the player choose one starting item
+// Start SCENE – lets the player choose one starting item
 //
+
 class MainMenuScene extends Phaser.Scene {
     constructor() {
         super({ key: 'MainMenuScene' });
+    }
+    create() {
+        this.add.text(200, 100, "Select Mode", { fontSize: '28px', fill: '#fff' });
+
+        let regularButton = this.add.text(200, 150, "Regular Mode", { fontSize: '24px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)', padding: { x: 10, y: 5 } })
+            .setInteractive();
+        regularButton.on('pointerdown', () => {
+            GameState.devMode = false;
+            this.scene.start('StartScene');
+        });
+
+        let devButton = this.add.text(200, 200, "Dev Mode", { fontSize: '24px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)', padding: { x: 10, y: 5 } })
+            .setInteractive();
+        devButton.on('pointerdown', () => {
+            GameState.devMode = true;
+            this.scene.start('StartScene');
+        });
+
+    }
+}
+
+class StartScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'StartScene' });
     }
     preload() {
         // Load shared assets for all scenes.
@@ -1185,6 +1215,14 @@ class RaceScene extends Phaser.Scene {
         let delta = baseDelta * this.fastForward;
         this.elapsedTime += delta;
 
+       /* if (GameState.devMode) {
+            this.input.keyboard.on('keydown-P', () => {
+                // Pause the current scene
+                this.scene.pause();
+                // Launch the DevPauseScene on top of it
+                this.scene.launch('DevPauseScene');
+            });
+        }*/
 
 
         // Update our effect manager with delta.
@@ -1379,7 +1417,7 @@ class RaceScene extends Phaser.Scene {
         // Determine intensity: for example, base intensity of 5, plus 3 additional particles per win.
         let intensity = 5 + (GameState.winCount * 3);
         // Trigger the confetti effect.
-        this.createConfetti(intensity);
+        //this.createConfetti(intensity);
 
         let summaryText = `Race Complete!\nStamina left: ${Math.floor(percentLeft)}%\nYou earned $${reward}\nTime: ${completionTime} sec`;
         this.add.text(300, 200, summaryText, { fontSize: '20px', fill: '#fff', backgroundColor: '#000' });
@@ -1396,12 +1434,11 @@ class RaceScene extends Phaser.Scene {
                 this.scene.start('WinScreenScene');
             }
         });
+
     }
     createConfetti(intensity) {
-        // Create a Particle Emitter Manager for confetti.
-        let particles = this.add.particles('confetti');
-
-        let emitter = particles.createEmitter({
+        // Create a Particle Emitter Manager with the emitter configuration in one step.
+        let particles = this.add.particles('confetti', {
             x: { min: 0, max: this.game.config.width },
             y: 0,
             speedY: { min: 200, max: 400 },
@@ -1409,20 +1446,22 @@ class RaceScene extends Phaser.Scene {
             angle: { min: 0, max: 360 },
             lifespan: { min: 1000, max: 2000 },
             gravityY: 300,
-            quantity: intensity,  // More intensity means more particles.
+            quantity: intensity,  // This determines how many particles per emission.
             scale: { start: 1, end: 0 },
             blendMode: 'ADD'
         });
 
-        // Let the emitter emit for a short time then stop and destroy.
-        this.time.delayedCall(5000, () => {
-            emitter.stop();
-            // Optionally, destroy the particle manager after a delay.
+        // The emitter is automatically created as the first (and only) emitter in particles.emitters.list.
+        // Stop the emitter after 1 second:
+        this.time.delayedCall(1000, () => {
+            particles.emitters.list[0].stop();
+            // Optionally, destroy the particle manager after an additional second.
             this.time.delayedCall(1000, () => {
                 particles.destroy();
             });
         });
     }
+
 
 
     raceLost() {
@@ -1437,8 +1476,131 @@ class RaceScene extends Phaser.Scene {
         GameState.newSlotPrice = 20;
 
         this.time.delayedCall(2000, () => {
-            this.scene.start('MainMenuScene');
+            this.scene.start('StartScene');
         });
+    }
+
+
+}
+
+class DevPauseScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'DevPauseScene' });
+    }
+    create() {
+        // Create a semi-transparent overlay
+        this.add.rectangle(0, 0, this.game.config.width, this.game.config.height, 0x000000, 0.7).setOrigin(0);
+        // Create a semi-transparent background overlay.
+        this.devMenu = this.add.container(0, 0);
+        let overlay = this.add.rectangle(0, 0, this.game.config.width, this.game.config.height, 0x000000, 0.7)
+            .setOrigin(0);
+        this.devMenu.add(overlay);
+
+        // Create a panel for dev options.
+        let panel = this.add.rectangle(this.cameras.main.centerX, this.cameras.main.centerY, 500, 400, 0x333333, 0.9)
+            .setOrigin(0.5);
+        this.devMenu.add(panel);
+        // Add your dev menu options (buttons, text, etc.)
+        /*this.add.text(this.cameras.main.centerX, 100, "Dev Pause Menu", {
+            fontSize: '28px',
+            fill: '#fff'
+        }).setOrigin(0.5);
+*/
+        // Example: a Resume button.
+        let resumeButton = this.add.text(this.cameras.main.centerX, 450, "Resume", {
+            fontSize: '24px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(0.5).setInteractive();
+
+        resumeButton.on('pointerdown', () => {
+            // Resume the paused scene.
+            this.scene.resume('ShopScene');
+            // Stop the dev pause scene.
+            this.scene.stop();
+        });
+
+
+        // Create some text at the top.
+        let title = this.add.text(this.cameras.main.centerX, 120, "Dev Mode Pause Menu", {
+            fontSize: '28px',
+            fill: '#fff'
+        }).setOrigin(0.5);
+        this.devMenu.add(title);
+
+        // Create a button for "Give Yourself $1000"
+        let addMoneyButton = this.add.text(this.cameras.main.centerX, 170, "Add $1000", {
+            fontSize: '20px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(0.5).setInteractive();
+        addMoneyButton.on('pointerdown', () => {
+            GameState.money += 1000;
+            // Update your cash display if needed.
+            console.log("Added $1000. New cash: " + GameState.money);
+        });
+        this.devMenu.add(addMoneyButton);
+
+        // Create a button for "Switch Level"
+        let switchLevelButton = this.add.text(this.cameras.main.centerX, 220, "Switch Level", {
+            fontSize: '20px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(0.5).setInteractive();
+        switchLevelButton.on('pointerdown', () => {
+            // For simplicity, prompt the user to enter a level.
+            let level = prompt("Enter level number:");
+            if (level !== null) {
+                GameState.currentLevel = parseInt(level);
+                console.log("Switched to level " + GameState.currentLevel);
+            }
+        });
+        this.devMenu.add(switchLevelButton);
+
+        // Create a button for "Add Item" to inventory.
+        let addItemButton = this.add.text(this.cameras.main.centerX, 270, "Add Item", {
+            fontSize: '20px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(0.5).setInteractive();
+        addItemButton.on('pointerdown', () => {
+            // For simplicity, prompt the user to enter an item key.
+            let itemKey = prompt("Enter item key:");
+            if (itemKey && GameConfig.itemData[itemKey]) {
+                GameState.equippedItems.push(itemKey);
+                console.log("Added item " + itemKey);
+            } else {
+                console.log("Item not found.");
+            }
+        });
+        this.devMenu.add(addItemButton);
+
+        // Additional buttons for modifying rarity values, removing items, and editing item variables
+        // could be added here following a similar pattern.
+
+        // Create a button for "Save Dev Mode State"
+        let saveStateButton = this.add.text(this.cameras.main.centerX, 350, "Save Dev State", {
+            fontSize: '20px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(0.5).setInteractive();
+        saveStateButton.on('pointerdown', () => {
+            let stateToSave = {
+                gameState: GameState,
+                config: GameConfig
+            };
+            // Save as "devSave1" (you could build an array or dynamic keys)
+            localStorage.setItem('devSave1', JSON.stringify(stateToSave));
+            console.log("Dev state saved.");
+        });
+        this.devMenu.add(saveStateButton);
+
+        // (Add your additional dev options here, e.g., level selection, giving money, etc.)
     }
 }
 
@@ -1452,7 +1614,15 @@ class ShopScene extends Phaser.Scene {
     }
     create() {
         this.scene.stop('RaceScene');
-
+        if (GameState.devMode) {
+            this.input.keyboard.on('keydown-P', () => {
+                // Pause the current scene
+                this.scene.pause();
+                // Launch the DevPauseScene on top of it
+                this.scene.launch('DevPauseScene');
+            });
+        }
+        
         // Add background image.
         this.add.image(400, 300, 'background');
         // At the beginning of ShopScene.create(), reset reroll price:
@@ -2041,10 +2211,12 @@ class WinScreenScene extends Phaser.Scene {
             GameState.newSlotPrice = 20;
             // Optionally, reset other persistent stats.
             // Transition to the ShopScene (or your starting scene for a new run).
-            this.scene.start('MainMenuScene');
+            this.scene.start('StartScene');
         });
     }
 }
+
+
 
 function getConsumableFrame(consumable) {
     // Map consumable names to frame indexes.
@@ -2133,7 +2305,7 @@ var phaserConfig = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
-    scene: [MainMenuScene, RaceScene, ShopScene, WinScreenScene]
+    scene: [MainMenuScene, StartScene, RaceScene, ShopScene, DevPauseScene, WinScreenScene]
 };
 
 var game = new Phaser.Game(phaserConfig);
