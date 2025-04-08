@@ -24,6 +24,7 @@ class EffectManager {
         effect.lastCycleCount = 0;
         effect.duration = effect.duration || Infinity;
         this.effects.push(effect);
+        //return effect;
     }
 
     /**
@@ -1051,6 +1052,7 @@ class RaceScene extends Phaser.Scene {
                     icon.tooltip = null;
                 }
             });
+            let effect = this.effectManager.effects[this.effectManager.effects.length - 1];
             // Create a rectangle above the icon to display the cooldown progress.
             let cooldownBar = this.add.rectangle(x, iconY - iconSize / 2 - 6, iconSize, 4, 0xff0000);
             // Save reference for update.
@@ -1058,7 +1060,8 @@ class RaceScene extends Phaser.Scene {
                 itemName: item,
                 cooldownCycle: cooldownCycle,
                 cooldownBar: cooldownBar,
-                maxWidth: iconSize
+                maxWidth: iconSize,
+                effect: effect
             });
 
 
@@ -1305,6 +1308,8 @@ class RaceScene extends Phaser.Scene {
 
         // Update cooldown bars for equipped items.
         this.itemDisplays.forEach(display => {
+            console.log("Display:", display.itemName, "cooldownCycle:", display.cooldownCycle, "maxWidth:", display.maxWidth);
+
             if (display.cooldownCycle && display.effect) {
                 let phase = display.effect.elapsed % display.cooldownCycle;
                 let progress = phase / display.cooldownCycle;
