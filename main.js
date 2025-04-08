@@ -337,20 +337,46 @@ var GameConfig = {
         Torch: {
             rarity: "Common",
             description: "Increases max stamina by 1 point per win.",
-            image: { col: 2, row: 12 }, price: commonPrice  
+            image: { col: 2, row: 12 }, price: commonPrice
             // No periodic cycle needed—this is a discrete bonus per win.
         },
         Candle: {
             rarity: "Uncommon",
             description: "Increases max stamina by 2 points per win.",
-            image: { col: 1, row: 12 } , price: uncommonPrice  
+            image: { col: 1, row: 12 }, price: uncommonPrice
             // No periodic cycle needed—this is a discrete bonus per win.
         },
         Lamp: {
             rarity: "Rare",
             description: "Increases max stamina by 3 points per win.",
-            image: { col: 14, row: 12 }, price: rarePrice 
+            image: { col: 14, row: 12 }, price: rarePrice
             // No periodic cycle needed—this is a discrete bonus per win.
+        },
+
+        // --- Scaling Speed per win
+        OilLantern: {
+            rarity: "Common",
+            description: "Permanently Increase Speed by 5 m/s per win.",
+            image: { col: 4, row: 12 }, price: commonPrice
+            // You might include other properties if needed.
+        },
+        FlameLantern: {
+            rarity: "Uncommon",
+            description: "Permanently Increase Speed by 7 m/s per win.",
+            image: { col: 5, row: 12 }, price: uncommonPrice
+            // You might include other properties if needed.
+        },
+        IceLantern: {
+            rarity: "Unommon",
+            description: "Permanently Increase Speed by 10 m/s per win.",
+            image: { col: 6, row: 12 }, price: uncommonPrice
+            // You might include other properties if needed.
+        },
+        RegalLantern: {
+            rarity: "Rare",
+            description: "Permanently Increase Speed by 12 m/s per win.",
+            image: { col: 7, row: 12 }, price: rarePrice
+            // You might include other properties if needed.
         },
 
     },
@@ -532,7 +558,8 @@ var GameState = {
     // Add consumables array (you can pre-populate with sample names, e.g., "apple", "Pasta", etc.)
     consumables: [],
     maxItems: 5,
-    devMode: false
+    devMode: false,
+    scalerBonusSpeed: 0,
 
 };
 GameState.consumables = ['apple', 'Orange', 'Beer'];
@@ -1249,7 +1276,7 @@ class RaceScene extends Phaser.Scene {
 
         // Update our effect manager with delta.
         this.effectManager.update(delta);
-
+        let baseSpeedValue = GameConfig.baseTimePer100m * 4;
         // Compute net multipliers from active effects.
         let staminaMultiplier = this.effectManager.getNetMultiplier("stamina");
         let speedMultiplier = this.effectManager.getNetMultiplier("speed");
@@ -1272,9 +1299,12 @@ class RaceScene extends Phaser.Scene {
                 flatBonus += data.flatSpeedIncrease;
             }
         });
-
-        // Combine base speed multiplier and flat bonus.
-        let finalSpeedMultiplier = speedMultiplier * (1 + flatBonus + this.cooldownBonus) * this.speedOverride;
+        // Calculate an oil factor that is 1 plus the relative bonus.
+        // For example, if your base speed is 20 m/s and the oil lantern bonus totals 5,
+        // then oilFactor would be 1 + (5 / 20) = 1.25.
+        let scalerFactor = 1 + (GameState.scalerBonusSpeed / baseSpeedValue);
+        // Combine base speed multiplier, scaler and flat bonus.
+        let finalSpeedMultiplier = speedMultiplier * (1 + flatBonus + this.cooldownBonus) * this.speedOverride * scalerFactor;
         // Choose an acceleration factor (per second); adjust as needed.
         let accelerationFactor = 0.5; // This means 50% of the difference is closed per second.
 
@@ -1288,8 +1318,8 @@ class RaceScene extends Phaser.Scene {
         // Use the speedMultiplier when computing the effective elapsed time.
         let effectiveTime = this.elapsedTime * this.currentSpeedMultiplier;
         //console.log(effectiveTime)
-        let currentSpeedText = (GameConfig.baseTimePer100m * 4) * this.currentSpeedMultiplier;
-        let speedText = (GameConfig.baseTimePer100m * 4) * finalSpeedMultiplier;
+        let currentSpeedText = (baseSpeedValue) * this.currentSpeedMultiplier;
+        let speedText = baseSpeedValue * finalSpeedMultiplier;
         this.currentSpeedText.setText(`Speed: ${currentSpeedText.toFixed(2)} m/s`);
         this.speedText.setText(`Top Speed: ${speedText.toFixed(2)} m/s`);
 
@@ -1454,6 +1484,18 @@ class RaceScene extends Phaser.Scene {
             GameState.maxStamina += 3;
 
         }
+        if (GameState.equippedItems.includes("OilLantern")) {
+            GameState.scalerBonusSpeed += 5; // add 5 m/s per win
+        }
+        if (GameState.equippedItems.includes("FlameLantern")) {
+            GameState.scalerBonusSpeed += 7; // add 5 m/s per win
+        }
+        if (GameState.equippedItems.includes("IceLantern")) {
+            GameState.scalerBonusSpeed += 10; // add 5 m/s per win
+        }
+        if (GameState.equippedItems.includes("RegalLantern")) {
+            GameState.scalerBonusSpeed += 12; // add 5 m/s per win
+        }
         // Determine intensity: for example, base intensity of 5, plus 3 additional particles per win.
         let intensity = 5 + (GameState.winCount * 3);
         // Trigger the confetti effect.
@@ -1514,6 +1556,7 @@ class RaceScene extends Phaser.Scene {
         GameState.equippedItems = [];
         GameState.maxStamina = 100;
         GameState.newSlotPrice = 20;
+        GameState.scalerBonusSpeed = 0;
 
         this.time.delayedCall(2000, () => {
             this.scene.start('StartScene');
