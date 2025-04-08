@@ -101,6 +101,7 @@ class EffectManager {
                 }
             }
         });
+        //console.log()
         return { addition, cycles: totalCycles };
     }
 }
@@ -379,6 +380,14 @@ var GameConfig = {
             // You might include other properties if needed.
         },
 
+        Cerebro: {
+            rarity: "Rare",
+            description: "All Cooldown Effects Happen Twice.",
+            image: { col: 1, row: 44 }, price: rarePrice
+            // Cerebro might not have its own effect value; it just doubles the triggers.
+            // But you might want to use it just as a flag.
+        }
+
     },
 
     rarityWeights: {
@@ -395,149 +404,8 @@ var GameConfig = {
         Uncommon: "#FF0000", // Red
         Rare: "#FFD700"      // Gold
     },
-
-    itemDescriptions: {
-        Coin: "Halves stamina usage for 1 sec every 3 sec.",
-        Bit: "Halves stamina usage for 1 sec every 4 sec.",
-        Copper: "Halves stamina usage for 1 sec every 5 sec.",
-        CopperStack: "Halves stamina usage for 2 sec every 5 sec.",
-        Silver: "Halves stamina usage for 3 sec every 5 sec.",
-        Dubloon: "Halves stamina usage for 1 sec every 2 sec.",
-        Piece: "Halves stamina usage for 2 sec every 4 sec.",
-        Gold: "Halves stamina usage for 4 sec every 5 sec.",
-        Pound: "Halves stamina usage for 2 sec every 3 sec.",
-        Booty: "Halves stamina usage for 3 sec every 4 sec.",
-
-        RubyAmulet: "Recovers 1% stamina every 5 sec.",
-        SapphireAmulet: "Recovers 1% stamina every 4 sec.",
-        AmethystAmulet: "Recovers 1% stamina every 3 sec.",
-        EmeraldAmulet: "Recovers 1% stamina every 2 sec.",
-        BlessedRubyAmulet: "Recovers 2% stamina every 5 sec.",
-        BlessedSapphireAmulet: "Recovers 2% stamina every 4 sec.",
-        BlessedAmethystAmulet: "Recovers 2% stamina every 3 sec.",
-        BlessedEmeraldAmulet: "Recovers 3% stamina every 5 sec.",
-        PharaohsAmulet: "Recovers 4% stamina every 5 sec.",
-        DeceiversAmulet: "Recovers 3% stamina every 4 sec.",
-        HolyAmulet: "Recovers 5% stamina every 5 sec.",
-        MessiahAmulet: "Recovers 1% stamina every 1 sec.",
-        UnderworldAmulet: "Recovers 2% stamina every 2 sec.",
-        ShiningAmulet: "Recovers 3% stamina every 3 sec.",
-        AmbixAmulet: "Recovers 4% stamina every 4 sec.",
-
-        Shoes: "Increase Speed by 50%",
-        CowboyBoots: "Increase Speed by 60%",
-        Galoshes: "Increase Speed by 70%",
-        Sneakers: "Increase Speed by 80%",
-        Nikes: "Increase Speed by 90%",
-        NiceShoes: "Increase Speed by 100%",
-        SuedeCowboyBoots: "Increase Speed by 110%",
-        ToughGaloshes: "Increase Speed by 120%",
-        Hokas: "Increase Speed by 130%",
-        BestGaloshes: "Increase Speed by 140%",
-
-        Cape: "Each cooldown trigger increases speed by 5%.",
-        BloodCape: "Each cooldown trigger increases speed by 10%.",
-        RegalCape: "Each cooldown trigger increases speed by 15%.",
-        DarkCape: "Each cooldown trigger increases speed by 20%.",
-        //Ginger: "Stamina depletes 10% slower.",
-        //Ring: "Reduces item cooldowns by 1%.",
-        //Candle: "Increases max stamina by 2% (plus bonus per win)."
-    },
-    // Items sprite sheet now has 12 columns.
     itemSpriteSheetColumns: 64,
-    itemSpriteFrames: {
-        Coin: { col: 23, row: 9 },
-        Bit: { col: 26, row: 9 },
-        Copper: { col: 32, row: 9 },
-        CopperStack: { col: 34, row: 9 },
-        Silver: { col: 18, row: 9 },
-        Dubloon: { col: 15, row: 9 },
-        Piece: { col: 12, row: 9 },
-        Gold: { col: 3, row: 9 },
-        Pound: { col: 10, row: 9 },
-        Booty: { col: 13, row: 9 },
-
-        RubyAmulet: { col: 11, row: 6 },
-        SapphireAmulet: { col: 12, row: 6 },
-        AmethystAmulet: { col: 13, row: 6 },
-        EmeraldAmulet: { col: 14, row: 6 },
-        BlessedRubyAmulet: { col: 1, row: 6 },
-        BlessedSapphireAmulet: { col: 2, row: 6 },
-        BlessedAmethystAmulet: { col: 3, row: 6 },
-        BlessedEmeraldAmulet: { col: 4, row: 6 },
-        PharaohsAmulet: { col: 16, row: 6 },
-        DeceiversAmulet: { col: 18, row: 6 },
-        HolyAmulet: { col: 22, row: 6 },
-        MessiahAmulet: { col: 30, row: 6 },
-        UnderworldAmulet: { col: 21, row: 6 },
-        ShiningAmulet: { col: 20, row: 6 },
-        AmbixAmulet: { col: 31, row: 6 },
-
-        Shoes: { col: 21, row: 31 },
-        CowboyBoots: { col: 22, row: 31 },
-        Galoshes: { col: 23, row: 31 },
-        Sneakers: { col: 24, row: 31 },
-        Nikes: { col: 24, row: 32 },
-        NiceShoes: { col: 21, row: 32 },
-        SuedeCowboyBoots: { col: 22, row: 32 },
-        ToughGaloshes: { col: 23, row: 32 },
-        Hokas: { col: 24, row: 33 },
-        BestGaloshes: { col: 23, row: 33 },
-
-        Cape: { col: 28, row: 18 },
-        BloodCape: { col: 28, row: 21 },
-        RegalCape: { col: 28, row: 22 },
-        DarkCape: { col: 28, row: 23 },
-        //Ginger: { col: 1, row: 10 },
-        //Ring: { col: 1, row: 5 },
-        //Candle: { col: 1, row: 12 }
-    },
-    // Define fixed item purchase prices (hard-coded values between $3 and $7)
-    itemPrices: {
-        Coin: 1,
-        Bit: 1,
-        Copper: 1,
-        CopperStack: 1,
-        Silver: 2,
-        Dubloon: 2,
-        Piece: 2,
-        Gold: 3,
-        Pound: 3,
-        Booty: 3,
-        RubyAmulet: 1,
-        SapphireAmulet: 1,
-        AmethystAmulet: 1,
-        EmeraldAmulet: 1,
-        BlessedRubyAmulet: 1,
-        BlessedSapphireAmulet: 1,
-        BlessedAmethystAmulet: 1,
-        BlessedEmeraldAmulet: 1,
-        PharaohsAmulet: 2,
-        DeceiversAmulet: 2,
-        HolyAmulet: 2,
-        MessiahAmulet: 3,
-        UnderworldAmulet: 3,
-        ShiningAmulet: 3,
-        AmbixAmulet: 3,
-        Shoes: 1,
-        CowboyBoots: 1,
-        Galoshes: 1,
-        Sneakers: 1,
-        Nikes: 1,
-        NiceShoes: 2,
-        SuedeCowboyBoots: 2,
-        ToughGaloshes: 2,
-        Hokas: 3,
-        BestGaloshes: 3,
-
-        Cape: 4,
-        BloodCape: 5,
-        RegalCape: 6,
-        DarkCape: 7,
-        //Ginger: 2,
-        //Ring: 2,
-        //Candle: 2
-    },
+  
     consumableDescriptions: {
         apple: "5% stamina refill",
         Orange: "10% stamina refill",
@@ -807,7 +675,7 @@ class RaceScene extends Phaser.Scene {
                     type: "stamina",
                     value: 0.5,          // Half stamina usage
                     cycle: 5,            // Every 5 seconds,
-                    activeDuration: 4,   // active for 1 seconds,
+                    activeDuration: 4,   // active for 4 seconds,
                     lastCycleCount: 0,
                     elapsed: 0,              // Starts at 0
 
@@ -818,8 +686,8 @@ class RaceScene extends Phaser.Scene {
                 this.effectManager.addEffect({
                     type: "stamina",
                     value: 0.5,          // Half stamina usage
-                    cycle: 5,            // Every 4 seconds,
-                    activeDuration: 4,   // active for 2 seconds,
+                    cycle: 3,            // Every 3 seconds,
+                    activeDuration: 2,   // active for 2 seconds,
                     lastCycleCount: 0,
                     elapsed: 0,              // Starts at 0
 
@@ -1286,9 +1154,14 @@ class RaceScene extends Phaser.Scene {
         let recoveryObj = this.effectManager.getPeriodicAddition(["staminaRecovery", "stamina"], GameState.maxStamina, delta);
         this.stamina = Math.min(this.stamina + recoveryObj.addition, GameState.maxStamina);
 
+        let cycles = recoveryObj.cycles;
+
+        if (GameState.equippedItems.includes("Cerebro")) {
+            cycles *= 2;  // Double the trigger count if Cerebro is equipped.
+        }
         // If any recovery cycles triggered, also trigger the bonus.
         if (recoveryObj.cycles > 0) {
-            this.triggerCooldownBonus(recoveryObj.cycles);
+            this.triggerCooldownBonus(cycles);
         }
         // Sum flat speed bonuses from equipped items.
 
