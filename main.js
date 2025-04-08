@@ -386,7 +386,29 @@ var GameConfig = {
             image: { col: 1, row: 44 }, price: rarePrice
             // Cerebro might not have its own effect value; it just doubles the triggers.
             // But you might want to use it just as a flag.
+        },
+
+        WhiteMushroom: {
+            rarity: "Uncommon",
+            description: "Each Consumable Eaten temporarily increases speed 100%.",
+            image: { col: 4, row: 4 }, price: commonPrice // (adjust these numbers to the correct sprite position)
+            // No cycle or multiplier is needed here since it’s triggered by consumption events.
+        },
+
+        GuildedMushroom: {
+            rarity: "Uncommon",
+            description: "Each Consumable Eaten temporarily increases speed 110%.",
+            image: { col: 3, row: 4 }, price: uncommonPrice // (adjust these numbers to the correct sprite position)
+            // No cycle or multiplier is needed here since it’s triggered by consumption events.
+        },
+        
+        DarkMushroom: {
+            rarity: "Uncommon",
+            description: "Each Consumable Eaten temporarily increases speed 120%.",
+            image: { col: 1, row: 4 }, price: uncommonPrice // (adjust these numbers to the correct sprite position)
+            // No cycle or multiplier is needed here since it’s triggered by consumption events.
         }
+
 
     },
 
@@ -428,6 +450,8 @@ var GameState = {
     maxItems: 5,
     devMode: false,
     scalerBonusSpeed: 0,
+    mushroomCount: 0
+
 
 };
 GameState.consumables = ['apple', 'Orange', 'Beer'];
@@ -1043,6 +1067,15 @@ class RaceScene extends Phaser.Scene {
                 tooltip.setInteractive();
                 tooltip.on('pointerdown', () => {
                     applyConsumableEffect(consumable, this);
+                    if (GameState.equippedItems.includes("WhiteMushroom")){
+                        GameState.mushroomCount += 1;
+                    }
+                    if (GameState.equippedItems.includes("GuildedMushroom")){
+                        GameState.mushroomCount += 1.1;
+                    }
+                    if (GameState.equippedItems.includes("DarkMushroom")){
+                        GameState.mushroomCount += 1.2;
+                    }
                     Phaser.Utils.Array.Remove(GameState.consumables, consumable);
                     tooltip.destroy();
                     icon.destroy();
@@ -1149,6 +1182,7 @@ class RaceScene extends Phaser.Scene {
         let staminaMultiplier = this.effectManager.getNetMultiplier("stamina");
         let speedMultiplier = this.effectManager.getNetMultiplier("speed");
         // If no speed effects are present, speedMultiplier remains 1.
+        let mushroomBonus = GameState.mushroomCount;
 
         // Apply periodic stamina recovery.
         let recoveryObj = this.effectManager.getPeriodicAddition(["staminaRecovery", "stamina"], GameState.maxStamina, delta);
@@ -1177,7 +1211,7 @@ class RaceScene extends Phaser.Scene {
         // then oilFactor would be 1 + (5 / 20) = 1.25.
         let scalerFactor = 1 + (GameState.scalerBonusSpeed / baseSpeedValue);
         // Combine base speed multiplier, scaler and flat bonus.
-        let finalSpeedMultiplier = speedMultiplier * (1 + flatBonus + this.cooldownBonus) * this.speedOverride * scalerFactor;
+        let finalSpeedMultiplier = speedMultiplier * (1 + flatBonus + this.cooldownBonus+ mushroomBonus) * this.speedOverride * scalerFactor;
         // Choose an acceleration factor (per second); adjust as needed.
         let accelerationFactor = 0.5; // This means 50% of the difference is closed per second.
 
@@ -1322,7 +1356,7 @@ class RaceScene extends Phaser.Scene {
 
     raceComplete() {
         // Calculate the completion time in seconds (formatted with 1 decimal).
-
+        GameState.mushroomCount = 0;
         let completionTime = this.elapsedTime.toFixed(1);
 
         // Determine reward based on remaining stamina percentage.
@@ -1430,6 +1464,7 @@ class RaceScene extends Phaser.Scene {
         GameState.maxStamina = 100;
         GameState.newSlotPrice = 20;
         GameState.scalerBonusSpeed = 0;
+        GameState.mushroomCount = 0;
 
         this.time.delayedCall(2000, () => {
             this.scene.start('StartScene');
@@ -2100,6 +2135,15 @@ class ShopScene extends Phaser.Scene {
                 tooltip.setInteractive();
                 tooltip.on('pointerdown', () => {
                     applyConsumableEffect(consumable, this);
+                    if (GameState.equippedItems.includes("WhiteMushroom")){
+                        GameState.mushroomCount += 1;
+                    }
+                    if (GameState.equippedItems.includes("GuildedMushroom")){
+                        GameState.mushroomCount += 1.1;
+                    }
+                    if (GameState.equippedItems.includes("DarkMushroom")){
+                        GameState.mushroomCount += 1.2;
+                    }
                     Phaser.Utils.Array.Remove(GameState.consumables, consumable);
                     tooltip.destroy();
                     icon.destroy();
