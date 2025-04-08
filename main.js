@@ -333,6 +333,25 @@ var GameConfig = {
             image: { col: 28, row: 23 }, price: elitePrice
         },
 
+        // --- Scaling stamina per win
+        Torch: {
+            rarity: "Common",
+            description: "Increases max stamina by 1 point per win.",
+            image: { col: 2, row: 12 }, price: commonPrice  
+            // No periodic cycle needed—this is a discrete bonus per win.
+        },
+        Candle: {
+            rarity: "Uncommon",
+            description: "Increases max stamina by 2 points per win.",
+            image: { col: 1, row: 12 } , price: uncommonPrice  
+            // No periodic cycle needed—this is a discrete bonus per win.
+        },
+        Lamp: {
+            rarity: "Rare",
+            description: "Increases max stamina by 3 points per win.",
+            image: { col: 14, row: 12 }, price: rarePrice 
+            // No periodic cycle needed—this is a discrete bonus per win.
+        },
 
     },
 
@@ -1218,14 +1237,14 @@ class RaceScene extends Phaser.Scene {
         let delta = baseDelta * this.fastForward;
         this.elapsedTime += delta;
 
-       /* if (GameState.devMode) {
-            this.input.keyboard.on('keydown-P', () => {
-                // Pause the current scene
-                this.scene.pause();
-                // Launch the DevPauseScene on top of it
-                this.scene.launch('DevPauseScene');
-            });
-        }*/
+        /* if (GameState.devMode) {
+             this.input.keyboard.on('keydown-P', () => {
+                 // Pause the current scene
+                 this.scene.pause();
+                 // Launch the DevPauseScene on top of it
+                 this.scene.launch('DevPauseScene');
+             });
+         }*/
 
 
         // Update our effect manager with delta.
@@ -1419,6 +1438,22 @@ class RaceScene extends Phaser.Scene {
         GameState.money += reward;
         GameState.winCount += 1;
 
+        if (GameState.equippedItems.includes("Torch")) {
+            // If you expect only one Lamp, simply:
+            GameState.maxStamina += 1;
+
+            // If you want to support multiple copies, you could do:
+            // let lampCount = GameState.equippedItems.filter(item => item === "Lamp").length;
+            // GameState.maxStamina += lampCount;
+        }
+        if (GameState.equippedItems.includes("Candle")) {
+            GameState.maxStamina += 2;
+
+        }
+        if (GameState.equippedItems.includes("Lamp")) {
+            GameState.maxStamina += 3;
+
+        }
         // Determine intensity: for example, base intensity of 5, plus 3 additional particles per win.
         let intensity = 5 + (GameState.winCount * 3);
         // Trigger the confetti effect.
@@ -1627,7 +1662,7 @@ class ShopScene extends Phaser.Scene {
                 this.scene.launch('DevPauseScene');
             });
         }
-        
+
         // Add background image.
         this.add.image(400, 300, 'background');
         // At the beginning of ShopScene.create(), reset reroll price:
@@ -1844,10 +1879,9 @@ class ShopScene extends Phaser.Scene {
                             GameState.equippedItems.push(item);
                             this.updateInventoryDisplay();
 
-                            // If needed, update other properties (e.g., max stamina for "Log").
-                            if (item === "Log") {
-                                GameState.maxStamina = 100 * (1 + GameConfig.itemData.Log.staminaIncrease + GameState.winCount * GameConfig.itemData.Log.winBonus);
-                            }
+                            // Update maxStamina for stamina increasers
+                            //GameState.maxStamina = GameConfig.maxStamina;
+
 
 
                             // Optionally, show a temporary confirmation message.
