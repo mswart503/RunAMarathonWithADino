@@ -1,12 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Run A Marathon With A Dino (RAMWAD)</title>
-  <!-- Load Phaser 3 from CDN -->
-  <script src="//cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js"></script>
-  <script type= "module" src="main.js"></script>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="styles.css">
+
+    <title>Run A Marathon With A Dino (RAMWAD)</title>
+    <!-- Load Phaser 3 from CDN -->
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js"></script>
+    <script type="module" src="firebase-init.js"></script>
+    <script type="module" src="main.js"></script>
 </head>
 <body>
+    
+    <div id="game-container"></div>
+
+    <div id="highScores">
+      <h2>High Scores</h2>
+      <div class="tables-container">
+          <div>
+              <h2>Furthest Distance</h2>
+              <table id="distanceTable">
+                  <thead>
+                      <tr>
+                          <th>Rank</th>
+                          <th>Name</th>
+                          <th>Date</th>
+                          <th>Total Distance</th>
+                          <th>Final Level</th>
+                      </tr>
+                  </thead>
+                  <tbody></tbody>
+              </table>
+          </div>
+  
+          <div>
+              <h2>Top Speed</h2>
+              <table id="speedTable">
+                  <thead>
+                      <tr>
+                          <th>Rank</th>
+                          <th>Name</th>
+                          <th>Date</th>
+                          <th>Top Speed</th>
+                      </tr>
+                  </thead>
+                  <tbody></tbody>
+              </table>
+          </div>
+      </div>
+  </div>
+  
 </body>
 </html>

@@ -1,3 +1,8 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+import { getFirestore, collection, query, orderBy, limit, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+const db = window.db;
+
 //const Phaser = require("phaser");
 
 //import Phaser from 'https://cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js';
@@ -177,7 +182,7 @@ var GameConfig = {
             image: { col: 10, row: 9 }, price: rarePrice
         },
         Booty: {
-            rarity: "Rare", cycle: 5,
+            rarity: "Rare", cycle: 4,
             description: "Halves stamina usage for 3 sec every 4 sec.",
             image: { col: 13, row: 9 }, price: rarePrice
         },
@@ -390,21 +395,21 @@ var GameConfig = {
 
         WhiteMushroom: {
             rarity: "Uncommon",
-            description: "Each Consumable Eaten temporarily increases speed 100%.",
+            description: "Each Consumable Eaten Increases \nSpeed 100% for current race.",
             image: { col: 4, row: 4 }, price: commonPrice // (adjust these numbers to the correct sprite position)
             // No cycle or multiplier is needed here since it’s triggered by consumption events.
         },
 
         GuildedMushroom: {
             rarity: "Uncommon",
-            description: "Each Consumable Eaten temporarily increases speed 110%.",
+            description: "Each Consumable Eaten Increases \nSpeed 110% for current race.",
             image: { col: 3, row: 4 }, price: uncommonPrice // (adjust these numbers to the correct sprite position)
             // No cycle or multiplier is needed here since it’s triggered by consumption events.
         },
-        
+
         DarkMushroom: {
             rarity: "Uncommon",
-            description: "Each Consumable Eaten temporarily increases speed 120%.",
+            description: "Each Consumable Eaten Increases \nSpeed 120% for current race.",
             image: { col: 1, row: 4 }, price: uncommonPrice // (adjust these numbers to the correct sprite position)
             // No cycle or multiplier is needed here since it’s triggered by consumption events.
         }
@@ -427,7 +432,7 @@ var GameConfig = {
         Rare: "#FFD700"      // Gold
     },
     itemSpriteSheetColumns: 64,
-  
+
     consumableDescriptions: {
         apple: "5% stamina refill",
         Orange: "10% stamina refill",
@@ -450,7 +455,10 @@ var GameState = {
     maxItems: 5,
     devMode: false,
     scalerBonusSpeed: 0,
-    mushroomCount: 0
+    mushroomCount: 0,
+    computedTotalDistance: 0,
+    computedMaxSpeed: 0,
+    playerName: "Anon",
 
 
 };
@@ -535,6 +543,10 @@ class StartScene extends Phaser.Scene {
 
             startY += 40;
         });
+        if (GameState.playerName == "Anon"){
+            GameState.playerName = prompt("Enter name for High Score Rank:");
+        }
+
     }
 }
 
@@ -722,8 +734,8 @@ class RaceScene extends Phaser.Scene {
                 this.effectManager.addEffect({
                     type: "stamina",
                     value: 0.5,          // Half stamina usage
-                    cycle: 4,            // Every 5 seconds,
-                    activeDuration: 3,   // active for 1 seconds,
+                    cycle: 4,            // Every 4 seconds,
+                    activeDuration: 3,   // active for 3 seconds,
                     lastCycleCount: 0,
                     elapsed: 0,              // Starts at 0
 
@@ -1067,13 +1079,13 @@ class RaceScene extends Phaser.Scene {
                 tooltip.setInteractive();
                 tooltip.on('pointerdown', () => {
                     applyConsumableEffect(consumable, this);
-                    if (GameState.equippedItems.includes("WhiteMushroom")){
+                    if (GameState.equippedItems.includes("WhiteMushroom")) {
                         GameState.mushroomCount += 1;
                     }
-                    if (GameState.equippedItems.includes("GuildedMushroom")){
+                    if (GameState.equippedItems.includes("GuildedMushroom")) {
                         GameState.mushroomCount += 1.1;
                     }
-                    if (GameState.equippedItems.includes("DarkMushroom")){
+                    if (GameState.equippedItems.includes("DarkMushroom")) {
                         GameState.mushroomCount += 1.2;
                     }
                     Phaser.Utils.Array.Remove(GameState.consumables, consumable);
@@ -1165,6 +1177,7 @@ class RaceScene extends Phaser.Scene {
         let delta = baseDelta * this.fastForward;
         this.elapsedTime += delta;
 
+
         /* if (GameState.devMode) {
              this.input.keyboard.on('keydown-P', () => {
                  // Pause the current scene
@@ -1211,7 +1224,7 @@ class RaceScene extends Phaser.Scene {
         // then oilFactor would be 1 + (5 / 20) = 1.25.
         let scalerFactor = 1 + (GameState.scalerBonusSpeed / baseSpeedValue);
         // Combine base speed multiplier, scaler and flat bonus.
-        let finalSpeedMultiplier = speedMultiplier * (1 + flatBonus + this.cooldownBonus+ mushroomBonus) * this.speedOverride * scalerFactor;
+        let finalSpeedMultiplier = speedMultiplier * (1 + flatBonus + this.cooldownBonus + mushroomBonus) * this.speedOverride * scalerFactor;
         // Choose an acceleration factor (per second); adjust as needed.
         let accelerationFactor = 0.5; // This means 50% of the difference is closed per second.
 
@@ -1229,6 +1242,9 @@ class RaceScene extends Phaser.Scene {
         let speedText = baseSpeedValue * finalSpeedMultiplier;
         this.currentSpeedText.setText(`Speed: ${currentSpeedText.toFixed(2)} m/s`);
         this.speedText.setText(`Top Speed: ${speedText.toFixed(2)} m/s`);
+        if (currentSpeedText > GameState.computedMaxSpeed){
+            GameState.computedMaxSpeed = Math.round(currentSpeedText*100)/100;
+        }
 
         let startX = 50;
         let endX = 750;
@@ -1358,7 +1374,7 @@ class RaceScene extends Phaser.Scene {
         // Calculate the completion time in seconds (formatted with 1 decimal).
         GameState.mushroomCount = 0;
         let completionTime = this.elapsedTime.toFixed(1);
-
+        GameState.computedTotalDistance += GameConfig.rounds[GameState.currentLevel];
         // Determine reward based on remaining stamina percentage.
         let reward;
         let percentLeft = (this.stamina / GameState.maxStamina) * 100;
@@ -1465,6 +1481,9 @@ class RaceScene extends Phaser.Scene {
         GameState.newSlotPrice = 20;
         GameState.scalerBonusSpeed = 0;
         GameState.mushroomCount = 0;
+        storeHighScore()
+        GameState.computedTotalDistance = 0;
+        GameState.computedMaxSpeed = 0;
 
         this.time.delayedCall(2000, () => {
             this.scene.start('StartScene');
@@ -2135,13 +2154,13 @@ class ShopScene extends Phaser.Scene {
                 tooltip.setInteractive();
                 tooltip.on('pointerdown', () => {
                     applyConsumableEffect(consumable, this);
-                    if (GameState.equippedItems.includes("WhiteMushroom")){
+                    if (GameState.equippedItems.includes("WhiteMushroom")) {
                         GameState.mushroomCount += 1;
                     }
-                    if (GameState.equippedItems.includes("GuildedMushroom")){
+                    if (GameState.equippedItems.includes("GuildedMushroom")) {
                         GameState.mushroomCount += 1.1;
                     }
-                    if (GameState.equippedItems.includes("DarkMushroom")){
+                    if (GameState.equippedItems.includes("DarkMushroom")) {
                         GameState.mushroomCount += 1.2;
                     }
                     Phaser.Utils.Array.Remove(GameState.consumables, consumable);
@@ -2173,7 +2192,7 @@ class WinScreenScene extends Phaser.Scene {
     create() {
         // Optional: Add a background image.
         this.add.image(400, 300, 'background');
-
+        storeHighScore();
         // Retrieve stats you want to show.
         // You could store these in GameState or pass via the scene's registry.
         // Here we'll assume final race time was stored in a variable before transitioning.
@@ -2215,7 +2234,53 @@ class WinScreenScene extends Phaser.Scene {
     }
 }
 
+function storeHighScore() {
+    // Variables computed at the end of a run:
+    let playerName = GameState.playerName || "Anonymous";
+    let totalDistance = GameState.computedTotalDistance;   // Sum of all race distances for the run.
+    //let finalLevel = GameState.currentLevel;       // The level reached when the run ended.
+    let dateAchieved = new Date().toISOString();
 
+    try {
+        // Reference to the "furthestDistanceHighScores" collection
+        const furthestDistanceCollectionRef = collection(db, "furthestDistanceHighScores");
+
+        // Add a new document to the collection
+        addDoc(furthestDistanceCollectionRef, {
+            name: playerName,
+            date: dateAchieved,
+            totalDistance: totalDistance,
+            //finalLevel: finalLevel
+        }).then(() => {
+            console.log("Furthest distance high score saved.");
+        }).catch(error => {
+            console.error("Error saving high score: ", error);
+        });
+    } catch (error) {
+        console.error("Error saving high score: ", error);
+    }
+
+    let topSpeed = GameState.computedMaxSpeed;  // The maximum top speed achieved during the run
+
+    try {
+        // Reference to the "topSpeedHighScores" collection
+        const topSpeedCollectionRef = collection(db, "topSpeedHighScores");
+
+        // Add a new document to the collection
+        addDoc(topSpeedCollectionRef, {
+            name: playerName,
+            date: dateAchieved,
+            topSpeed: topSpeed
+        }).then(() => {
+            console.log("Top speed high score saved.");
+        }).catch(error => {
+            console.error("Error saving high score: ", error);
+        });
+    } catch (error) {
+        console.error("Error saving high score: ", error);
+    }
+
+}
 
 function getConsumableFrame(consumable) {
     // Map consumable names to frame indexes.
@@ -2297,6 +2362,67 @@ function getWeightedRandomItem() {
 }
 
 
+async function loadHighScores() {
+    const furthestDistanceTableBody = document.getElementById("distanceTable").getElementsByTagName("tbody")[0];
+    const topSpeedTableBody = document.getElementById("speedTable").getElementsByTagName("tbody")[0];
+
+    furthestDistanceTableBody.innerHTML = "";
+    topSpeedTableBody.innerHTML = "";
+
+    try {
+        // Reference to the "furthestDistanceHighScores" collection
+        const furthestDistanceCollectionRef = collection(db, "furthestDistanceHighScores");
+        // Create a query to order by "totalDistance" descending and limit to 10
+        const furthestDistanceQuery = query(furthestDistanceCollectionRef, orderBy("totalDistance", "desc"), limit(10));
+        // Get the documents that match the query
+        const furthestDistanceQuerySnapshot = await getDocs(furthestDistanceQuery);
+
+        let distanceRank = 1;
+        furthestDistanceQuerySnapshot.forEach(doc => {
+            let data = doc.data();
+            let row = furthestDistanceTableBody.insertRow();
+            row.insertCell(0).innerText = distanceRank;
+            row.insertCell(1).innerText = data.name;
+            row.insertCell(2).innerText = new Date(data.date).toLocaleDateString();
+            row.insertCell(3).innerText = data.totalDistance + " m";
+            //row.insertCell(4).innerText = data.finalLevel;
+            distanceRank++;
+        });
+    } catch (error) {
+        console.error("Error loading furthest distance high scores:", error);
+    }
+
+    try {
+        // Reference to the "topSpeedHighScores" collection
+        const topSpeedCollectionRef = collection(db, "topSpeedHighScores");
+        // Create a query to order by "topSpeed" descending and limit to 10
+        const topSpeedQuery = query(topSpeedCollectionRef, orderBy("topSpeed", "desc"), limit(10));
+        // Get the documents that match the query
+        const topSpeedQuerySnapshot = await getDocs(topSpeedQuery);
+
+        let speedRank = 1;
+        topSpeedQuerySnapshot.forEach(doc => {
+            let data = doc.data();
+            let row = topSpeedTableBody.insertRow();
+            row.insertCell(0).innerText = speedRank;
+            row.insertCell(1).innerText = data.name;
+            row.insertCell(2).innerText = new Date(data.date).toLocaleDateString();
+            row.insertCell(3).innerText = data.topSpeed + " m/s";
+            speedRank++;
+        });
+    } catch (error) {
+        console.error("Error loading top speed high scores:", error);
+    }
+}
+
+// Call this function on page load, and optionally add real-time listeners:
+loadHighScores();
+
+
+
+// (You could also set up onSnapshot listeners to update in real time.)
+
+
 //
 // GAME INITIALIZATION
 //
@@ -2304,6 +2430,7 @@ var phaserConfig = {
     type: Phaser.AUTO,
     width: 800,
     height: 600,
+    parent: 'game-container',
     scene: [MainMenuScene, StartScene, RaceScene, ShopScene, DevPauseScene, WinScreenScene]
 };
 
