@@ -2424,7 +2424,7 @@ class RewardScene extends Phaser.Scene {
         // 3. $2 Cash reward
         // Position them at predetermined coordinates.
         let optionXPositions = [200, 400, 600];
-        let optionLabels = ["Random Item", "Random Consumable", "$2 Cash"];
+        let optionLabels = ["Random Item", "Random Consumable", "$1 Cash"];
         let optionDisplayTexts = ["?", "Consumable", "$1"];
         
         // Loop through each option and add to the rewardsContainer.
