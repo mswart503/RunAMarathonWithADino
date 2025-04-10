@@ -452,6 +452,7 @@ var GameState = {
     equippedItems: [],  // Max 5 item slots
     winCount: 0,
     maxStamina: 100,
+    fixedDepletionRate: .10,
     weight: 100,  // Starting weight
     // Add consumables array (you can pre-populate with sample names, e.g., "apple", "Pasta", etc.)
     consumables: [],
@@ -1259,9 +1260,9 @@ class RaceScene extends Phaser.Scene {
         this.distanceProgressText.setText(`Distance: ${Math.floor(runDistance)}m / ${this.distance}m`);
 
         // Use the staminaMultiplier for depletion.
-        let depletionRate = GameState.maxStamina / GameConfig.baseStaminaTime;
+        //let depletionRate = staminaMultiplier * GameConfig.fixedDepletionRate;
         // For example, if multiplier is 0.5, stamina depletes at half the normal rate.
-        this.stamina -= depletionRate * staminaMultiplier * delta;
+        this.stamina -= GameState.maxStamina * GameState.fixedDepletionRate * delta;
         this.stamina = Phaser.Math.Clamp(this.stamina, 0, GameState.maxStamina);
         let newWidth = (this.stamina / GameState.maxStamina) * 300;
 
@@ -2253,6 +2254,7 @@ function storeHighScore() {
             name: playerName,
             date: dateAchieved,
             totalDistance: totalDistance,
+            currVersion: currVersion,
             //finalLevel: finalLevel
         }).then(() => {
             console.log("Furthest distance high score saved.");
@@ -2273,7 +2275,9 @@ function storeHighScore() {
         addDoc(topSpeedCollectionRef, {
             name: playerName,
             date: dateAchieved,
-            topSpeed: topSpeed
+            topSpeed: topSpeed,
+            currVersion: currVersion,
+
         }).then(() => {
             console.log("Top speed high score saved.");
         }).catch(error => {
@@ -2388,6 +2392,8 @@ async function loadHighScores() {
             row.insertCell(1).innerText = data.name;
             row.insertCell(2).innerText = new Date(data.date).toLocaleDateString();
             row.insertCell(3).innerText = data.totalDistance + " m";
+            row.insertCell(4).innerText = data.currVersion;
+
             //row.insertCell(4).innerText = data.finalLevel;
             distanceRank++;
         });
@@ -2411,6 +2417,7 @@ async function loadHighScores() {
             row.insertCell(1).innerText = data.name;
             row.insertCell(2).innerText = new Date(data.date).toLocaleDateString();
             row.insertCell(3).innerText = data.topSpeed + " m/s";
+            row.insertCell(4).innerText = data.currVersion;
             speedRank++;
         });
     } catch (error) {
