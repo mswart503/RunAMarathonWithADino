@@ -452,7 +452,7 @@ var GameState = {
     equippedItems: [],  // Max 5 item slots
     winCount: 0,
     maxStamina: 100,
-    fixedDepletionRate: .10,
+    fixedDepletionRate: 10,
     weight: 100,  // Starting weight
     // Add consumables array (you can pre-populate with sample names, e.g., "apple", "Pasta", etc.)
     consumables: [],
@@ -1262,7 +1262,7 @@ class RaceScene extends Phaser.Scene {
         // Use the staminaMultiplier for depletion.
         //let depletionRate = staminaMultiplier * GameConfig.fixedDepletionRate;
         // For example, if multiplier is 0.5, stamina depletes at half the normal rate.
-        this.stamina -= GameState.maxStamina * GameState.fixedDepletionRate * delta;
+        this.stamina -= GameState.fixedDepletionRate*staminaMultiplier * delta;
         this.stamina = Phaser.Math.Clamp(this.stamina, 0, GameState.maxStamina);
         let newWidth = (this.stamina / GameState.maxStamina) * 300;
 
