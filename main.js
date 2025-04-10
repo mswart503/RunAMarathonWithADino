@@ -595,7 +595,12 @@ class RaceScene extends Phaser.Scene {
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
         });
-
+        this.cashText = this.add.text(this.game.config.width - 20, 20, `$${GameState.money}`, {
+            fontSize: '20px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(1, 0);
 
         // --- Status Menu ---
         this.statusMenu = this.add.container(this.game.config.width - 210, this.game.config.height - 140);
@@ -1285,7 +1290,7 @@ class RaceScene extends Phaser.Scene {
 
         // Update cooldown bars for equipped items.
         this.itemDisplays.forEach(display => {
-            console.log("Display:", display.itemName, "cooldownCycle:", display.cooldownCycle, "maxWidth:", display.maxWidth);
+           // console.log("Display:", display.itemName, "cooldownCycle:", display.cooldownCycle, "maxWidth:", display.maxWidth);
 
             if (display.cooldownCycle && display.effect) {
                 let phase = display.effect.elapsed % display.cooldownCycle;
@@ -1371,7 +1376,7 @@ class RaceScene extends Phaser.Scene {
         });
         if (bonusFromItems > 0) {
             this.cooldownBonus += bonusFromItems * cycles;
-            console.log("Cooldown bonus added: " + bonusFromItems + ". Total bonus: " + this.cooldownBonus);
+            //console.log("Cooldown bonus added: " + bonusFromItems + ". Total bonus: " + this.cooldownBonus);
         }
     }
 
@@ -1431,12 +1436,17 @@ class RaceScene extends Phaser.Scene {
 
         let summaryText = `Race Complete!\nStamina left: ${Math.floor(percentLeft)}%\nYou earned $${reward}\nTime: ${completionTime} sec`;
         this.add.text(300, 200, summaryText, { fontSize: '20px', fill: '#fff', backgroundColor: '#000' });
+        let gotoRewardButton = this.add.text(this.cameras.main.centerX, 400, "Next", {
+            fontSize: '24px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(0.5).setInteractive();
 
-        // After a short delay, proceed to the Shop scene (or end game if rounds are finished).
-        this.time.delayedCall(2000, () => {
+        gotoRewardButton.on('pointerdown', () => {
             GameState.currentLevel++;
             if (GameState.currentLevel < GameConfig.totalRounds) {
-                this.scene.start('ShopScene');
+                this.scene.start('RewardScene');
             } else {
                 // Pass the final time to the next scene via the registry.
                 this.registry.set("finalTime", completionTime);
@@ -1444,6 +1454,8 @@ class RaceScene extends Phaser.Scene {
                 this.scene.start('WinScreenScene');
             }
         });
+
+
 
     }
     createConfetti(intensity) {
@@ -1486,7 +1498,7 @@ class RaceScene extends Phaser.Scene {
         GameState.newSlotPrice = 20;
         GameState.scalerBonusSpeed = 0;
         GameState.mushroomCount = 0;
-        if (GameState.devMode == false){
+        if (GameState.devMode == false) {
             storeHighScore()
 
         }
@@ -1848,7 +1860,7 @@ class ShopScene extends Phaser.Scene {
                 container.on('pointerdown', () => {
 
                     if (GameState.money >= price) {
-                        console.log(GameState.maxItems)
+                        //.log(GameState.maxItems)
                         if (GameState.equippedItems.length < GameState.maxItems) {
                             GameState.money -= price;
                             this.cashText.setText(`$${GameState.money}`);
@@ -2029,7 +2041,7 @@ class ShopScene extends Phaser.Scene {
 
         // Define header Y and initial start for items
         let headerY = this.consumableContainer.y + 40;
-        this.add.text(300, headerY+30, "Consumables", {
+        this.add.text(300, headerY + 30, "Consumables", {
             fontSize: '28px',
             fill: '#fff',
             backgroundColor: 'rgba(0,0,0,0.7)'
@@ -2052,7 +2064,7 @@ class ShopScene extends Phaser.Scene {
         };
 
         availableConsumables.forEach(consumable => {
-            console.log("Adding consumable: " + consumable + " at y=" + consStartY);
+            //console.log("Adding consumable: " + consumable + " at y=" + consStartY);
             // Create a container for each consumable option
             let container = this.add.container(200, consStartY);
 
@@ -2200,7 +2212,7 @@ class WinScreenScene extends Phaser.Scene {
     create() {
         // Optional: Add a background image.
         this.add.image(400, 300, 'background');
-        if (GameState.devMode == false){
+        if (GameState.devMode == false) {
             storeHighScore();
 
         }
@@ -2244,6 +2256,302 @@ class WinScreenScene extends Phaser.Scene {
         });
     }
 }
+
+class RewardScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'RewardScene' });
+    }
+
+    create() {
+        // Optional: Add background
+        this.add.image(400, 300, 'background');
+
+        // Display a header message.
+        this.add.text(400, 100, "Choose Your Reward", { fontSize: '28px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' }).setOrigin(0.5);
+        
+        this.cashText = this.add.text(this.game.config.width - 20, 20, `$${GameState.money}`, {
+            fontSize: '20px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(1, 0);
+        // Create the container for reward options
+        this.rewardsContainer = this.add.container(0, 100);
+        this.createRewardOptions();
+
+        // Create a container for the inventory display (equipped items) at the top middle.
+        this.inventoryContainer = this.add.container(0, 0);
+        this.updateInventoryDisplay = () => {
+            // Clear any existing icons.
+            if (!this.inventoryContainer) {
+                this.inventoryContainer = this.add.container(0, 0);
+            } else {
+                this.inventoryContainer.removeAll(true); // remove and destroy all children
+            }
+
+            let numItems = GameState.equippedItems.length;
+            let iconScale = 2;
+            let iconSize = 16 * iconScale;
+            let spacing = 10;
+            let totalWidth = numItems * iconSize + (numItems - 1) * spacing;
+            let startX = (this.game.config.width - totalWidth) / 2 + iconSize / 2;
+            let iconY = 30; // Y position for inventory icons.
+
+            GameState.equippedItems.forEach((item, index) => {
+                let frameIndex = getItemFrameIndex(item);
+                let x = startX + index * (iconSize + spacing);
+                let icon = this.add.image(x, iconY, 'bulkItems', frameIndex).setScale(iconScale);
+
+                icon.setInteractive();
+                icon.on('pointerover', () => {
+                    let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemData[item].description}`, {
+                        fontSize: '14px',
+                        fill: '#fff',
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        padding: { x: 5, y: 5 }
+                    }).setOrigin(0.5, 1);
+                    this.children.bringToTop(tooltip);
+                    icon.tooltip = tooltip;
+                });
+                /*icon.on('pointerout', () => {
+                    if (icon.tooltip) {
+                        icon.tooltip.destroy();
+                        icon.tooltip = null;
+                    }
+                });*/
+
+
+                // NEW: Add pointerdown event to prompt selling the item.
+                icon.on('pointerdown', () => {
+                    // Loop through all children in the inventory container.
+                    this.inventoryContainer.list.forEach(child => {
+                        // If the child is not the one just clicked and has a tooltip, destroy it.
+                        if (child !== icon && child.tooltip) {
+                            child.tooltip.destroy();
+                            child.tooltip = null;
+                        }
+                        // Similarly, if you store sell tooltips separately:
+                        if (child !== icon && child.sellTooltip) {
+                            child.sellTooltip.destroy();
+                            child.sellTooltip = null;
+                        }
+                    });
+                    icon.tooltipPersistent = true;
+
+                    // Destroy any previous tooltips on this icon.
+                    if (icon.tooltip) {
+                        icon.tooltip.destroy();
+                        icon.tooltip = null;
+                    }
+                    if (icon.sellTooltip) {
+                        icon.sellTooltip.destroy();
+                        icon.sellTooltip = null;
+                    }
+
+                    // Calculate the sell value: half the purchase price, rounded down (minimum $1).
+                    let purchasePrice = GameConfig.itemData[item].price;
+                    let sellValue = Math.max(Math.floor(purchasePrice / 2), 1);
+
+                    let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemData[item].description}`, {
+                        fontSize: '14px',
+                        fill: '#fff',
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        padding: { x: 5, y: 5 }
+                    }).setOrigin(0.5, 1);
+                    this.children.bringToTop(tooltip);
+                    icon.tooltip = tooltip;
+                    // Create a tooltip for selling just below the icon.
+                    let sellTooltip = this.add.text(x, iconY + iconSize + 10, `Sell ${item} for $${sellValue}?`, {
+                        fontSize: '14px',
+                        fill: '#fff',
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        padding: { x: 5, y: 5 }
+                    }).setOrigin(0.5, 0);
+                    this.children.bringToTop(sellTooltip);
+                    sellTooltip.setInteractive();
+                    icon.sellTooltip = sellTooltip;
+
+                    // When the tooltip is clicked, process the sale.
+                    sellTooltip.on('pointerdown', () => {
+                        // Add the sell value to the player's cash.
+                        GameState.money += sellValue;
+                        this.cashText.setText(`$${GameState.money}`);
+
+                        // Remove the item from the equipped items.
+                        Phaser.Utils.Array.Remove(GameState.equippedItems, item);
+
+                        // Destroy the tooltip.
+                        sellTooltip.destroy();
+                        tooltip.destroy();
+                        icon.sellTooltip = null;
+                        icon.tooltip = null;
+                        icon.tooltipPersistent = false;
+                        // Refresh the inventory display.
+                        this.updateInventoryDisplay();
+                    });
+
+                    // Optional: Remove the sell tooltip automatically after 3 seconds if not clicked.
+                    this.time.delayedCall(3000, () => {
+                        if (icon.sellTooltip) {
+                            sellTooltip.destroy();
+                            icon.sellTooltip = null;
+                        }
+                        if (icon.tooltip) {
+                            tooltip.destroy();
+                            icon.tooltip = null;
+                        }
+                        icon.tooltipPersistent = false;
+                    });
+                });
+                icon.on('pointerout', () => {
+                    if (!icon.tooltipPersistent && icon.tooltip) {
+                        icon.tooltip.destroy();
+                        icon.tooltip = null;
+                    }
+                });
+                this.inventoryContainer.add(icon);
+            });
+        };
+
+        // Call this once initially.
+        this.updateInventoryDisplay();
+
+    }
+    createRewardOptions() {
+        // Create options for:
+        // 1. Random Item (represented by a red question mark box)
+        // 2. Random Consumable
+        // 3. $2 Cash reward
+        // Position them at predetermined coordinates.
+        let optionXPositions = [200, 400, 600];
+        let optionLabels = ["Random Item", "Random Consumable", "$2 Cash"];
+        let optionDisplayTexts = ["?", "Consumable", "$1"];
+        
+        // Loop through each option and add to the rewardsContainer.
+        for (let i = 0; i < 3; i++) {
+            let container = this.createRewardOption(
+                optionXPositions[i],
+                0,
+                optionLabels[i],
+                optionDisplayTexts[i],
+                i + 1  // optionID
+            );
+            // Set interactive behavior for each option:
+            if (i === 0) { // Random Item option
+                container.setInteractive();
+                container.on("pointerdown", () => {
+                    this.revealRandomItem();
+                });
+            }
+            else if (i === 1) { // Random Consumable
+                container.setInteractive();
+                container.on("pointerdown", () => {
+                    this.giveRandomConsumable();
+                });
+            }
+            else if (i === 2) { // $1 Cash
+                container.setInteractive();
+                container.on("pointerdown", () => {
+                    GameState.money += 1;
+                    // Optionally update your cash display
+                    // Transition to ShopScene (or the next appropriate scene)
+                    this.scene.start("ShopScene");
+                });
+            }
+            this.rewardsContainer.add(container);
+        }
+    }
+
+    createRewardOption(x, y, label, displayText, optionID) {
+        // Create a container with a defined size for reward option.
+        let container = this.add.container(x, y);
+        container.setSize(120, 120);
+    
+        // For option 1 (Random Item), use a red background and a question mark.
+        let bgColor = (optionID === 1) ? 0xff0000 : 0x333333;
+        let bg = this.add.rectangle(0, 150, 120, 120, bgColor, 0.8).setOrigin(0.5);
+        let text = this.add.text(0, 150, displayText, { fontSize: '32px', fill: '#fff' }).setOrigin(0.5);
+        container.add([bg, text]);
+    
+        // Add the label below.
+        this.add.text(x, y + 330, label, { fontSize: '20px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' }).setOrigin(0.5);
+    
+        container.setInteractive(new Phaser.Geom.Rectangle(0, 150, 120, 120), Phaser.Geom.Rectangle.Contains);
+        return container;
+    }
+
+
+    // Option 1: Random Item logic.
+    revealRandomItem() {
+        // When the player clicks the Random Item option, first remove/hide the rewards options.
+        this.rewardsContainer.destroy();
+        //this.text.destroy();
+    
+        // Now, reveal the random item reward.
+        let availableItems = Object.keys(GameConfig.itemData)
+            .filter(item => !GameState.equippedItems.includes(item));
+        if (availableItems.length === 0) {
+            // No new items available.
+            this.add.text(400, 350, "No new items available", { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
+            return;
+        }
+        Phaser.Utils.Array.Shuffle(availableItems);
+        let randomItem = availableItems[0];
+        // Update the item reward container (you can reuse your rewardsContainer variable if desired,
+        // or create a new dedicated container for the revealed item).
+        let rewardContainer = this.add.container(200, 150);
+        rewardContainer.setSize(120, 120);
+        // Remove the red question mark and show the actual item image.
+        let frameIndex = getItemFrameIndex(randomItem);
+        let itemSprite = this.add.image(0, 80, 'bulkItems', frameIndex).setScale(2);
+        rewardContainer.add(itemSprite);
+    
+        // Add "Accept" and "Skip" buttons below.
+        let acceptButton = this.add.text(0, 120, "Accept", {
+            fontSize: '20px',
+            fill: '#0f0',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 5, y: 5 }
+        }).setOrigin(0.5).setInteractive();
+    
+        let skipButton = this.add.text(0, 150, "Skip", {
+            fontSize: '20px',
+            fill: '#f00',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 5, y: 5 }
+        }).setOrigin(0.5).setInteractive();
+    
+        rewardContainer.add([acceptButton, skipButton]);
+    
+        // Accept behavior.
+        acceptButton.on("pointerdown", () => {
+            if (GameState.equippedItems.length < GameState.maxItems) {
+                GameState.equippedItems.push(randomItem);
+                this.scene.start("ShopScene");
+            } else {
+                alert("Not enough inventory space.");
+            }
+        });
+        // Skip behavior.
+        skipButton.on("pointerdown", () => {
+            this.scene.start("ShopScene");
+        });
+    }
+
+    // Option 2: Random Consumable logic.
+    giveRandomConsumable() {
+        // When the player clicks the Random Consumable option,
+        // remove the rewards container so no other option is visible.
+        this.rewardsContainer.destroy();
+        let availableConsumables = ['apple', 'Orange', 'Beer']; // or from your config
+        Phaser.Utils.Array.Shuffle(availableConsumables);
+        let randomConsumable = availableConsumables[0];
+        // Add the consumable to the player's inventory.
+        GameState.consumables.push(randomConsumable);
+        this.scene.start("ShopScene");
+    }
+}
+
 
 function storeHighScore() {
     // Variables computed at the end of a run:
@@ -2448,7 +2756,7 @@ var phaserConfig = {
     width: 800,
     height: 600,
     parent: 'game-container',
-    scene: [MainMenuScene, StartScene, RaceScene, ShopScene, DevPauseScene, WinScreenScene]
+    scene: [MainMenuScene, StartScene, RaceScene, ShopScene, DevPauseScene, RewardScene, WinScreenScene]
 };
 
 var game = new Phaser.Game(phaserConfig);
