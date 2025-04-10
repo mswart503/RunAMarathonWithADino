@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 import { getFirestore, collection, query, orderBy, limit, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 const db = window.db;
+const currVersion = "v0.07"
 
 //const Phaser = require("phaser");
 
@@ -117,11 +118,13 @@ const rarePrice = 6;
 const elitePrice = 8;
 
 var GameConfig = {
-    totalRounds: 63,
+    totalRounds: 30,
     // Define 63 rounds that scale from a short sprint to a full marathon.
-    rounds: [100, 200, 400, 500, 1000, 1500, 2000, 3000, 4000, 5000, 7000,
-        10000, 13000, 17000, 21100, 23000, 25000, 27000, 29000, 32000, 33000,
-        35000, 37000, 39000, 42195],
+    rounds: [100, 200, 300, 400, 500, 1000, 
+        1500, 2000, 2500, 3000, 4000, 5000, 
+        7000, 9000, 12000, 15000, 18000, 21097, 
+        23000, 24500, 26000, 28000, 30000, 32000, 
+        33000, 34500, 36000, 38000, 40000, 42195],
 
     longRounds: [100, 200, 300, 400, 500, 700, 900, 1100, 1300, 1500, 1800, 2100, 2400, 2700, 3000,
         3400, 3800, 4200, 4600, 5000, 5500, 6000, 6500, 7000, 7500, 8100, 8700, 9300, 9900, 10500,
