@@ -345,19 +345,19 @@ var GameConfig = {
         // --- Scaling stamina per win
         Torch: {
             rarity: "Common",
-            description: "Increases max stamina by 1 point per win.",
+            description: "Increases max stamina by 3 points per win.",
             image: { col: 2, row: 12 }, price: commonPrice
             // No periodic cycle needed—this is a discrete bonus per win.
         },
         Candle: {
             rarity: "Uncommon",
-            description: "Increases max stamina by 2 points per win.",
+            description: "Increases max stamina by 6 points per win.",
             image: { col: 1, row: 12 }, price: uncommonPrice
             // No periodic cycle needed—this is a discrete bonus per win.
         },
         Lamp: {
             rarity: "Rare",
-            description: "Increases max stamina by 3 points per win.",
+            description: "Increases max stamina by 9 points per win.",
             image: { col: 14, row: 12 }, price: rarePrice
             // No periodic cycle needed—this is a discrete bonus per win.
         },
@@ -1385,31 +1385,31 @@ class RaceScene extends Phaser.Scene {
         let percentLeft = (this.stamina / GameState.maxStamina) * 100;
         // If 75% or more stamina remains, reward $5; if between 50% and 75%, $3; otherwise, $1.
         if (percentLeft >= 75) {
-            reward = 5;
+            reward = 6;
         } else if (percentLeft >= 50) {
-            reward = 4;
+            reward = 5;
         } else if (percentLeft >= 25) {
-            reward = 3;
+            reward = 4;
         } else {
-            reward = 2;
+            reward = 3;
         }
         GameState.money += reward;
         GameState.winCount += 1;
 
         if (GameState.equippedItems.includes("Torch")) {
             // If you expect only one Lamp, simply:
-            GameState.maxStamina += 1;
+            GameState.maxStamina += 3;
 
             // If you want to support multiple copies, you could do:
             // let lampCount = GameState.equippedItems.filter(item => item === "Lamp").length;
             // GameState.maxStamina += lampCount;
         }
         if (GameState.equippedItems.includes("Candle")) {
-            GameState.maxStamina += 2;
+            GameState.maxStamina += 6;
 
         }
         if (GameState.equippedItems.includes("Lamp")) {
-            GameState.maxStamina += 3;
+            GameState.maxStamina += 9;
 
         }
         if (GameState.equippedItems.includes("OilLantern")) {
@@ -1644,7 +1644,7 @@ class ShopScene extends Phaser.Scene {
         // Add background image.
         this.add.image(400, 300, 'background');
         // At the beginning of ShopScene.create(), reset reroll price:
-        this.rerollPrice = 2;
+        this.rerollPrice = 1;
         if (GameState.newSlotPrice === undefined) {
             GameState.newSlotPrice = 20;
         }
@@ -1814,8 +1814,8 @@ class ShopScene extends Phaser.Scene {
             });
             Phaser.Utils.Array.Shuffle(allItems);
 
-            // Pick the first 3 items.
-            let availableItems = allItems.slice(0, 3);
+            // Pick the first 4 items.
+            let availableItems = allItems.slice(0, 4);
             // Starting Y position for each shop item within the container.
             let startY = 0;
             availableItems.forEach(item => {
@@ -2025,11 +2025,11 @@ class ShopScene extends Phaser.Scene {
         if (this.consumableContainer) {
             this.consumableContainer.destroy(true);
         }
-        this.consumableContainer = this.add.container(0, 250); // Position below the item container
+        this.consumableContainer = this.add.container(0, 270); // Position below the item container
 
         // Define header Y and initial start for items
         let headerY = this.consumableContainer.y + 40;
-        this.add.text(300, headerY, "Consumables", {
+        this.add.text(300, headerY+30, "Consumables", {
             fontSize: '28px',
             fill: '#fff',
             backgroundColor: 'rgba(0,0,0,0.7)'
