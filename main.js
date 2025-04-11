@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 import { getFirestore, collection, query, orderBy, limit, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 const db = window.db;
-const currVersion = "v0.07"
+const currVersion = "v0.08"
 
 //const Phaser = require("phaser");
 
@@ -194,77 +194,77 @@ var GameConfig = {
         //Recovers stamina periodically
         RubyAmulet: {
             rarity: "Common", cycle: 5,
-            description: "Recovers 5% stamina every 5 sec.",
+            description: "Recovers 3% stamina every 5 sec.",
             image: { col: 11, row: 6 }, price: commonPrice
         },
         SapphireAmulet: {
             rarity: "Common", cycle: 4,
-            description: "Recovers 5% stamina every 4 sec.",
+            description: "Recovers 3% stamina every 4 sec.",
             image: { col: 12, row: 6 }, price: commonPrice
         },
         AmethystAmulet: {
             rarity: "Common", cycle: 3,
-            description: "Recovers 5% stamina every 3 sec.",
+            description: "Recovers 3% stamina every 3 sec.",
             image: { col: 13, row: 6 }, price: commonPrice
         },
         EmeraldAmulet: {
             rarity: "Common", cycle: 2,
-            description: "Recovers 5% stamina every 2 sec.",
+            description: "Recovers 3% stamina every 2 sec.",
             image: { col: 14, row: 6 }, price: commonPrice
         },
         BlessedRubyAmulet: {
             rarity: "Common", cycle: 5,
-            description: "Recovers 7% stamina every 5 sec.",
+            description: "Recovers 5% stamina every 5 sec.",
             image: { col: 1, row: 6 }, price: commonPrice
         },
         BlessedSapphireAmulet: {
             rarity: "Common", cycle: 4,
-            description: "Recovers 7% stamina every 4 sec.",
+            description: "Recovers 5% stamina every 4 sec.",
             image: { col: 2, row: 6 }, price: commonPrice
         },
         BlessedAmethystAmulet: {
             rarity: "Common", cycle: 3,
-            description: "Recovers 7% stamina every 3 sec.",
+            description: "Recovers 5% stamina every 3 sec.",
             image: { col: 3, row: 6 }, price: commonPrice
         },
         BlessedEmeraldAmulet: {
             rarity: "Common", cycle: 5,
-            description: "Recovers 9% stamina every 5 sec.",
+            description: "Recovers 7% stamina every 5 sec.",
             image: { col: 4, row: 6 }, price: commonPrice
         },
         PharaohsAmulet: {
             rarity: "Uncommon", cycle: 5,
-            description: "Recovers 11% stamina every 5 sec.",
+            description: "Recovers 9% stamina every 5 sec.",
             image: { col: 16, row: 6 }, price: uncommonPrice
         },
         DeceiversAmulet: {
             rarity: "Uncommon", cycle: 4,
-            description: "Recovers 7% stamina every 4 sec.",
+            description: "Recovers 5% stamina every 4 sec.",
             image: { col: 18, row: 6 }, price: uncommonPrice
         },
         HolyAmulet: {
             rarity: "Uncommon", cycle: 5,
-            description: "Recovers 13% stamina every 5 sec.",
+            description: "Recovers 11% stamina every 5 sec.",
             image: { col: 22, row: 6 }, price: uncommonPrice
         },
         MessiahAmulet: {
             rarity: "Rare", cycle: 1,
-            description: "Recovers 5% stamina every 1 sec.",
+            description: "Recovers 3% stamina every 1 sec.",
             image: { col: 30, row: 6 }, price: rarePrice
         },
         UnderworldAmulet: {
             rarity: "Rare", cycle: 2,
-            description: "Recovers 7% stamina every 2 sec.",
+            description: "Recovers 5% stamina every 2 sec.",
             image: { col: 21, row: 6 }, price: rarePrice
         },
         ShiningAmulet: {
             rarity: "Rare", cycle: 3,
-            description: "Recovers 9% stamina every 3 sec.",
+            description: "Recovers 7% stamina every 3 sec.",
             image: { col: 20, row: 6 }, price: rarePrice
         },
         AmbixAmulet: {
             rarity: "Rare", cycle: 4,
-            description: "Recovers 11% stamina every 4 sec.",
+            description: "Recovers 9% stamina every 4 sec.",
             image: { col: 31, row: 6 }, price: rarePrice
         },
 
@@ -388,13 +388,13 @@ var GameConfig = {
             // You might include other properties if needed.
         },
 
-        Cerebro: {
+       /* Cerebro: {
             rarity: "Rare",
             description: "All Cooldown Effects Happen Twice.",
             image: { col: 1, row: 44 }, price: rarePrice
             // Cerebro might not have its own effect value; it just doubles the triggers.
             // But you might want to use it just as a flag.
-        },
+        },*/
 
         WhiteMushroom: {
             rarity: "Uncommon",
@@ -515,7 +515,7 @@ class StartScene extends Phaser.Scene {
         // Add background image
         this.add.image(400, 300, 'background');
 
-        this.add.text(200, 150, "Run A Marathon With A Dino", { fontSize: '28px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
+        this.add.text(200, 150, "Run A Marathon With A Dino", { fontSize: '28px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
         this.add.text(200, 200, "Select your starting item", { fontSize: '20px', fill: '#fff', backgroundColor: 'rgba(0,0,0,0.7)' });
         // Randomly pick 3 unique items from the available list.
         let allItems = Object.keys(GameConfig.itemData);
@@ -764,7 +764,7 @@ class RaceScene extends Phaser.Scene {
             if (item === "RubyAmulet") {
                 this.effectManager.addEffect({
                     type: "staminaRecovery",
-                    value: 0.05,       // 5% of max stamina per cycle
+                    value: 0.03,       // 3% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
                     lastCycleCount: 0,
 
@@ -774,7 +774,7 @@ class RaceScene extends Phaser.Scene {
             if (item === "SapphireAmulet") {
                 this.effectManager.addEffect({
                     type: "staminaRecovery",
-                    value: 0.05,       // 5% of max stamina per cycle
+                    value: 0.03,       // 3% of max stamina per cycle
                     cycle: 4,          // every 4 seconds
                     lastCycleCount: 0,
 
@@ -784,7 +784,7 @@ class RaceScene extends Phaser.Scene {
             if (item === "AmethystAmulet") {
                 this.effectManager.addEffect({
                     type: "staminaRecovery",
-                    value: 0.05,       // 5% of max stamina per cycle
+                    value: 0.03,       // 3% of max stamina per cycle
                     cycle: 3,          // every 3 seconds
                     lastCycleCount: 0,
 
@@ -794,7 +794,7 @@ class RaceScene extends Phaser.Scene {
             if (item === "EmeraldAmulet") {
                 this.effectManager.addEffect({
                     type: "staminaRecovery",
-                    value: 0.05,       // 5% of max stamina per cycle
+                    value: 0.03,       // 3% of max stamina per cycle
                     cycle: 2,          // every 2 seconds
                     lastCycleCount: 0,
 
@@ -805,7 +805,7 @@ class RaceScene extends Phaser.Scene {
             if (item === "BlessedRubyAmulet") {
                 this.effectManager.addEffect({
                     type: "staminaRecovery",
-                    value: 0.07,       // 7% of max stamina per cycle
+                    value: 0.05,       // 5% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
                     lastCycleCount: 0,
 
@@ -815,7 +815,7 @@ class RaceScene extends Phaser.Scene {
             if (item === "BlessedSapphireAmulet") {
                 this.effectManager.addEffect({
                     type: "staminaRecovery",
-                    value: 0.07,       // 7% of max stamina per cycle
+                    value: 0.05,       // 5% of max stamina per cycle
                     cycle: 4,          // every 4 seconds
                     lastCycleCount: 0,
 
@@ -825,7 +825,7 @@ class RaceScene extends Phaser.Scene {
             if (item === "BlessedAmethystAmulet") {
                 this.effectManager.addEffect({
                     type: "staminaRecovery",
-                    value: 0.07,       // 7% of max stamina per cycle
+                    value: 0.05,       // 5% of max stamina per cycle
                     cycle: 3,          // every 3 seconds
                     lastCycleCount: 0,
 
@@ -835,7 +835,7 @@ class RaceScene extends Phaser.Scene {
             if (item === "BlessedEmeraldAmulet") {
                 this.effectManager.addEffect({
                     type: "staminaRecovery",
-                    value: 0.09,       // 9% of max stamina per cycle
+                    value: 0.07,       // 7% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
                     lastCycleCount: 0,
 
@@ -846,7 +846,7 @@ class RaceScene extends Phaser.Scene {
             if (item === "PharaohsAmulet") {
                 this.effectManager.addEffect({
                     type: "staminaRecovery",
-                    value: 0.11,       // 11% of max stamina per cycle
+                    value: 0.09,       // 9% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
                     lastCycleCount: 0,
 
@@ -856,7 +856,7 @@ class RaceScene extends Phaser.Scene {
             if (item === "DeceiversAmulet") {
                 this.effectManager.addEffect({
                     type: "staminaRecovery",
-                    value: 0.09,       // 9% of max stamina per cycle
+                    value: 0.07,       // 7% of max stamina per cycle
                     cycle: 4,          // every 4 seconds
                     lastCycleCount: 0,
 
@@ -866,8 +866,8 @@ class RaceScene extends Phaser.Scene {
             if (item === "HolyAmulet") {
                 this.effectManager.addEffect({
                     type: "staminaRecovery",
-                    value: 0.13,       // 13% of max stamina per cycle
-                    cycle: 5,          // every 3 seconds
+                    value: 0.11,       // 11% of max stamina per cycle
+                    cycle: 5,          // every 5 seconds
                     lastCycleCount: 0,
 
                     duration: Infinity // or a finite duration if needed
@@ -876,7 +876,7 @@ class RaceScene extends Phaser.Scene {
             if (item === "MessiahAmulet") {
                 this.effectManager.addEffect({
                     type: "staminaRecovery",
-                    value: 0.05,       // 5% of max stamina per cycle
+                    value: 0.03,       // 3% of max stamina per cycle
                     cycle: 1,          // every 1 seconds
                     lastCycleCount: 0,
 
@@ -886,7 +886,7 @@ class RaceScene extends Phaser.Scene {
             if (item === "UnderworldAmulet") {
                 this.effectManager.addEffect({
                     type: "staminaRecovery",
-                    value: 0.07,       // 7% of max stamina per cycle
+                    value: 0.05,       // 5% of max stamina per cycle
                     cycle: 2,          // every 2 seconds
                     lastCycleCount: 0,
 
@@ -896,7 +896,7 @@ class RaceScene extends Phaser.Scene {
             if (item === "ShiningAmulet") {
                 this.effectManager.addEffect({
                     type: "staminaRecovery",
-                    value: 0.09,       // 9% of max stamina per cycle
+                    value: 0.07,       // 7% of max stamina per cycle
                     cycle: 3,          // every 3 seconds
                     lastCycleCount: 0,
 
@@ -906,7 +906,7 @@ class RaceScene extends Phaser.Scene {
             if (item === "AmbixAmulet") {
                 this.effectManager.addEffect({
                     type: "staminaRecovery",
-                    value: 0.11,       // 11% of max stamina per cycle
+                    value: 0.09,       // 9% of max stamina per cycle
                     cycle: 4,          // every 4 seconds
                     lastCycleCount: 0,
 
@@ -1390,13 +1390,13 @@ class RaceScene extends Phaser.Scene {
         let percentLeft = (this.stamina / GameState.maxStamina) * 100;
         // If 75% or more stamina remains, reward $5; if between 50% and 75%, $3; otherwise, $1.
         if (percentLeft >= 75) {
-            reward = 6;
-        } else if (percentLeft >= 50) {
             reward = 5;
-        } else if (percentLeft >= 25) {
+        } else if (percentLeft >= 50) {
             reward = 4;
-        } else {
+        } else if (percentLeft >= 25) {
             reward = 3;
+        } else {
+            reward = 2;
         }
         GameState.money += reward;
         GameState.winCount += 1;
@@ -1985,7 +1985,7 @@ class ShopScene extends Phaser.Scene {
         });
 
         // ----- New: Buy New Item Slot Button -----
-        this.newSlotButton = this.add.text(
+        /*this.newSlotButton = this.add.text(
             20,
             this.rerollButton.y + this.rerollButton.height + 10,
             "Buy New \nItem Slot \n ($" + GameState.newSlotPrice + ")", {
@@ -1993,9 +1993,9 @@ class ShopScene extends Phaser.Scene {
             fill: '#fff',
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
-        }).setInteractive();
+        }).setInteractive();*/
 
-        this.newSlotButton.on('pointerdown', () => {
+      /*  this.newSlotButton.on('pointerdown', () => {
             if (GameState.money >= GameState.newSlotPrice) {
                 // Deduct cash and update display.
                 GameState.money -= GameState.newSlotPrice;
@@ -2031,7 +2031,7 @@ class ShopScene extends Phaser.Scene {
                     tip.destroy();
                 });
             }
-        });
+        });*/
 
         // ----- Consumables Section -----
         if (this.consumableContainer) {
@@ -2500,12 +2500,23 @@ class RewardScene extends Phaser.Scene {
         // Update the item reward container (you can reuse your rewardsContainer variable if desired,
         // or create a new dedicated container for the revealed item).
         let rewardContainer = this.add.container(200, 150);
-        rewardContainer.setSize(120, 120);
+        rewardContainer.setSize(220, 120);
         // Remove the red question mark and show the actual item image.
         let frameIndex = getItemFrameIndex(randomItem);
-        let itemSprite = this.add.image(0, 80, 'bulkItems', frameIndex).setScale(2);
-        rewardContainer.add(itemSprite);
-    
+        let itemSprite = this.add.image(0, 40, 'bulkItems', frameIndex).setScale(2).setOrigin(0.5);
+        let description = GameConfig.itemData[randomItem].description;
+        
+        let itemDescriptionText = this.add.text(100, 80, `${randomItem}:${description}`,{
+            fontSize: '16px',
+            fill: '#fff',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 5, y: 5 }
+        }).setOrigin(0.5);
+        //console.log(itemDescriptionText);
+        rewardContainer.add([itemSprite, itemDescriptionText]);
+        //rewardContainer.add(itemDescription);
+        itemSprite.setInteractive();
+
         // Add "Accept" and "Skip" buttons below.
         let acceptButton = this.add.text(0, 120, "Accept", {
             fontSize: '20px',
@@ -2536,6 +2547,7 @@ class RewardScene extends Phaser.Scene {
         skipButton.on("pointerdown", () => {
             this.scene.start("ShopScene");
         });
+        
     }
 
     // Option 2: Random Consumable logic.

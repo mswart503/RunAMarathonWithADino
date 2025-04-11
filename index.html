@@ -5,9 +5,24 @@
     <link rel="stylesheet" href="styles.css">
 
     <title>Run A Marathon With A Dino (RAMWAD)</title>
+
     <!-- Load Phaser 3 from CDN -->
     <script src="//cdn.jsdelivr.net/npm/phaser@3.88.2/dist/phaser.js"></script>
     <script type="module" src="firebase-init.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+<script>
+  WebFont.load({
+    custom: {
+      families: ['MyCustomFont'],
+      urls: ['assets/fonts/styles.css'] // you can put your @font-face declaration in this CSS file too.
+    },
+    active: function() {
+      // Once the font is loaded, start the game.
+      var config = { /* your Phaser config */ };
+      var game = new Phaser.Game(config);
+    }
+  });
+</script>
     <script type="module" src="main.js"></script>
 </head>
 <body>
@@ -45,6 +60,7 @@
                       <th>Rank</th>
                       <th>Name</th>
                       <th>Date</th>
+                      <th>Total Speed</th>
                       <th>Version</th>
                       
                   </tr>

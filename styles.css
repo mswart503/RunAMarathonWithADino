@@ -1,12 +1,38 @@
 .tables-container {
-    display: flex; /* Creates a flex container */
-    flex-direction: row; /* Arranges items in a row (horizontally) */
-    justify-content: space-around; /* Distributes space evenly between and around tables */
-    align-items: flex-start; /* Aligns items to the top */
-    flex-wrap: wrap; /* Allows tables to wrap to the next line if needed */
+    display: flex;
+    /* Creates a flex container */
+    flex-direction: row;
+    /* Arranges items in a row (horizontally) */
+    justify-content: space-around;
+    /* Distributes space evenly between and around tables */
+    align-items: flex-start;
+    /* Aligns items to the top */
+    flex-wrap: wrap;
+    /* Allows tables to wrap to the next line if needed */
 }
 
-.tables-container > div {
-    flex: 1; /* Each table takes up equal space */
-    margin: 10px; /* Adds space around each table */
+.tables-container>div {
+    flex: 1;
+    /* Each table takes up equal space */
+    margin: 10px;
+    /* Adds space around each table */
+}
+
+@font-face {
+    font-family: "MyCustomFont";
+    src: url("assets/fonts/MyCustomFont.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: "SilkScreen";
+    src: url("assets/fonts/slkscr.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Optionally, set a default font for the webpage */
+body {
+    font-family: "MyCustomFont", sans-serif;
 }
