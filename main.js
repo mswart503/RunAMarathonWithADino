@@ -388,13 +388,13 @@ var GameConfig = {
             // You might include other properties if needed.
         },
 
-       /* Cerebro: {
-            rarity: "Rare",
-            description: "All Cooldown Effects Happen Twice.",
-            image: { col: 1, row: 44 }, price: rarePrice
-            // Cerebro might not have its own effect value; it just doubles the triggers.
-            // But you might want to use it just as a flag.
-        },*/
+        /* Cerebro: {
+             rarity: "Rare",
+             description: "All Cooldown Effects Happen Twice.",
+             image: { col: 1, row: 44 }, price: rarePrice
+             // Cerebro might not have its own effect value; it just doubles the triggers.
+             // But you might want to use it just as a flag.
+         },*/
 
         WhiteMushroom: {
             rarity: "Uncommon",
@@ -1066,14 +1066,14 @@ class RaceScene extends Phaser.Scene {
         // Green bar showing current stamina.
         this.staminaBar = this.add.rectangle(250, 580, 300, 20, 0x24DBAB);
         this.staminaBar.setOrigin(0, 0.5)
-        this.staminaText = this.add.text(250, 580, "", { fontSize: '14px', fill: '#fff', fontFamily: 'SilkScreen', backgroundColor: 'rgba(0,0,0,0.7)'}).setOrigin(0, 0.5);
+        this.staminaText = this.add.text(250, 580, "", { fontSize: '14px', fill: '#fff', fontFamily: 'SilkScreen', backgroundColor: 'rgba(0,0,0,0.7)' }).setOrigin(0, 0.5);
 
         // --- Consumables Panel at Bottom ---
         this.consumablesPanel = this.add.container(0, this.game.config.height - 50);
         let comspacing = 40;
 
         GameState.consumables.forEach((consumable, index) => {
-            let iconX = (startX-135) + index * comspacing;
+            let iconX = (startX - 135) + index * comspacing;
             let icon = this.add.image(iconX, 0, 'consumableSprites', getConsumableFrame(consumable)).setScale(2);
             icon.setInteractive();
             icon.on('pointerdown', () => {
@@ -1291,7 +1291,7 @@ class RaceScene extends Phaser.Scene {
 
         // Update cooldown bars for equipped items.
         this.itemDisplays.forEach(display => {
-           // console.log("Display:", display.itemName, "cooldownCycle:", display.cooldownCycle, "maxWidth:", display.maxWidth);
+            // console.log("Display:", display.itemName, "cooldownCycle:", display.cooldownCycle, "maxWidth:", display.maxWidth);
 
             if (display.cooldownCycle && display.effect) {
                 let phase = display.effect.elapsed % display.cooldownCycle;
@@ -1847,7 +1847,7 @@ class ShopScene extends Phaser.Scene {
                     padding: { x: 5, y: 2 }
                 }).setOrigin(0.5);
                 // Create description text.
-                let descText = this.add.text(40, -8, `${item}: ${GameConfig.itemData[item].description}`, {
+                let descText = this.add.text(40, -8, `${item}`, {
                     fontSize: '16px',
                     fill: '#fff', fontFamily: "SilkScreen",
                     backgroundColor: 'rgba(0,0,0,0.7)'
@@ -1856,6 +1856,30 @@ class ShopScene extends Phaser.Scene {
                 container.add([priceText, icon, descText]);
                 container.setSize(300, 20);
                 container.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 20), Phaser.Geom.Rectangle.Contains);
+
+                // Add pointerover event to show a tooltip with the item description.
+                container.on('pointerover', () => {
+                    // Create a tooltip that shows the description.
+                    // Position it relative to the container, adjust as needed.
+                    let tooltip = this.add.text(container.x + 40, container.y + 170,
+                        `${GameConfig.itemData[item].description}`, {
+                        fontSize: '14px',
+                        fill: '#fff',
+                        fontFamily: "SilkScreen",
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        padding: { x: 5, y: 3 }
+                    }
+                    ).setOrigin(0, 0.5);
+                    // Save the tooltip reference on the container for later removal.
+                    container.tooltip = tooltip;
+                });
+                // Remove the tooltip on pointerout.
+                container.on('pointerout', () => {
+                    if (container.tooltip) {
+                        container.tooltip.destroy();
+                        container.tooltip = null;
+                    }
+                });
 
                 // Purchase logic for the item.
                 container.on('pointerdown', () => {
@@ -1996,43 +2020,43 @@ class ShopScene extends Phaser.Scene {
             padding: { x: 10, y: 5 }
         }).setInteractive();*/
 
-      /*  this.newSlotButton.on('pointerdown', () => {
-            if (GameState.money >= GameState.newSlotPrice) {
-                // Deduct cash and update display.
-                GameState.money -= GameState.newSlotPrice;
-                this.cashText.setText(`$${GameState.money}`);
-                // Increase available item slots.
-                GameState.maxItems += 1;
-                GameState.newSlotPrice += 20;
-                this.newSlotButton.setText("Buy New \nItem Slot \n ($" + GameState.newSlotPrice + ")");
-                // Show a confirmation tip.
-                let tip = this.add.text(
-                    this.newSlotButton.x + this.newSlotButton.width,
-                    this.newSlotButton.y - 20,
-                    "Item slot purchased!", {
-                    fontSize: '16px',
-                    fill: '#fff', fontFamily: "SilkScreen",
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    padding: { x: 5, y: 5 }
-                }).setOrigin(0.5);
-                this.time.delayedCall(2000, () => {
-                    tip.destroy();
-                });
-            } else {
-                let tip = this.add.text(
-                    this.newSlotButton.x + this.newSlotButton.width,
-                    this.newSlotButton.y + 20,
-                    "Not enough cash, stranger", {
-                    fontSize: '16px',
-                    fill: '#fff', fontFamily: "SilkScreen",
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    padding: { x: 5, y: 5 }
-                }).setOrigin(0.5);
-                this.time.delayedCall(2000, () => {
-                    tip.destroy();
-                });
-            }
-        });*/
+        /*  this.newSlotButton.on('pointerdown', () => {
+              if (GameState.money >= GameState.newSlotPrice) {
+                  // Deduct cash and update display.
+                  GameState.money -= GameState.newSlotPrice;
+                  this.cashText.setText(`$${GameState.money}`);
+                  // Increase available item slots.
+                  GameState.maxItems += 1;
+                  GameState.newSlotPrice += 20;
+                  this.newSlotButton.setText("Buy New \nItem Slot \n ($" + GameState.newSlotPrice + ")");
+                  // Show a confirmation tip.
+                  let tip = this.add.text(
+                      this.newSlotButton.x + this.newSlotButton.width,
+                      this.newSlotButton.y - 20,
+                      "Item slot purchased!", {
+                      fontSize: '16px',
+                      fill: '#fff', fontFamily: "SilkScreen",
+                      backgroundColor: 'rgba(0,0,0,0.7)',
+                      padding: { x: 5, y: 5 }
+                  }).setOrigin(0.5);
+                  this.time.delayedCall(2000, () => {
+                      tip.destroy();
+                  });
+              } else {
+                  let tip = this.add.text(
+                      this.newSlotButton.x + this.newSlotButton.width,
+                      this.newSlotButton.y + 20,
+                      "Not enough cash, stranger", {
+                      fontSize: '16px',
+                      fill: '#fff', fontFamily: "SilkScreen",
+                      backgroundColor: 'rgba(0,0,0,0.7)',
+                      padding: { x: 5, y: 5 }
+                  }).setOrigin(0.5);
+                  this.time.delayedCall(2000, () => {
+                      tip.destroy();
+                  });
+              }
+          });*/
 
         // ----- Consumables Section -----
         if (this.consumableContainer) {
@@ -2211,11 +2235,11 @@ class ShopScene extends Phaser.Scene {
             // Create the panel container if it doesn't exist.
             this.consumablesPanel = this.add.container(0, this.game.config.height - 50);
         }
-    
+
         // We'll assume you want to display the consumable icons side by side.
         let startX = 20; // starting X position for icons.
         let spacing = 40; // horizontal spacing between icons.
-    
+
         // Loop through each consumable in GameState.consumables and add an icon.
         GameState.consumables.forEach((consumable, index) => {
             let iconX = startX + index * spacing;
@@ -2225,7 +2249,7 @@ class ShopScene extends Phaser.Scene {
             this.consumablesPanel.add(icon);
         });
     }
-    
+
 }
 
 
@@ -2293,7 +2317,7 @@ class RewardScene extends Phaser.Scene {
 
         // Display a header message.
         this.add.text(400, 100, "Choose Your Reward", { fontSize: '28px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' }).setOrigin(0.5);
-        
+
         this.cashText = this.add.text(this.game.config.width - 20, 20, `$${GameState.money}`, {
             fontSize: '20px',
             fill: '#fff', fontFamily: "SilkScreen",
@@ -2451,7 +2475,7 @@ class RewardScene extends Phaser.Scene {
         let optionXPositions = [200, 400, 600];
         let optionLabels = ["Random Item", "Random Consumable", "$1 Cash"];
         let optionDisplayTexts = ["?", "Consumable", "$1"];
-        
+
         // Loop through each option and add to the rewardsContainer.
         for (let i = 0; i < 3; i++) {
             let container = this.createRewardOption(
@@ -2491,16 +2515,16 @@ class RewardScene extends Phaser.Scene {
         // Create a container with a defined size for reward option.
         let container = this.add.container(x, y);
         container.setSize(120, 120);
-    
+
         // For option 1 (Random Item), use a red background and a question mark.
         let bgColor = (optionID === 1) ? 0xff0000 : 0x333333;
         let bg = this.add.rectangle(0, 150, 120, 120, bgColor, 0.8).setOrigin(0.5);
         let text = this.add.text(0, 150, displayText, { fontSize: '32px', fill: '#fff' }).setOrigin(0.5);
         container.add([bg, text]);
-    
+
         // Add the label below.
         this.add.text(x, y + 330, label, { fontSize: '20px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' }).setOrigin(0.5);
-    
+
         container.setInteractive(new Phaser.Geom.Rectangle(0, 150, 120, 120), Phaser.Geom.Rectangle.Contains);
         return container;
     }
@@ -2511,7 +2535,7 @@ class RewardScene extends Phaser.Scene {
         // When the player clicks the Random Item option, first remove/hide the rewards options.
         this.rewardsContainer.destroy();
         //this.text.destroy();
-    
+
         // Now, reveal the random item reward.
         let availableItems = Object.keys(GameConfig.itemData)
             .filter(item => !GameState.equippedItems.includes(item));
@@ -2530,8 +2554,8 @@ class RewardScene extends Phaser.Scene {
         let frameIndex = getItemFrameIndex(randomItem);
         let itemSprite = this.add.image(0, 40, 'bulkItems', frameIndex).setScale(2).setOrigin(0.5);
         let description = GameConfig.itemData[randomItem].description;
-        
-        let itemDescriptionText = this.add.text(100, 80, `${randomItem}:${description}`,{
+
+        let itemDescriptionText = this.add.text(100, 80, `${randomItem}:${description}`, {
             fontSize: '16px',
             fill: '#fff',
             fontFamily: "SilkScreen",
@@ -2550,16 +2574,16 @@ class RewardScene extends Phaser.Scene {
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 5, y: 5 }
         }).setOrigin(0.5).setInteractive();
-    
+
         let skipButton = this.add.text(0, 150, "Skip", {
             fontSize: '20px',
             fill: '#f00',
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 5, y: 5 }
         }).setOrigin(0.5).setInteractive();
-    
+
         rewardContainer.add([acceptButton, skipButton]);
-    
+
         // Accept behavior.
         acceptButton.on("pointerdown", () => {
             if (GameState.equippedItems.length < GameState.maxItems) {
@@ -2573,7 +2597,7 @@ class RewardScene extends Phaser.Scene {
         skipButton.on("pointerdown", () => {
             this.scene.start("ShopScene");
         });
-        
+
     }
 
     // Option 2: Random Consumable logic.
