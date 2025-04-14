@@ -345,19 +345,19 @@ var GameConfig = {
         // --- Scaling stamina per win
         Torch: {
             rarity: "Common",
-            description: "Increases max stamina by 3 points per win.",
+            description: "Increases max stamina by 2 points per win.",
             image: { col: 2, row: 12 }, price: commonPrice
             // No periodic cycle needed—this is a discrete bonus per win.
         },
         Candle: {
             rarity: "Uncommon",
-            description: "Increases max stamina by 6 points per win.",
+            description: "Increases max stamina by 4 points per win.",
             image: { col: 1, row: 12 }, price: uncommonPrice
             // No periodic cycle needed—this is a discrete bonus per win.
         },
         Lamp: {
             rarity: "Rare",
-            description: "Increases max stamina by 9 points per win.",
+            description: "Increases max stamina by 6 points per win.",
             image: { col: 14, row: 12 }, price: rarePrice
             // No periodic cycle needed—this is a discrete bonus per win.
         },
@@ -1403,18 +1403,18 @@ class RaceScene extends Phaser.Scene {
 
         if (GameState.equippedItems.includes("Torch")) {
             // If you expect only one Lamp, simply:
-            GameState.maxStamina += 3;
+            GameState.maxStamina += 2;
 
             // If you want to support multiple copies, you could do:
             // let lampCount = GameState.equippedItems.filter(item => item === "Lamp").length;
             // GameState.maxStamina += lampCount;
         }
         if (GameState.equippedItems.includes("Candle")) {
-            GameState.maxStamina += 6;
+            GameState.maxStamina += 4;
 
         }
         if (GameState.equippedItems.includes("Lamp")) {
-            GameState.maxStamina += 9;
+            GameState.maxStamina += 6;
 
         }
         if (GameState.equippedItems.includes("OilLantern")) {
