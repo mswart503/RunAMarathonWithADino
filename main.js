@@ -439,7 +439,7 @@ var GameConfig = {
     consumableDescriptions: {
         apple: "5% stamina refill",
         Orange: "10% stamina refill",
-        Beer: "20% stamina refill"
+        Banana: "20% stamina refill"
     }
 };
 
@@ -466,7 +466,7 @@ var GameState = {
 
 
 };
-GameState.consumables = ['apple', 'Orange', 'Beer'];
+GameState.consumables = ['apple', 'Orange', 'Banana'];
 
 //
 // Start SCENE – lets the player choose one starting item
@@ -523,7 +523,7 @@ class StartScene extends Phaser.Scene {
         let availableItems = allItems.slice(0, 5);
         // List the 5 available items.
         let startY = 250;
-        GameState.consumables = ['apple', 'Orange', 'Beer'];
+        GameState.consumables = ['apple', 'Orange', 'Banana'];
 
         availableItems.forEach(item => {
             // Create a container for the icon and the text.
@@ -2049,18 +2049,18 @@ class ShopScene extends Phaser.Scene {
         let consStartY = headerY - 200;
 
         // Define available consumables
-        let availableConsumables = ['apple', 'Orange', 'Beer'];
+        let availableConsumables = ['apple', 'Orange', 'Banana'];
         // Define fixed prices for consumables:
         GameConfig.consumablePrices = {
             apple: 1,
             Orange: 2,
-            Beer: 3
+            Banana: 3
         };
         // And define descriptions (if not defined already)
         GameConfig.consumableDescriptions = {
             apple: "5% stamina refill",
             Orange: "10% stamina refill",
-            Beer: "20% stamina refill"
+            Banana: "20% stamina refill"
         };
 
         availableConsumables.forEach(consumable => {
@@ -2580,7 +2580,7 @@ class RewardScene extends Phaser.Scene {
         // When the player clicks the Random Consumable option,
         // remove the rewards container so no other option is visible.
         this.rewardsContainer.destroy();
-        let availableConsumables = ['apple', 'Orange', 'Beer']; // or from your config
+        let availableConsumables = ['apple', 'Orange', 'Banana']; // or from your config
         Phaser.Utils.Array.Shuffle(availableConsumables);
         let randomConsumable = availableConsumables[0];
         // Add the consumable to the player's inventory.
@@ -2646,6 +2646,7 @@ function getConsumableFrame(consumable) {
     const mapping = {
         Apple: 0,
         Orange: 1,
+        Banana: 2,
         Beer: 5,
 
         // Add more consumables as needed.
@@ -2692,6 +2693,10 @@ function applyConsumableEffect(consumable, scene) {
         //    console.log("Orange effect ended: Speed multiplier reset.");
         //});
         //break;
+        case 'Banana':
+            scene.stamina = Math.min(scene.stamina + GameState.maxStamina * 0.20, GameState.maxStamina);
+            break;
+            
         case 'Beer':
             // Restore 20% of max stamina.
             scene.stamina = Math.min(scene.stamina + GameState.maxStamina * 0.20, GameState.maxStamina);
