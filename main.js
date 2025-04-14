@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 import { getFirestore, collection, query, orderBy, limit, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 const db = window.db;
-const currVersion = "v0.08"
+const currVersion = "v0.09"
 
 //const Phaser = require("phaser");
 
@@ -1065,14 +1065,14 @@ class RaceScene extends Phaser.Scene {
         // Green bar showing current stamina.
         this.staminaBar = this.add.rectangle(250, 580, 300, 20, 0x24DBAB);
         this.staminaBar.setOrigin(0, 0.5)
-        this.staminaText = this.add.text(250, 580, "", { fontSize: '14px', fill: '#fff', fontFamily: 'SilkScreen' }).setOrigin(0, 0.5);
+        this.staminaText = this.add.text(250, 580, "", { fontSize: '14px', fill: '#fff', fontFamily: 'SilkScreen', backgroundColor: 'rgba(0,0,0,0.7)'}).setOrigin(0, 0.5);
 
         // --- Consumables Panel at Bottom ---
         this.consumablesPanel = this.add.container(0, this.game.config.height - 50);
         let comspacing = 40;
 
         GameState.consumables.forEach((consumable, index) => {
-            let iconX = startX + index * comspacing;
+            let iconX = (startX-135) + index * comspacing;
             let icon = this.add.image(iconX, 0, 'consumableSprites', getConsumableFrame(consumable)).setScale(2);
             icon.setInteractive();
             icon.on('pointerdown', () => {
