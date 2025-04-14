@@ -477,16 +477,16 @@ class MainMenuScene extends Phaser.Scene {
         super({ key: 'MainMenuScene' });
     }
     create() {
-        this.add.text(200, 100, "Select Mode", { fontSize: '28px', fill: '#fff', fontFamily: 'VT323' });
+        this.add.text(200, 100, "Select Mode", { fontSize: '28px', fill: '#fff', fontFamily: 'SilkScreen' });
 
-        let regularButton = this.add.text(200, 150, "Regular Mode", { fontSize: '24px', fill: '#fff', fontFamily: "VT323", backgroundColor: 'rgba(0,0,0,0.7)', padding: { x: 10, y: 5 } })
+        let regularButton = this.add.text(200, 150, "Regular Mode", { fontSize: '24px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)', padding: { x: 10, y: 5 } })
             .setInteractive();
         regularButton.on('pointerdown', () => {
             GameState.devMode = false;
             this.scene.start('StartScene');
         });
 
-        let devButton = this.add.text(200, 200, "Dev Mode", { fontSize: '24px', fill: '#fff', fontFamily: "VT323", backgroundColor: 'rgba(0,0,0,0.7)', padding: { x: 10, y: 5 } })
+        let devButton = this.add.text(200, 200, "Dev Mode", { fontSize: '24px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)', padding: { x: 10, y: 5 } })
             .setInteractive();
         devButton.on('pointerdown', () => {
             GameState.devMode = true;
@@ -515,8 +515,8 @@ class StartScene extends Phaser.Scene {
         // Add background image
         this.add.image(400, 300, 'background');
         let leftMarginY = 150;
-        this.add.text(150, 150, "Run A Marathon With A Dino", { fontSize: '28px', fill: '#fff', fontFamily: "VT323", backgroundColor: 'rgba(0,0,0,0.7)' });
-        this.add.text(150, 200, "Select your starting item", { fontSize: '20px', fill: '#fff', fontFamily: "VT323", backgroundColor: 'rgba(0,0,0,0.7)' });
+        this.add.text(150, 150, "Run A Marathon With A Dino", { fontSize: '28px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
+        this.add.text(150, 200, "Select your starting item", { fontSize: '20px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
         // Randomly pick 3 unique items from the available list.
         let allItems = Object.keys(GameConfig.itemData);
         Phaser.Utils.Array.Shuffle(allItems);
@@ -533,7 +533,7 @@ class StartScene extends Phaser.Scene {
             let frameIndex = getItemFrameIndex(item);
             let icon = this.add.image(0, 0, 'bulkItems', frameIndex).setScale(2);
             let desc = GameConfig.itemData[item].description;
-            let text = this.add.text(40, -8, `${item}: ${desc}`, { fontSize: '16px', fill: '#fff', fontFamily: "VT323", backgroundColor: 'rgba(0,0,0,0.7)' });
+            let text = this.add.text(40, -8, `${item}: ${desc}`, { fontSize: '16px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
             container.add([icon, text]);
 
             container.setSize(300, 20);
@@ -583,7 +583,7 @@ class RaceScene extends Phaser.Scene {
         // --- Distance Tracker ---
         this.distanceProgressText = this.add.text(300, 170, "Distance: 0m / 0m", {
             fontSize: '20px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
         });
@@ -591,24 +591,24 @@ class RaceScene extends Phaser.Scene {
         // --- Timer ---
         this.timerText = this.add.text(300, 200, "Time: 0.0 sec", {
             fontSize: '20px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
         });
         this.cashText = this.add.text(this.game.config.width - 20, 20, `$${GameState.money}`, {
             fontSize: '20px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
         }).setOrigin(1, 0);
 
         // --- Status Menu ---
         this.statusMenu = this.add.container(this.game.config.width - 210, this.game.config.height - 140);
-        this.currentSpeedText = this.add.text(0, 0, "Speed: 00.0 m/s", { fontSize: '16px', fill: '#fff', fontFamily: 'VT323' });
-        this.speedText = this.add.text(0, 20, "Top Speed: 00.0 m/s", { fontSize: '16px', fill: '#fff', fontFamily: 'VT323' });
-        this.weightText = this.add.text(0, 40, "Weight: 100", { fontSize: '16px', fill: '#fff', fontFamily: 'VT323' });
-        this.intoxText = this.add.text(0, 60, "Intox: 0%", { fontSize: '16px', fill: '#fff', fontFamily: 'VT323' });
-        this.wellRestedText = this.add.text(0, 100, "Well Rested: 0%", { fontSize: '16px', fill: '#fff', fontFamily: 'VT323' });
+        this.currentSpeedText = this.add.text(0, 0, "Speed: 00.0 m/s", { fontSize: '16px', fill: '#fff', fontFamily: 'SilkScreen' });
+        this.speedText = this.add.text(0, 20, "Top Speed: 00.0 m/s", { fontSize: '16px', fill: '#fff', fontFamily: 'SilkScreen' });
+        this.weightText = this.add.text(0, 40, "Weight: 100", { fontSize: '16px', fill: '#fff', fontFamily: 'SilkScreen' });
+        this.intoxText = this.add.text(0, 60, "Intox: 0%", { fontSize: '16px', fill: '#fff', fontFamily: 'SilkScreen' });
+        this.wellRestedText = this.add.text(0, 100, "Well Rested: 0%", { fontSize: '16px', fill: '#fff', fontFamily: 'SilkScreen' });
         this.statusMenu.add([this.currentSpeedText, this.speedText, this.weightText, this.intoxText, this.wellRestedText]);
         // After creating the dino, for example:
         this.speedMultiplier = 0;  // default speed multiplier
@@ -999,7 +999,7 @@ class RaceScene extends Phaser.Scene {
             icon.on('pointerover', () => {
                 let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemData[item].description}`, {
                     fontSize: '14px',
-                    fill: '#fff', fontFamily: "VT323",
+                    fill: '#fff', fontFamily: "SilkScreen",
                     backgroundColor: 'rgba(0,0,0,0.7)',
                     padding: { x: 5, y: 5 }
                 }).setOrigin(0.5, 1);
@@ -1065,7 +1065,7 @@ class RaceScene extends Phaser.Scene {
         // Green bar showing current stamina.
         this.staminaBar = this.add.rectangle(250, 580, 300, 20, 0x24DBAB);
         this.staminaBar.setOrigin(0, 0.5)
-        this.staminaText = this.add.text(250, 580, "", { fontSize: '14px', fill: '#fff', fontFamily: 'VT323' }).setOrigin(0, 0.5);
+        this.staminaText = this.add.text(250, 580, "", { fontSize: '14px', fill: '#fff', fontFamily: 'SilkScreen' }).setOrigin(0, 0.5);
 
         // --- Consumables Panel at Bottom ---
         this.consumablesPanel = this.add.container(0, this.game.config.height - 50);
@@ -1080,7 +1080,7 @@ class RaceScene extends Phaser.Scene {
                 let worldY = icon.y + this.consumablesPanel.y;
                 let tooltip = this.add.text(worldX, worldY - 30, `Eat ${consumable}?`, {
                     fontSize: '14px',
-                    fill: '#fff', fontFamily: "VT323",
+                    fill: '#fff', fontFamily: "SilkScreen",
                     backgroundColor: 'rgba(0,0,0,0.7)',
                     padding: { x: 5, y: 5 }
                 }).setOrigin(0.5);
@@ -1116,10 +1116,10 @@ class RaceScene extends Phaser.Scene {
         this.stamina = GameState.maxStamina;
 
         // Display current race distance.
-        this.roundText = this.add.text(10, 10, `Round: ${this.roundIndex + 1} / ${GameConfig.rounds.length}`, { fontSize: '20px', fill: '#fff', fontFamily: "VT323", backgroundColor: 'rgba(0,0,0,0.7)' });
+        this.roundText = this.add.text(10, 10, `Round: ${this.roundIndex + 1} / ${GameConfig.rounds.length}`, { fontSize: '20px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
 
         // Display current race distance.
-        this.distanceText = this.add.text(10, 32, `Distance: ${this.distance}m`, { fontSize: '20px', fill: '#fff', fontFamily: "VT323", backgroundColor: 'rgba(0,0,0,0.7)' });
+        this.distanceText = this.add.text(10, 32, `Distance: ${this.distance}m`, { fontSize: '20px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
 
         // Set up a timer event to update the race simulation every 100ms.
         this.timerEvent = this.time.addEvent({
@@ -1135,7 +1135,7 @@ class RaceScene extends Phaser.Scene {
         // Create a label for the fast forward section in the bottom left.
         let ffLabel = this.add.text(20, this.game.config.height - 80, "Fast Forward:", {
             fontSize: '18px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 5, y: 5 }
         });
@@ -1143,7 +1143,7 @@ class RaceScene extends Phaser.Scene {
         // Create a minus button. It will lower the multiplier but not below 1.
         let minusButton = this.add.text(20, this.game.config.height - 50, "–", {
             fontSize: '24px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 5, y: 5 }
         }).setInteractive();
@@ -1151,7 +1151,7 @@ class RaceScene extends Phaser.Scene {
         // Create a plus button. It will raise the multiplier up to 20.
         let plusButton = this.add.text(60, this.game.config.height - 50, "+", {
             fontSize: '24px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 5, y: 5 }
         }).setInteractive();
@@ -1159,7 +1159,7 @@ class RaceScene extends Phaser.Scene {
         // Create a display for the current fast forward value.
         let ffDisplay = this.add.text(110, this.game.config.height - 50, this.fastForward.toFixed(1), {
             fontSize: '24px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 5, y: 5 }
         });
@@ -1435,10 +1435,10 @@ class RaceScene extends Phaser.Scene {
         //this.createConfetti(intensity);
 
         let summaryText = `Race Complete!\nStamina left: ${Math.floor(percentLeft)}%\nYou earned $${reward}\nTime: ${completionTime} sec`;
-        this.add.text(300, 200, summaryText, { fontSize: '20px', fill: '#fff', fontFamily: "VT323", backgroundColor: '#000' });
+        this.add.text(300, 200, summaryText, { fontSize: '20px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: '#000' });
         let gotoRewardButton = this.add.text(this.cameras.main.centerX, 400, "Next", {
             fontSize: '24px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
         }).setOrigin(0.5).setInteractive();
@@ -1488,7 +1488,7 @@ class RaceScene extends Phaser.Scene {
 
     raceLost() {
         // Display a loss message then reset the game state and return to Main Menu.
-        this.add.text(300, 200, "You ran out of stamina!\nReturning to Main Menu...", { fontSize: '20px', fill: '#fff', fontFamily: "VT323", backgroundColor: '#000' });
+        this.add.text(300, 200, "You ran out of stamina!\nReturning to Main Menu...", { fontSize: '20px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: '#000' });
         // Reset game progress.
         GameState.currentLevel = 0;
         GameState.money = 0;
@@ -1539,7 +1539,7 @@ class DevPauseScene extends Phaser.Scene {
         // Example: a Resume button.
         let resumeButton = this.add.text(this.cameras.main.centerX, 450, "Resume", {
             fontSize: '24px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
         }).setOrigin(0.5).setInteractive();
@@ -1562,7 +1562,7 @@ class DevPauseScene extends Phaser.Scene {
         // Create a button for "Give Yourself $1000"
         let addMoneyButton = this.add.text(this.cameras.main.centerX, 170, "Add $1000", {
             fontSize: '20px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
         }).setOrigin(0.5).setInteractive();
@@ -1576,7 +1576,7 @@ class DevPauseScene extends Phaser.Scene {
         // Create a button for "Switch Level"
         let switchLevelButton = this.add.text(this.cameras.main.centerX, 220, "Switch Level", {
             fontSize: '20px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
         }).setOrigin(0.5).setInteractive();
@@ -1593,7 +1593,7 @@ class DevPauseScene extends Phaser.Scene {
         // Create a button for "Add Item" to inventory.
         let addItemButton = this.add.text(this.cameras.main.centerX, 270, "Add Item", {
             fontSize: '20px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
         }).setOrigin(0.5).setInteractive();
@@ -1615,7 +1615,7 @@ class DevPauseScene extends Phaser.Scene {
         // Create a button for "Save Dev Mode State"
         let saveStateButton = this.add.text(this.cameras.main.centerX, 350, "Save Dev State", {
             fontSize: '20px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
         }).setOrigin(0.5).setInteractive();
@@ -1665,7 +1665,7 @@ class ShopScene extends Phaser.Scene {
         // Create a cash display box in the top right corner.
         this.cashText = this.add.text(this.game.config.width - 20, 20, `$${GameState.money}`, {
             fontSize: '20px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
         }).setOrigin(1, 0);
@@ -1696,7 +1696,7 @@ class ShopScene extends Phaser.Scene {
                 icon.on('pointerover', () => {
                     let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemData[item].description}`, {
                         fontSize: '14px',
-                        fill: '#fff', fontFamily: "VT323",
+                        fill: '#fff', fontFamily: "SilkScreen",
                         backgroundColor: 'rgba(0,0,0,0.7)',
                         padding: { x: 5, y: 5 }
                     }).setOrigin(0.5, 1);
@@ -1744,7 +1744,7 @@ class ShopScene extends Phaser.Scene {
 
                     let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemData[item].description}`, {
                         fontSize: '14px',
-                        fill: '#fff', fontFamily: "VT323",
+                        fill: '#fff', fontFamily: "SilkScreen",
                         backgroundColor: 'rgba(0,0,0,0.7)',
                         padding: { x: 5, y: 5 }
                     }).setOrigin(0.5, 1);
@@ -1753,7 +1753,7 @@ class ShopScene extends Phaser.Scene {
                     // Create a tooltip for selling just below the icon.
                     let sellTooltip = this.add.text(x, iconY + iconSize + 10, `Sell ${item} for $${sellValue}?`, {
                         fontSize: '14px',
-                        fill: '#fff', fontFamily: "VT323",
+                        fill: '#fff', fontFamily: "SilkScreen",
                         backgroundColor: 'rgba(0,0,0,0.7)',
                         padding: { x: 5, y: 5 }
                     }).setOrigin(0.5, 0);
@@ -1806,8 +1806,8 @@ class ShopScene extends Phaser.Scene {
         // Call this once initially.
         this.updateInventoryDisplay();
 
-        this.add.text(300, 50, "Shop", { fontSize: '28px', fill: '#fff', fontFamily: "VT323", backgroundColor: 'rgba(0,0,0,0.7)' });
-        this.add.text(50, 100, "Click an item to buy it, click an item in your inventory to sell it", { fontSize: '18px', fill: '#fff', fontFamily: "VT323", backgroundColor: 'rgba(0,0,0,0.7)' });
+        this.add.text(300, 50, "Shop", { fontSize: '28px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
+        this.add.text(50, 100, "Click an item to buy it, click an item in your inventory to sell it", { fontSize: '18px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
         let rerollCheck = false;
 
 
@@ -1841,14 +1841,14 @@ class ShopScene extends Phaser.Scene {
                 // Create price text to the left of the icon.
                 let priceText = this.add.text(-50, 0, `$${price}`, {
                     fontSize: '16px',
-                    fill: '#fff', fontFamily: "VT323",
+                    fill: '#fff', fontFamily: "SilkScreen",
                     backgroundColor: 'rgba(0,0,0,0.7)',
                     padding: { x: 5, y: 2 }
                 }).setOrigin(0.5);
                 // Create description text.
                 let descText = this.add.text(40, -8, `${item}: ${GameConfig.itemData[item].description}`, {
                     fontSize: '16px',
-                    fill: '#fff', fontFamily: "VT323",
+                    fill: '#fff', fontFamily: "SilkScreen",
                     backgroundColor: 'rgba(0,0,0,0.7)'
                 });
 
@@ -1879,7 +1879,7 @@ class ShopScene extends Phaser.Scene {
                             let tipY = container.y + 150;
                             let shoptip = this.add.text(tipX, tipY, `You Bought ${item}`, {
                                 fontSize: '14px',
-                                fill: '#fff', fontFamily: "VT323",
+                                fill: '#fff', fontFamily: "SilkScreen",
                                 backgroundColor: 'rgba(0,0,0,0.7)',
                                 padding: { x: 5, y: 5 }
                             }).setOrigin(0.5);
@@ -1898,7 +1898,7 @@ class ShopScene extends Phaser.Scene {
                             let tipY = container.y + 150;
                             let shoptip = this.add.text(tipX, tipY, `Not enough space, stranger`, {
                                 fontSize: '14px',
-                                fill: '#fff', fontFamily: "VT323",
+                                fill: '#fff', fontFamily: "SilkScreen",
                                 backgroundColor: 'rgba(0,0,0,0.7)',
                                 padding: { x: 5, y: 5 }
                             }).setOrigin(0.5);
@@ -1913,7 +1913,7 @@ class ShopScene extends Phaser.Scene {
                         let tipY = container.y + 150;
                         let shoptip = this.add.text(tipX, tipY, `Not enough cash, stranger`, {
                             fontSize: '14px',
-                            fill: '#fff', fontFamily: "VT323",
+                            fill: '#fff', fontFamily: "SilkScreen",
                             backgroundColor: 'rgba(0,0,0,0.7)',
                             padding: { x: 5, y: 5 }
                         }).setOrigin(0.5);
@@ -1935,11 +1935,11 @@ class ShopScene extends Phaser.Scene {
 
             let leaveShopButton = this.add.text(this.cameras.main.centerX, this.game.config.height - 50, "Leave Shop", {
                 fontSize: '20px',
-                fill: '#fff', fontFamily: "VT323",
+                fill: '#fff', fontFamily: "SilkScreen",
                 backgroundColor: 'rgba(0,0,0,0.7)',
                 padding: { x: 10, y: 5 }
             }).setOrigin(0.5).setInteractive();
-            this.nextRoundText = this.add.text(leaveShopButton.x - 90, this.game.config.height - 85, `Next Round: ${GameConfig.rounds[GameState.currentLevel]}m`, { fontSize: '20px', fill: '#fff', fontFamily: "VT323", backgroundColor: 'rgba(0,0,0,0.7)' });
+            this.nextRoundText = this.add.text(leaveShopButton.x - 90, this.game.config.height - 85, `Next Round: ${GameConfig.rounds[GameState.currentLevel]}m`, { fontSize: '20px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
             console.log(GameState.currentLevel)
             leaveShopButton.on('pointerdown', () => {
                 this.scene.start('RaceScene');
@@ -1951,7 +1951,7 @@ class ShopScene extends Phaser.Scene {
         // Create a Reroll button in the bottom left of the shop section.
         this.rerollButton = this.add.text(20, 150, "Reroll \n ($" + this.rerollPrice + ")", {
             fontSize: '20px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
         }).setInteractive();
@@ -1972,7 +1972,7 @@ class ShopScene extends Phaser.Scene {
                 let tipY = this.rerollButton.y + 60;
                 let shoptip = this.add.text(tipX, tipY, `Not enough cash, stranger`, {
                     fontSize: '14px',
-                    fill: '#fff', fontFamily: "VT323",
+                    fill: '#fff', fontFamily: "SilkScreen",
                     backgroundColor: 'rgba(0,0,0,0.7)',
                     padding: { x: 5, y: 5 }
                 }).setOrigin(0.5);
@@ -1990,7 +1990,7 @@ class ShopScene extends Phaser.Scene {
             this.rerollButton.y + this.rerollButton.height + 10,
             "Buy New \nItem Slot \n ($" + GameState.newSlotPrice + ")", {
             fontSize: '15px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
         }).setInteractive();*/
@@ -2010,7 +2010,7 @@ class ShopScene extends Phaser.Scene {
                     this.newSlotButton.y - 20,
                     "Item slot purchased!", {
                     fontSize: '16px',
-                    fill: '#fff', fontFamily: "VT323",
+                    fill: '#fff', fontFamily: "SilkScreen",
                     backgroundColor: 'rgba(0,0,0,0.7)',
                     padding: { x: 5, y: 5 }
                 }).setOrigin(0.5);
@@ -2023,7 +2023,7 @@ class ShopScene extends Phaser.Scene {
                     this.newSlotButton.y + 20,
                     "Not enough cash, stranger", {
                     fontSize: '16px',
-                    fill: '#fff', fontFamily: "VT323",
+                    fill: '#fff', fontFamily: "SilkScreen",
                     backgroundColor: 'rgba(0,0,0,0.7)',
                     padding: { x: 5, y: 5 }
                 }).setOrigin(0.5);
@@ -2043,7 +2043,7 @@ class ShopScene extends Phaser.Scene {
         let headerY = this.consumableContainer.y + 40;
         this.add.text(300, headerY + 30, "Consumables", {
             fontSize: '28px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)'
         }).setOrigin(0.5);
         let consStartY = headerY - 200;
@@ -2077,7 +2077,7 @@ class ShopScene extends Phaser.Scene {
             // Create price text to the left of the icon
             let priceText = this.add.text(-50, 0, `$${price}`, {
                 fontSize: '16px',
-                fill: '#fff', fontFamily: "VT323",
+                fill: '#fff', fontFamily: "SilkScreen",
                 backgroundColor: 'rgba(0,0,0,0.7)',
                 padding: { x: 5, y: 2 }
             }).setOrigin(0.5);
@@ -2085,7 +2085,7 @@ class ShopScene extends Phaser.Scene {
             // Create description text (using the description from GameConfig)
             let descText = this.add.text(40, -8, `${consumable}: ${GameConfig.consumableDescriptions[consumable]}`, {
                 fontSize: '16px',
-                fill: '#fff', fontFamily: "VT323",
+                fill: '#fff', fontFamily: "SilkScreen",
                 backgroundColor: 'rgba(0,0,0,0.7)'
             });
 
@@ -2107,7 +2107,7 @@ class ShopScene extends Phaser.Scene {
                     let tipY = container.y + 30;
                     let shoptip = this.add.text(tipX, tipY, `You Bought ${consumable}`, {
                         fontSize: '14px',
-                        fill: '#fff', fontFamily: "VT323",
+                        fill: '#fff', fontFamily: "SilkScreen",
                         backgroundColor: 'rgba(0,0,0,0.7)',
                         padding: { x: 5, y: 5 }
                     }).setOrigin(0.5);
@@ -2119,12 +2119,13 @@ class ShopScene extends Phaser.Scene {
 
                     // Remove this consumable option from the shop display.
                     container.destroy();
+                    this.updateConsumableInventory();
                 } else {
                     let tipX = container.x + container.width / 2;
                     let tipY = container.y + 250;
                     let shoptip = this.add.text(tipX, tipY, `Not enough cash, stranger`, {
                         fontSize: '14px',
-                        fill: '#fff', fontFamily: "VT323",
+                        fill: '#fff', fontFamily: "SilkScreen",
                         backgroundColor: 'rgba(0,0,0,0.7)',
                         padding: { x: 5, y: 5 }
                     }).setOrigin(0.5);
@@ -2166,7 +2167,7 @@ class ShopScene extends Phaser.Scene {
                 // Create tooltip in world space:
                 let tooltip = this.add.text(worldX, worldY - 30, `Eat ${consumable}?`, {
                     fontSize: '14px',
-                    fill: '#fff', fontFamily: "VT323",
+                    fill: '#fff', fontFamily: "SilkScreen",
                     backgroundColor: 'rgba(0,0,0,0.7)',
                     padding: { x: 5, y: 5 }
                 }).setOrigin(0.5);
@@ -2201,6 +2202,29 @@ class ShopScene extends Phaser.Scene {
         });
 
     }
+    updateConsumableInventory() {
+        // If the panel already exists, remove its children; otherwise, create it.
+        if (this.consumablesPanel) {
+            this.consumablesPanel.removeAll(true);
+        } else {
+            // Create the panel container if it doesn't exist.
+            this.consumablesPanel = this.add.container(0, this.game.config.height - 50);
+        }
+    
+        // We'll assume you want to display the consumable icons side by side.
+        let startX = 20; // starting X position for icons.
+        let spacing = 40; // horizontal spacing between icons.
+    
+        // Loop through each consumable in GameState.consumables and add an icon.
+        GameState.consumables.forEach((consumable, index) => {
+            let iconX = startX + index * spacing;
+            let icon = this.add.image(iconX, 0, 'consumableSprites', getConsumableFrame(consumable)).setScale(2);
+            icon.setInteractive();
+            // Optionally, add pointer events or tooltips to these inventory icons.
+            this.consumablesPanel.add(icon);
+        });
+    }
+    
 }
 
 
@@ -2229,7 +2253,7 @@ class WinScreenScene extends Phaser.Scene {
         // Display the stats in the center of the screen.
         this.add.text(400, 200, statsText, {
             fontSize: '24px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             align: 'center',
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 10 }
@@ -2238,7 +2262,7 @@ class WinScreenScene extends Phaser.Scene {
         // Create a "New Run" button.
         let newRunButton = this.add.text(400, 400, "New Run", {
             fontSize: '32px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 20, y: 10 }
         }).setOrigin(0.5).setInteractive();
@@ -2267,11 +2291,11 @@ class RewardScene extends Phaser.Scene {
         this.add.image(400, 300, 'background');
 
         // Display a header message.
-        this.add.text(400, 100, "Choose Your Reward", { fontSize: '28px', fill: '#fff', fontFamily: "VT323", backgroundColor: 'rgba(0,0,0,0.7)' }).setOrigin(0.5);
+        this.add.text(400, 100, "Choose Your Reward", { fontSize: '28px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' }).setOrigin(0.5);
         
         this.cashText = this.add.text(this.game.config.width - 20, 20, `$${GameState.money}`, {
             fontSize: '20px',
-            fill: '#fff', fontFamily: "VT323",
+            fill: '#fff', fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
         }).setOrigin(1, 0);
@@ -2306,7 +2330,7 @@ class RewardScene extends Phaser.Scene {
                 icon.on('pointerover', () => {
                     let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemData[item].description}`, {
                         fontSize: '14px',
-                        fill: '#fff', fontFamily: "VT323",
+                        fill: '#fff', fontFamily: "SilkScreen",
                         backgroundColor: 'rgba(0,0,0,0.7)',
                         padding: { x: 5, y: 5 }
                     }).setOrigin(0.5, 1);
@@ -2354,7 +2378,7 @@ class RewardScene extends Phaser.Scene {
 
                     let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemData[item].description}`, {
                         fontSize: '14px',
-                        fill: '#fff', fontFamily: "VT323",
+                        fill: '#fff', fontFamily: "SilkScreen",
                         backgroundColor: 'rgba(0,0,0,0.7)',
                         padding: { x: 5, y: 5 }
                     }).setOrigin(0.5, 1);
@@ -2363,7 +2387,7 @@ class RewardScene extends Phaser.Scene {
                     // Create a tooltip for selling just below the icon.
                     let sellTooltip = this.add.text(x, iconY + iconSize + 10, `Sell ${item} for $${sellValue}?`, {
                         fontSize: '14px',
-                        fill: '#fff', fontFamily: "VT323",
+                        fill: '#fff', fontFamily: "SilkScreen",
                         backgroundColor: 'rgba(0,0,0,0.7)',
                         padding: { x: 5, y: 5 }
                     }).setOrigin(0.5, 0);
@@ -2474,7 +2498,7 @@ class RewardScene extends Phaser.Scene {
         container.add([bg, text]);
     
         // Add the label below.
-        this.add.text(x, y + 330, label, { fontSize: '20px', fill: '#fff', fontFamily: "VT323", backgroundColor: 'rgba(0,0,0,0.7)' }).setOrigin(0.5);
+        this.add.text(x, y + 330, label, { fontSize: '20px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' }).setOrigin(0.5);
     
         container.setInteractive(new Phaser.Geom.Rectangle(0, 150, 120, 120), Phaser.Geom.Rectangle.Contains);
         return container;
@@ -2509,7 +2533,7 @@ class RewardScene extends Phaser.Scene {
         let itemDescriptionText = this.add.text(100, 80, `${randomItem}:${description}`,{
             fontSize: '16px',
             fill: '#fff',
-            fontFamily: "VT323",
+            fontFamily: "SilkScreen",
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 5, y: 5 }
         }).setOrigin(0.5);
