@@ -514,7 +514,7 @@ class StartScene extends Phaser.Scene {
     create() {
         // Add background image
         this.add.image(400, 300, 'background');
-        let leftMarginY = 150;
+        //let leftMarginY = 150;
         this.add.text(150, 150, "Run A Marathon With A Dino", { fontSize: '28px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
         this.add.text(150, 200, "Select your starting item", { fontSize: '20px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
         // Randomly pick 3 unique items from the available list.
@@ -1043,6 +1043,7 @@ class RaceScene extends Phaser.Scene {
         t = Phaser.Math.Clamp(t, 0, 1);
         let baseScale = Phaser.Math.Linear(1, 0.2, t);
         let dinoScale = baseScale * 4;
+        let flagScale = baseScale * 1;
         //dinoScale *= (1 + (GameState.weight - 100) * 0.01);
 
         // Create the dino sprite from its sprite sheet.
@@ -1057,7 +1058,7 @@ class RaceScene extends Phaser.Scene {
         this.dino.play('run');
 
         // Place the checkered flag image at the finish line.
-        this.flag = this.add.image(750, 330, 'flag');
+        this.flag = this.add.image(750, 330, 'flag').setScale(flagScale);
 
         // Create a stamina bar.
         // Background bar.
@@ -2696,7 +2697,7 @@ function applyConsumableEffect(consumable, scene) {
         case 'Banana':
             scene.stamina = Math.min(scene.stamina + GameState.maxStamina * 0.20, GameState.maxStamina);
             break;
-            
+
         case 'Beer':
             // Restore 20% of max stamina.
             scene.stamina = Math.min(scene.stamina + GameState.maxStamina * 0.20, GameState.maxStamina);
