@@ -2283,6 +2283,10 @@ class ShopScene extends Phaser.Scene {
                 }
             });
             container.on('pointerdown', () => {
+                if (container.tooltip) {
+                    container.tooltip.destroy();
+                    container.tooltip = null;
+                }
                 if (GameState.money >= price) {
                     // Deduct the price and update cash display.
                     GameState.money -= price;
