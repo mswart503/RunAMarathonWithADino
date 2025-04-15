@@ -140,51 +140,61 @@ var GameConfig = {
     itemData: {
         //Flow state: Halve stamina usage
         Coin: {
+            name: "Coin",
             rarity: "Common", cycle: 3,
             description: "Halves stamina usage for 1 sec every 3 sec.",
             image: { col: 23, row: 9 }, price: commonPrice
         },
         Bit: {
+            name: "Bit",
             rarity: "Common", cycle: 4,
             description: "Halves stamina usage for 1 sec every 4 sec.",
             image: { col: 26, row: 9 }, price: commonPrice
         },
         Copper: {
+            name: "Copper",
             rarity: "Common", cycle: 5,
             description: "Halves stamina usage for 1 sec every 5 sec.",
             image: { col: 32, row: 9 }, price: commonPrice
         },
         CopperStack: {
+            name: "Copper Stack",
             rarity: "Common", cycle: 5,
             description: "Halves stamina usage for 2 sec every 5 sec.",
             image: { col: 34, row: 9 }, price: commonPrice
         },
         Silver: {
+            name: "Silver",
             rarity: "Uncommon", cycle: 5,
             description: "Halves stamina usage for 3 sec every 5 sec.",
             image: { col: 18, row: 9 }, price: uncommonPrice
         },
         Dubloon: {
+            name: "Dubloon",
             rarity: "Uncommon", cycle: 2,
             description: "Halves stamina usage for 1 sec every 2 sec.",
             image: { col: 15, row: 9 }, price: uncommonPrice
         },
         Piece: {
+            name: "Piece",
             rarity: "Uncommon", cycle: 4,
             description: "Halves stamina usage for 2 sec every 4 sec.",
             image: { col: 12, row: 9 }, price: uncommonPrice
         },
         Gold: {
+            name: "Gold",
             rarity: "Rare", cycle: 5,
             description: "Halves stamina usage for 4 sec every 5 sec.",
             image: { col: 3, row: 9 }, price: rarePrice
         },
         Pound: {
+            name: "Pound",
             rarity: "Rare", cycle: 3,
             description: "Halves stamina usage for 2 sec every 3 sec.",
             image: { col: 10, row: 9 }, price: rarePrice
         },
         Booty: {
+            name: "Booty",
             rarity: "Rare", cycle: 4,
             description: "Halves stamina usage for 3 sec every 4 sec.",
             image: { col: 13, row: 9 }, price: rarePrice
@@ -193,76 +203,91 @@ var GameConfig = {
 
         //Recovers stamina periodically
         RubyAmulet: {
+            name: "Ruby Amulet",
             rarity: "Common", cycle: 5,
             description: "Recovers 3% stamina every 5 sec.",
             image: { col: 11, row: 6 }, price: commonPrice
         },
         SapphireAmulet: {
+            name: "Sapphire Amulet",
             rarity: "Common", cycle: 4,
             description: "Recovers 3% stamina every 4 sec.",
             image: { col: 12, row: 6 }, price: commonPrice
         },
         AmethystAmulet: {
+            name: "Amethyst Amulet",
             rarity: "Common", cycle: 3,
             description: "Recovers 3% stamina every 3 sec.",
             image: { col: 13, row: 6 }, price: commonPrice
         },
         EmeraldAmulet: {
+            name: "Emerald Amulet",
             rarity: "Common", cycle: 2,
             description: "Recovers 3% stamina every 2 sec.",
             image: { col: 14, row: 6 }, price: commonPrice
         },
         BlessedRubyAmulet: {
+            name: "Blessed Ruby Amulet",
             rarity: "Common", cycle: 5,
             description: "Recovers 5% stamina every 5 sec.",
             image: { col: 1, row: 6 }, price: commonPrice
         },
         BlessedSapphireAmulet: {
+            name: "Blessed Sapphire Amulet",
             rarity: "Common", cycle: 4,
             description: "Recovers 5% stamina every 4 sec.",
             image: { col: 2, row: 6 }, price: commonPrice
         },
         BlessedAmethystAmulet: {
+            name: "Blessed Amethyst Amulet",
             rarity: "Common", cycle: 3,
             description: "Recovers 5% stamina every 3 sec.",
             image: { col: 3, row: 6 }, price: commonPrice
         },
         BlessedEmeraldAmulet: {
+            name: "Blessed Emerald Amulet",
             rarity: "Common", cycle: 5,
             description: "Recovers 7% stamina every 5 sec.",
             image: { col: 4, row: 6 }, price: commonPrice
         },
         PharaohsAmulet: {
+            name: "Pharaohs Amulet",
             rarity: "Uncommon", cycle: 5,
             description: "Recovers 9% stamina every 5 sec.",
             image: { col: 16, row: 6 }, price: uncommonPrice
         },
         DeceiversAmulet: {
+            name: "Deceivers Amulet",
             rarity: "Uncommon", cycle: 4,
             description: "Recovers 5% stamina every 4 sec.",
             image: { col: 18, row: 6 }, price: uncommonPrice
         },
         HolyAmulet: {
+            name: "Holy Amulet",
             rarity: "Uncommon", cycle: 5,
             description: "Recovers 11% stamina every 5 sec.",
             image: { col: 22, row: 6 }, price: uncommonPrice
         },
         MessiahAmulet: {
+            name: "Messiah Amulet",
             rarity: "Rare", cycle: 1,
             description: "Recovers 3% stamina every 1 sec.",
             image: { col: 30, row: 6 }, price: rarePrice
         },
         UnderworldAmulet: {
+            name: "Underworld Amulet",
             rarity: "Rare", cycle: 2,
             description: "Recovers 5% stamina every 2 sec.",
             image: { col: 21, row: 6 }, price: rarePrice
         },
         ShiningAmulet: {
+            name: "Shining Amulet",
             rarity: "Rare", cycle: 3,
             description: "Recovers 7% stamina every 3 sec.",
             image: { col: 20, row: 6 }, price: rarePrice
         },
         AmbixAmulet: {
+            name: "Ambix Amulet",
             rarity: "Rare", cycle: 4,
             description: "Recovers 9% stamina every 4 sec.",
             image: { col: 31, row: 6 }, price: rarePrice
@@ -270,51 +295,61 @@ var GameConfig = {
 
         //Flat Speed Increase
         Shoes: {
+            name: "Shoes",
             rarity: "Common", flatSpeedIncrease: 0.5,
             description: "Increase Speed by 50%",
             image: { col: 21, row: 31 }, price: commonPrice
         },
         CowboyBoots: {
+            name: "Cowboy Boots",
             rarity: "Common", flatSpeedIncrease: 0.6,
             description: "Increase Speed by 60%",
             image: { col: 22, row: 31 }, price: commonPrice
         },
         Galoshes: {
+            name: "Galoshes",
             rarity: "Common", flatSpeedIncrease: 0.7,
             description: "Increase Speed by 70%",
             image: { col: 23, row: 31 }, price: commonPrice
         },
         Sneakers: {
+            name: "Sneakers",
             rarity: "Common", flatSpeedIncrease: 0.8,
             description: "Increase Speed by 80%",
             image: { col: 24, row: 31 }, price: commonPrice
         },
         Nikes: {
+            name: "Nikes",
             rarity: "Common", flatSpeedIncrease: 0.9,
             description: "Increase Speed by 90%",
             image: { col: 24, row: 32 }, price: commonPrice
         },
         NiceShoes: {
+            name: "Nice Shoes",
             rarity: "Uncommon", flatSpeedIncrease: 1.0,
             description: "Increase Speed by 100%",
             image: { col: 21, row: 32 }, price: uncommonPrice
         },
         SuedeCowboyBoots: {
+            name: "Space Cowboy Boots",
             rarity: "Uncommon", flatSpeedIncrease: 1.1,
             description: "Increase Speed by 110%",
             image: { col: 22, row: 32 }, price: uncommonPrice
         },
         ToughGaloshes: {
+            name: "Tough Galoshes",
             rarity: "Uncommon", flatSpeedIncrease: 1.2,
             description: "Increase Speed by 120%",
             image: { col: 23, row: 32 }, price: uncommonPrice
         },
         Hokas: {
+            name: "Hokas",
             rarity: "Rare", flatSpeedIncrease: 1.3,
             description: "Increase Speed by 130%",
             image: { col: 24, row: 33 }, price: rarePrice
         },
         BestGaloshes: {
+            name: "Best Galoshes",
             rarity: "Rare", flatSpeedIncrease: 1.4,
             description: "Increase Speed by 140%",
             image: { col: 23, row: 33 }, price: rarePrice
@@ -322,21 +357,25 @@ var GameConfig = {
 
         //Increase speed on each cooldown trigger:
         Cape: {
+            name: "Cape",
             rarity: "Uncommon", cooldownSpeedBonus: 0.05,
             description: "Each cooldown trigger increases speed by 5%.",
             image: { col: 28, row: 18 }, price: rarePrice
         },
         BloodCape: {
+            name: "Blood Cape",
             rarity: "Uncommon", cooldownSpeedBonus: 0.1,
             description: "Each cooldown trigger increases speed by 10%.",
             image: { col: 28, row: 21 }, price: rarePrice
         },
         RegalCape: {
+            name: "Regal Cape",
             rarity: "Rare", cooldownSpeedBonus: 0.15,
             description: "Each cooldown trigger increases speed by 15%.",
             image: { col: 28, row: 22 }, price: elitePrice
         },
         DarkCape: {
+            name: "Dark Cape",
             rarity: "Rare", cooldownSpeedBonus: 0.20,
             description: "Each cooldown trigger increases speed by 20%.",
             image: { col: 28, row: 23 }, price: elitePrice
@@ -344,18 +383,21 @@ var GameConfig = {
 
         // --- Scaling stamina per win
         Torch: {
+            name: "Torch",
             rarity: "Common",
             description: "Increases max stamina by 2 points per win.",
             image: { col: 2, row: 12 }, price: commonPrice
             // No periodic cycle needed—this is a discrete bonus per win.
         },
         Candle: {
+            name: "Candle",
             rarity: "Uncommon",
             description: "Increases max stamina by 4 points per win.",
             image: { col: 1, row: 12 }, price: uncommonPrice
             // No periodic cycle needed—this is a discrete bonus per win.
         },
         Lamp: {
+            name: "Lamp",
             rarity: "Rare",
             description: "Increases max stamina by 6 points per win.",
             image: { col: 14, row: 12 }, price: rarePrice
@@ -364,24 +406,28 @@ var GameConfig = {
 
         // --- Scaling Speed per win
         OilLantern: {
+            name: "Oil Lantern",
             rarity: "Common",
             description: "Permanently Increase Speed by 5 m/s per win.",
             image: { col: 4, row: 12 }, price: commonPrice
             // You might include other properties if needed.
         },
         FlameLantern: {
+            name: "Flame Lantern",
             rarity: "Uncommon",
             description: "Permanently Increase Speed by 7 m/s per win.",
             image: { col: 5, row: 12 }, price: uncommonPrice
             // You might include other properties if needed.
         },
         IceLantern: {
+            name: "Ice Lantern",
             rarity: "Unommon",
             description: "Permanently Increase Speed by 10 m/s per win.",
             image: { col: 6, row: 12 }, price: uncommonPrice
             // You might include other properties if needed.
         },
         RegalLantern: {
+            name: "Regal Lantern",
             rarity: "Rare",
             description: "Permanently Increase Speed by 12 m/s per win.",
             image: { col: 7, row: 12 }, price: rarePrice
@@ -397,6 +443,7 @@ var GameConfig = {
          },*/
 
         WhiteMushroom: {
+            name: "White Mushroom",
             rarity: "Uncommon",
             description: "Each Consumable Eaten Increases \nSpeed 100% for current race.",
             image: { col: 4, row: 4 }, price: commonPrice // (adjust these numbers to the correct sprite position)
@@ -404,6 +451,7 @@ var GameConfig = {
         },
 
         GuildedMushroom: {
+            name: "Builded Mushroo,",
             rarity: "Uncommon",
             description: "Each Consumable Eaten Increases \nSpeed 110% for current race.",
             image: { col: 3, row: 4 }, price: uncommonPrice // (adjust these numbers to the correct sprite position)
@@ -411,6 +459,7 @@ var GameConfig = {
         },
 
         DarkMushroom: {
+            name: "Dark Mushroom",
             rarity: "Uncommon",
             description: "Each Consumable Eaten Increases \nSpeed 120% for current race.",
             image: { col: 1, row: 4 }, price: uncommonPrice // (adjust these numbers to the correct sprite position)
@@ -532,8 +581,9 @@ class StartScene extends Phaser.Scene {
             // Get the frame index from the sprite sheet using our mapping.
             let frameIndex = getItemFrameIndex(item);
             let icon = this.add.image(0, 0, 'bulkItems', frameIndex).setScale(2);
+            let itemName = GameConfig.itemData[item].name;
             let desc = GameConfig.itemData[item].description;
-            let text = this.add.text(40, -8, `${item}: ${desc}`, { fontSize: '16px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
+            let text = this.add.text(40, -8, `${itemName}: ${desc}`, { fontSize: '16px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
             container.add([icon, text]);
 
             container.setSize(300, 20);
@@ -635,6 +685,7 @@ class RaceScene extends Phaser.Scene {
         GameState.equippedItems.forEach((item, index) => {
             if (item === "Coin") {
                 this.effectManager.addEffect({
+                    name: "Coin",
                     type: "stamina",
                     value: 0.5,          // Half stamina usage
                     cycle: 3,            // Every 3 seconds,
@@ -647,6 +698,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "Bit") {
                 this.effectManager.addEffect({
+                    name: "Bit",
                     type: "stamina",
                     value: 0.5,          // Half stamina usage
                     cycle: 4,            // Every 4 seconds,
@@ -658,6 +710,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "Copper") {
                 this.effectManager.addEffect({
+                    name: "Copper",
                     type: "stamina",
                     value: 0.5,          // Half stamina usage
                     cycle: 5,            // Every 5 seconds,
@@ -670,6 +723,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "CopperStack") {
                 this.effectManager.addEffect({
+                    name: "Copper Stack",
                     type: "stamina",
                     value: 0.5,          // Half stamina usage
                     cycle: 5,            // Every 5 seconds,
@@ -682,6 +736,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "Silver") {
                 this.effectManager.addEffect({
+                    name: "Silver",
                     type: "stamina",
                     value: 0.5,          // Half stamina usage
                     cycle: 5,            // Every 5 seconds,
@@ -694,6 +749,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "Dubloon") {
                 this.effectManager.addEffect({
+                    name: "Dubloon",
                     type: "stamina",
                     value: 0.5,          // Half stamina usage
                     cycle: 2,            // Every 2 seconds,
@@ -706,6 +762,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "Piece") {
                 this.effectManager.addEffect({
+                    name: "Piece",
                     type: "stamina",
                     value: 0.5,          // Half stamina usage
                     cycle: 4,            // Every 4 seconds,
@@ -718,6 +775,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "Gold") {
                 this.effectManager.addEffect({
+                    name: "Gold",
                     type: "stamina",
                     value: 0.5,          // Half stamina usage
                     cycle: 5,            // Every 5 seconds,
@@ -730,6 +788,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "Pound") {
                 this.effectManager.addEffect({
+                    name: "Pound",
                     type: "stamina",
                     value: 0.5,          // Half stamina usage
                     cycle: 3,            // Every 3 seconds,
@@ -742,6 +801,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "Booty") {
                 this.effectManager.addEffect({
+                    name: "Booty",
                     type: "stamina",
                     value: 0.5,          // Half stamina usage
                     cycle: 4,            // Every 4 seconds,
@@ -763,6 +823,7 @@ class RaceScene extends Phaser.Scene {
 
             if (item === "RubyAmulet") {
                 this.effectManager.addEffect({
+                    name: "Ruby Amulet",
                     type: "staminaRecovery",
                     value: 0.03,       // 3% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
@@ -773,6 +834,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "SapphireAmulet") {
                 this.effectManager.addEffect({
+                    name: "Sapphire Amulet",
                     type: "staminaRecovery",
                     value: 0.03,       // 3% of max stamina per cycle
                     cycle: 4,          // every 4 seconds
@@ -783,6 +845,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "AmethystAmulet") {
                 this.effectManager.addEffect({
+                    name: "Amethyst Amulet",
                     type: "staminaRecovery",
                     value: 0.03,       // 3% of max stamina per cycle
                     cycle: 3,          // every 3 seconds
@@ -793,6 +856,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "EmeraldAmulet") {
                 this.effectManager.addEffect({
+                    name: "Emerald Amulet",
                     type: "staminaRecovery",
                     value: 0.03,       // 3% of max stamina per cycle
                     cycle: 2,          // every 2 seconds
@@ -804,6 +868,7 @@ class RaceScene extends Phaser.Scene {
 
             if (item === "BlessedRubyAmulet") {
                 this.effectManager.addEffect({
+                    name: "Blessed Ruby Amulet",
                     type: "staminaRecovery",
                     value: 0.05,       // 5% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
@@ -814,6 +879,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "BlessedSapphireAmulet") {
                 this.effectManager.addEffect({
+                    name: "Blessed Sapphire Amulet",
                     type: "staminaRecovery",
                     value: 0.05,       // 5% of max stamina per cycle
                     cycle: 4,          // every 4 seconds
@@ -824,6 +890,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "BlessedAmethystAmulet") {
                 this.effectManager.addEffect({
+                    name: "Blessed Amethyst Amulet",
                     type: "staminaRecovery",
                     value: 0.05,       // 5% of max stamina per cycle
                     cycle: 3,          // every 3 seconds
@@ -834,6 +901,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "BlessedEmeraldAmulet") {
                 this.effectManager.addEffect({
+                    name: "Blessed Emerald Amulet",
                     type: "staminaRecovery",
                     value: 0.07,       // 7% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
@@ -845,6 +913,7 @@ class RaceScene extends Phaser.Scene {
 
             if (item === "PharaohsAmulet") {
                 this.effectManager.addEffect({
+                    name: "Pharaohs Amulet",
                     type: "staminaRecovery",
                     value: 0.09,       // 9% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
@@ -855,6 +924,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "DeceiversAmulet") {
                 this.effectManager.addEffect({
+                    name: "Deceivers Amulet",
                     type: "staminaRecovery",
                     value: 0.07,       // 7% of max stamina per cycle
                     cycle: 4,          // every 4 seconds
@@ -865,6 +935,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "HolyAmulet") {
                 this.effectManager.addEffect({
+                    name: "Holy Amulet",
                     type: "staminaRecovery",
                     value: 0.11,       // 11% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
@@ -875,6 +946,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "MessiahAmulet") {
                 this.effectManager.addEffect({
+                    name: "Messiah Amulet",
                     type: "staminaRecovery",
                     value: 0.03,       // 3% of max stamina per cycle
                     cycle: 1,          // every 1 seconds
@@ -885,6 +957,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "UnderworldAmulet") {
                 this.effectManager.addEffect({
+                    name: "Underworld Amulet",
                     type: "staminaRecovery",
                     value: 0.05,       // 5% of max stamina per cycle
                     cycle: 2,          // every 2 seconds
@@ -895,6 +968,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "ShiningAmulet") {
                 this.effectManager.addEffect({
+                    name: "Shining Amulet",
                     type: "staminaRecovery",
                     value: 0.07,       // 7% of max stamina per cycle
                     cycle: 3,          // every 3 seconds
@@ -905,6 +979,7 @@ class RaceScene extends Phaser.Scene {
             }
             if (item === "AmbixAmulet") {
                 this.effectManager.addEffect({
+                    name: "Ambix Amulet",
                     type: "staminaRecovery",
                     value: 0.09,       // 9% of max stamina per cycle
                     cycle: 4,          // every 4 seconds
@@ -997,7 +1072,7 @@ class RaceScene extends Phaser.Scene {
             // Optional: add tooltip on hover.
             icon.setInteractive();
             icon.on('pointerover', () => {
-                let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemData[item].description}`, {
+                let tooltip = this.add.text(x, iconY - iconSize + 75, `${GameConfig.itemData[item].name}:${GameConfig.itemData[item].description}`, {
                     fontSize: '14px',
                     fill: '#fff', fontFamily: "SilkScreen",
                     backgroundColor: 'rgba(0,0,0,0.7)',
@@ -1695,7 +1770,7 @@ class ShopScene extends Phaser.Scene {
 
                 icon.setInteractive();
                 icon.on('pointerover', () => {
-                    let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemData[item].description}`, {
+                    let tooltip = this.add.text(x, iconY - iconSize + 75, `${GameConfig.itemData[item].name}:${GameConfig.itemData[item].description}`, {
                         fontSize: '14px',
                         fill: '#fff', fontFamily: "SilkScreen",
                         backgroundColor: 'rgba(0,0,0,0.7)',
@@ -1743,7 +1818,7 @@ class ShopScene extends Phaser.Scene {
                     let purchasePrice = GameConfig.itemData[item].price;
                     let sellValue = Math.max(Math.floor(purchasePrice / 2), 1);
 
-                    let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemData[item].description}`, {
+                    let tooltip = this.add.text(x, iconY - iconSize + 75, `${GameConfig.itemData[item].name}:${GameConfig.itemData[item].description}`, {
                         fontSize: '14px',
                         fill: '#fff', fontFamily: "SilkScreen",
                         backgroundColor: 'rgba(0,0,0,0.7)',
@@ -1752,7 +1827,7 @@ class ShopScene extends Phaser.Scene {
                     this.children.bringToTop(tooltip);
                     icon.tooltip = tooltip;
                     // Create a tooltip for selling just below the icon.
-                    let sellTooltip = this.add.text(x, iconY + iconSize + 10, `Sell ${item} for $${sellValue}?`, {
+                    let sellTooltip = this.add.text(x, iconY + iconSize + 10, `Sell ${GameConfig.itemData[item].name} for $${sellValue}?`, {
                         fontSize: '14px',
                         fill: '#fff', fontFamily: "SilkScreen",
                         backgroundColor: 'rgba(0,0,0,0.7)',
@@ -1847,7 +1922,7 @@ class ShopScene extends Phaser.Scene {
                     padding: { x: 5, y: 2 }
                 }).setOrigin(0.5);
                 // Create description text.
-                let descText = this.add.text(40, -8, `${item}`, {
+                let descText = this.add.text(40, -8, `${GameConfig.itemData[item].name}`, {
                     fontSize: '16px',
                     fill: '#fff', fontFamily: "SilkScreen",
                     backgroundColor: 'rgba(0,0,0,0.7)'
@@ -1902,7 +1977,7 @@ class ShopScene extends Phaser.Scene {
                             // Optionally, show a temporary confirmation message.
                             let tipX = container.x + container.width / 2;
                             let tipY = container.y + 150;
-                            let shoptip = this.add.text(tipX, tipY, `You Bought ${item}`, {
+                            let shoptip = this.add.text(tipX, tipY, `You Bought ${GameConfig.itemData[item].name}`, {
                                 fontSize: '14px',
                                 fill: '#fff', fontFamily: "SilkScreen",
                                 backgroundColor: 'rgba(0,0,0,0.7)',
@@ -2353,7 +2428,7 @@ class RewardScene extends Phaser.Scene {
 
                 icon.setInteractive();
                 icon.on('pointerover', () => {
-                    let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemData[item].description}`, {
+                    let tooltip = this.add.text(x, iconY - iconSize + 75, `${GameConfig.itemData[item].name}:${GameConfig.itemData[item].description}`, {
                         fontSize: '14px',
                         fill: '#fff', fontFamily: "SilkScreen",
                         backgroundColor: 'rgba(0,0,0,0.7)',
@@ -2401,7 +2476,7 @@ class RewardScene extends Phaser.Scene {
                     let purchasePrice = GameConfig.itemData[item].price;
                     let sellValue = Math.max(Math.floor(purchasePrice / 2), 1);
 
-                    let tooltip = this.add.text(x, iconY - iconSize + 75, `${item}:${GameConfig.itemData[item].description}`, {
+                    let tooltip = this.add.text(x, iconY - iconSize + 75, `${GameConfig.itemData[item].name}:${GameConfig.itemData[item].description}`, {
                         fontSize: '14px',
                         fill: '#fff', fontFamily: "SilkScreen",
                         backgroundColor: 'rgba(0,0,0,0.7)',
@@ -2410,7 +2485,7 @@ class RewardScene extends Phaser.Scene {
                     this.children.bringToTop(tooltip);
                     icon.tooltip = tooltip;
                     // Create a tooltip for selling just below the icon.
-                    let sellTooltip = this.add.text(x, iconY + iconSize + 10, `Sell ${item} for $${sellValue}?`, {
+                    let sellTooltip = this.add.text(x, iconY + iconSize + 10, `Sell ${GameConfig.itemData[item].name} for $${sellValue}?`, {
                         fontSize: '14px',
                         fill: '#fff', fontFamily: "SilkScreen",
                         backgroundColor: 'rgba(0,0,0,0.7)',
@@ -2555,7 +2630,7 @@ class RewardScene extends Phaser.Scene {
         let itemSprite = this.add.image(0, 40, 'bulkItems', frameIndex).setScale(2).setOrigin(0.5);
         let description = GameConfig.itemData[randomItem].description;
 
-        let itemDescriptionText = this.add.text(100, 80, `${randomItem}:${description}`, {
+        let itemDescriptionText = this.add.text(100, 80, `${GameConfig.itemData[randomItem].name}: ${description}`, {
             fontSize: '16px',
             fill: '#fff',
             fontFamily: "SilkScreen",
