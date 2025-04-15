@@ -656,19 +656,34 @@ class RaceScene extends Phaser.Scene {
         this.statusMenu = this.add.container(this.game.config.width - 210, this.game.config.height - 140);
         this.currentSpeedText = this.add.text(0, 0, "Speed: 00.0 m/s", { fontSize: '16px', fill: '#fff', fontFamily: 'SilkScreen' });
         this.speedText = this.add.text(0, 20, "Top Speed: 00.0 m/s", { fontSize: '16px', fill: '#fff', fontFamily: 'SilkScreen' });
-        this.weightText = this.add.text(0, 40, "Weight: 100", { fontSize: '16px', fill: '#fff', fontFamily: 'SilkScreen' });
-        this.intoxText = this.add.text(0, 60, "Intox: 0%", { fontSize: '16px', fill: '#fff', fontFamily: 'SilkScreen' });
-        this.wellRestedText = this.add.text(0, 100, "Well Rested: 0%", { fontSize: '16px', fill: '#fff', fontFamily: 'SilkScreen' });
-        this.statusMenu.add([this.currentSpeedText, this.speedText, this.weightText, this.intoxText, this.wellRestedText]);
+        //this.weightText = this.add.text(0, 40, "Weight: 100", { fontSize: '16px', fill: '#fff', fontFamily: 'SilkScreen' });
+        //this.intoxText = this.add.text(0, 60, "Intox: 0%", { fontSize: '16px', fill: '#fff', fontFamily: 'SilkScreen' });
+        //this.wellRestedText = this.add.text(0, 100, "Well Rested: 0%", { fontSize: '16px', fill: '#fff', fontFamily: 'SilkScreen' });
+        // Create the speed info text object at the bottom-right corner.
+        this.speedInfoText = this.add.text(
+            this.game.config.width - 10,
+            this.game.config.height - 50,
+            "",
+            {
+                fontSize: '18px',
+                fill: '#fff',
+                fontFamily: 'SilkScreen',
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                padding: { x: 10, y: 5 },
+                align: 'right'
+            }
+        ).setOrigin(1, 1);
+
+        this.statusMenu.add([this.currentSpeedText, this.speedText, /*this.weightText, this.intoxText, this.wellRestedText*/]);
         // After creating the dino, for example:
         this.speedMultiplier = 0;  // default speed multiplier
         this.currentIntox = 0;     // current intoxication level (in %)
         this.currentWellRested = 0; // For testing, set to 50%
 
         // Cooldown bars for intoxication and well-rested (100 pixels wide)
-        this.intoxBar = this.add.rectangle(0, 85, 100, 10, 0xff0000).setOrigin(0, 0.5);
-        this.wellRestedBar = this.add.rectangle(0, 125, 100, 10, 0x00ff00).setOrigin(0, 0.5);
-        this.statusMenu.add([this.intoxBar, this.wellRestedBar]);
+        //this.intoxBar = this.add.rectangle(0, 85, 100, 10, 0xff0000).setOrigin(0, 0.5);
+        //this.wellRestedBar = this.add.rectangle(0, 125, 100, 10, 0x00ff00).setOrigin(0, 0.5);
+        //this.statusMenu.add([this.intoxBar, this.wellRestedBar]);
 
         // Initialize intoxication and well-rested cooldown timers
         this.intoxCooldown = 0;
@@ -1314,6 +1329,10 @@ class RaceScene extends Phaser.Scene {
         // Choose an acceleration factor (per second); adjust as needed.
         let accelerationFactor = 0.5; // This means 50% of the difference is closed per second.
 
+        const FIXED_DEPLETION_RATE = 100; // stamina points per second
+        let effectiveDepletion = FIXED_DEPLETION_RATE * staminaMultiplier;
+
+
         // Gradually update the current speed multiplier toward finalSpeedMultiplier.
         this.currentSpeedMultiplier = Phaser.Math.Linear(
             this.currentSpeedMultiplier,
@@ -1326,8 +1345,12 @@ class RaceScene extends Phaser.Scene {
         //console.log(effectiveTime)
         let currentSpeedText = (baseSpeedValue) * this.currentSpeedMultiplier;
         let speedText = baseSpeedValue * finalSpeedMultiplier;
+        let displayBaseSpeed = baseSpeedValue+(GameState.scalerBonusSpeed)
         this.currentSpeedText.setText(`Speed: ${currentSpeedText.toFixed(2)} m/s`);
         this.speedText.setText(`Top Speed: ${speedText.toFixed(2)} m/s`);
+        this.speedInfoText.setText(
+            `Base Speed: ${displayBaseSpeed.toFixed(0)} m/s\nStamina Depletion: ${effectiveDepletion.toFixed(1)}%`
+        );
         if (currentSpeedText > GameState.computedMaxSpeed) {
             GameState.computedMaxSpeed = Math.round(currentSpeedText * 100) / 100;
         }
