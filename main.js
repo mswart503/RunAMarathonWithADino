@@ -2686,6 +2686,7 @@ class RewardScene extends Phaser.Scene {
                     this.revealRandomItem();
                     this.rotationTimer.remove(false);
                     this.rewardContainer.destroy();
+                    this.conRewardContainer.destroy();
                 });
             }
             else if (i === 1) { // Random Consumable
