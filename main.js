@@ -1345,7 +1345,7 @@ class RaceScene extends Phaser.Scene {
         //console.log(effectiveTime)
         let currentSpeedText = (baseSpeedValue) * this.currentSpeedMultiplier;
         let speedText = baseSpeedValue * finalSpeedMultiplier;
-        let displayBaseSpeed = baseSpeedValue+(GameState.scalerBonusSpeed)
+        let displayBaseSpeed = baseSpeedValue + (GameState.scalerBonusSpeed)
         this.currentSpeedText.setText(`Speed: ${currentSpeedText.toFixed(2)} m/s`);
         this.speedText.setText(`Top Speed: ${speedText.toFixed(2)} m/s`);
         this.speedInfoText.setText(
@@ -2508,6 +2508,9 @@ class RewardScene extends Phaser.Scene {
 
         // Display a header message.
         this.add.text(400, 100, "Choose Your Reward", { fontSize: '28px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' }).setOrigin(0.5);
+        // Immediately create the reward preview container for Random Item
+        this.createRandomItemPreview();
+        this.createRandomConsumablePreview();
 
         this.cashText = this.add.text(this.game.config.width - 20, 20, `$${GameState.money}`, {
             fontSize: '20px',
@@ -2665,7 +2668,7 @@ class RewardScene extends Phaser.Scene {
         // Position them at predetermined coordinates.
         let optionXPositions = [200, 400, 600];
         let optionLabels = ["Random Item", "Random Consumable", "$1 Cash"];
-        let optionDisplayTexts = ["?", "Consumable", "$1"];
+        let optionDisplayTexts = ["?", "?", "$1"];
 
         // Loop through each option and add to the rewardsContainer.
         for (let i = 0; i < 3; i++) {
@@ -2681,6 +2684,8 @@ class RewardScene extends Phaser.Scene {
                 container.setInteractive();
                 container.on("pointerdown", () => {
                     this.revealRandomItem();
+                    this.rotationTimer.remove(false);
+                    this.rewardContainer.destroy();
                 });
             }
             else if (i === 1) { // Random Consumable
@@ -2701,6 +2706,146 @@ class RewardScene extends Phaser.Scene {
             this.rewardsContainer.add(container);
         }
     }
+    createRandomItemPreview() {
+        // Create a container that will display the rotating preview.
+        this.rewardContainer = this.add.container(200, 150);
+        // Make the container wide enough to display both the item image and its description.
+        this.rewardContainer.setSize(220, 120);
+
+        // Create a background rectangle (optional)
+        let bg = this.add.rectangle(0, 100, 120, 120, 0x222222, 0.8).setOrigin(0.5);
+        this.rewardContainer.add(bg);
+
+        // Create a placeholder preview image.
+        // Start with a default image, for instance a red question-mark,
+        // This image will be updated automatically by the rotation timer.
+        this.previewImage = this.add.image(20, 60, 'bulkItems', getItemFrameIndex("Coin"))
+            .setScale(2)
+            .setOrigin(0, 0.5);
+        this.rewardContainer.add(this.previewImage);
+
+        // Create a text object for the preview description.
+        this.previewText = this.add.text(80, 60, "", {
+            fontSize: '16px',
+            fill: '#fff',
+            fontFamily: 'SilkScreen',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 5, y: 5 },
+            align: 'left'
+        }).setOrigin(0, 0.5);
+        this.rewardContainer.add(this.previewText);
+
+        // Immediately start a timer to rotate through the available items.
+        this.rotationTimer = this.time.addEvent({
+            delay: 500,  // Change preview every 500ms
+            loop: true,
+            callback: () => {
+                // Get available items that are not in the player's inventory.
+                let availableItems = Object.keys(GameConfig.itemData)
+                    .filter(item => !GameState.equippedItems.includes(item));
+                if (availableItems.length === 0) {
+                    this.previewText.setText("No new items available");
+                    return;
+                }
+                // Shuffle available items and pick the first one as the preview.
+                Phaser.Utils.Array.Shuffle(availableItems);
+                this.previewItem = availableItems[0];
+
+                // Update the preview image and description.
+                let frameIndex = getItemFrameIndex(this.previewItem);
+                this.previewImage.setFrame(frameIndex);
+                //this.previewText.setText(`${this.previewItem}: ${GameConfig.itemData[this.previewItem].description}`);
+            }
+        });
+
+        // Create Accept and Skip buttons, visible immediately.
+        /*let acceptButton = this.add.text(110, 140, "Accept", {
+            fontSize: '20px',
+            fill: '#0f0',
+            fontFamily: 'VT323',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(0.5).setInteractive();
+
+        let skipButton = this.add.text(110, 170, "Skip", {
+            fontSize: '20px',
+            fill: '#f00',
+            fontFamily: 'VT323',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(0.5).setInteractive();
+
+        // Add the buttons to the reward container.
+        this.rewardContainer.add([acceptButton, skipButton]);
+
+        // When Accept is clicked, stop the timer and finalize the reward.
+        acceptButton.on('pointerdown', () => {
+            this.rotationTimer.remove(false);
+            // Final reward: either use the currently previewed item...
+            let finalItem = this.previewItem;  // or choose randomly again if desired
+            if (GameState.equippedItems.length < GameState.maxItems) {
+                GameState.equippedItems.push(finalItem);
+                this.scene.start("ShopScene");
+            } else {
+                alert("Not enough inventory space.");
+            }
+        });
+
+        // When Skip is clicked, stop the timer and transition without a reward.
+        skipButton.on('pointerdown', () => {
+            this.rotationTimer.remove(false);
+            this.scene.start("ShopScene");
+        });*/
+    }
+
+    createRandomConsumablePreview() {
+        // Create a container that will display the rotating preview.
+        this.conRewardContainer = this.add.container(400, 150);
+        // Make the container wide enough to display both the item image and its description.
+        this.conRewardContainer.setSize(220, 120);
+
+        // Create a background rectangle (optional)
+        let bg = this.add.rectangle(0, 100, 120, 120, 0x222222, 0.8).setOrigin(0.5);
+        this.conRewardContainer.add(bg);
+
+        // Create a placeholder preview image.
+        // Start with a default image, for instance a red question-mark,
+        // This image will be updated automatically by the rotation timer.
+        this.conPreviewImage = this.add.image(20, 60, 'consumableSprites', getConsumableFrame("Apple"))
+            .setScale(2)
+            .setOrigin(0, 0.5);
+        this.conRewardContainer.add(this.conPreviewImage);
+
+        // Create a text object for the preview description.
+        this.previewText = this.add.text(80, 60, "", {
+            fontSize: '16px',
+            fill: '#fff',
+            fontFamily: 'SilkScreen',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 5, y: 5 },
+            align: 'left'
+        }).setOrigin(0, 0.5);
+        this.conRewardContainer.add(this.previewText);
+
+        // Immediately start a timer to rotate through the available items.
+        this.rotationTimer = this.time.addEvent({
+            delay: 500,  // Change preview every 500ms
+            loop: true,
+            callback: () => {
+                // Get available items that are not in the player's inventory.
+                let availableItems = Object.keys(GameState.consumables);
+                // Shuffle available items and pick the first one as the preview.
+                Phaser.Utils.Array.Shuffle(availableItems);
+                this.previewItem = availableItems[0];
+
+                // Update the preview image and description.
+                let frameIndex = getConsumableFrame(this.previewItem);
+                this.conPreviewImage.setFrame(frameIndex);
+                //this.previewText.setText(`${this.previewItem}: ${GameConfig.itemData[this.previewItem].description}`);
+            }
+        });
+    }
+
 
     createRewardOption(x, y, label, displayText, optionID) {
         // Create a container with a defined size for reward option.
