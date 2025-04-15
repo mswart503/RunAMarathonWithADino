@@ -1958,45 +1958,116 @@ class ShopScene extends Phaser.Scene {
 
                 // Purchase logic for the item.
                 container.on('pointerdown', () => {
+                    if (container.tooltip) {
+                        container.tooltip.destroy();
+                        container.tooltip = null;
+                    }
+                    // Only show the confirmation if there isn’t already one for this container.
+                    if (container.confirmation) {
+                        return;
+                    }
 
-                    if (GameState.money >= price) {
-                        //.log(GameState.maxItems)
-                        if (GameState.equippedItems.length < GameState.maxItems) {
-                            GameState.money -= price;
-                            this.cashText.setText(`$${GameState.money}`);
+                    // Create a confirmation container positioned relative to the current container.
+                    let confirmation = this.add.container(container.x, container.y + 150);
+                    confirmation.setSize(300, 50);
+
+                    // Create a background for the confirmation prompt.
+                    let bg = this.add.rectangle(0, 0, 300, 50, 0x000000, 0.7).setOrigin(0.5);
+
+                    // Create confirmation text.
+                    let confirmText = this.add.text(0, -10, `Buy ${GameConfig.itemData[item].name} for $${price}?`, {
+                        fontSize: '14px',
+                        fill: '#fff',
+                        fontFamily: "SilkScreen",
+                        align: 'center'
+                    }).setOrigin(0.5);
+
+                    // Create Yes and No buttons.
+                    let yesButton = this.add.text(-40, 10, "Yes", {
+                        fontSize: '14px',
+                        fill: '#0f0',
+                        fontFamily: "SilkScreen",
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        padding: { x: 5, y: 5 }
+                    }).setOrigin(0.5).setInteractive();
+
+                    let noButton = this.add.text(40, 10, "No", {
+                        fontSize: '14px',
+                        fill: '#f00',
+                        fontFamily: "SilkScreen",
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        padding: { x: 5, y: 5 }
+                    }).setOrigin(0.5).setInteractive();
+
+                    // Add all elements to the confirmation container.
+                    confirmation.add([bg, confirmText, yesButton, noButton]);
+
+                    // Store the confirmation container on the item container (so we avoid duplicating it).
+                    container.confirmation = confirmation;
+
+                    // Optionally, disable further interaction on the container while confirmation is active.
+                    container.disableInteractive();
+                    // Behavior for the Yes button: Process the purchase.
+                    yesButton.on('pointerdown', () => {
+                        if (GameState.money >= price) {
+                            //.log(GameState.maxItems)
+                            if (GameState.equippedItems.length < GameState.maxItems) {
+                                GameState.money -= price;
+                                this.cashText.setText(`$${GameState.money}`);
 
 
-                            GameState.equippedItems.push(item);
-                            this.updateInventoryDisplay();
+                                GameState.equippedItems.push(item);
+                                this.updateInventoryDisplay();
 
-                            // Update maxStamina for stamina increasers
-                            //GameState.maxStamina = GameConfig.maxStamina;
+                                // Update maxStamina for stamina increasers
+                                //GameState.maxStamina = GameConfig.maxStamina;
 
 
 
-                            // Optionally, show a temporary confirmation message.
-                            let tipX = container.x + container.width / 2;
-                            let tipY = container.y + 150;
-                            let shoptip = this.add.text(tipX, tipY, `You Bought ${GameConfig.itemData[item].name}`, {
-                                fontSize: '14px',
-                                fill: '#fff', fontFamily: "SilkScreen",
-                                backgroundColor: 'rgba(0,0,0,0.7)',
-                                padding: { x: 5, y: 5 }
-                            }).setOrigin(0.5);
-                            this.time.delayedCall(1500, () => {
-                                if (shoptip && shoptip.active) {
-                                    shoptip.destroy();
-                                }
-                            });
+                                // Optionally, show a temporary confirmation message.
+                                let tipX = container.x + container.width / 2;
+                                let tipY = container.y + 150;
+                                let shoptip = this.add.text(tipX, tipY, `You Bought ${GameConfig.itemData[item].name}`, {
+                                    fontSize: '14px',
+                                    fill: '#fff', fontFamily: "SilkScreen",
+                                    backgroundColor: 'rgba(0,0,0,0.7)',
+                                    padding: { x: 5, y: 5 }
+                                }).setOrigin(0.5);
+                                this.time.delayedCall(1500, () => {
+                                    if (shoptip && shoptip.active) {
+                                        shoptip.destroy();
+                                    }
+                                });
 
-                            // Remove the purchased item from the shop display.
-                            container.destroy();
-                            // Refresh the shop items display.
-                            //this.displayShopItems();
+                                // Remove the purchased item from the shop display.
+                                // Clean up: Destroy the shop item container and confirmation prompt.
+                                container.destroy();
+                                confirmation.destroy();
+                                // Refresh the shop items display.
+                                //this.displayShopItems();
+                            } else {
+                                let tipX = container.x + container.width / 2;
+                                let tipY = container.y + 150;
+                                let shoptip = this.add.text(tipX, tipY, `Not enough space, stranger`, {
+                                    fontSize: '14px',
+                                    fill: '#fff', fontFamily: "SilkScreen",
+                                    backgroundColor: 'rgba(0,0,0,0.7)',
+                                    padding: { x: 5, y: 5 }
+                                }).setOrigin(0.5);
+                                this.time.delayedCall(1500, () => {
+                                    if (shoptip && shoptip.active) {
+                                        shoptip.destroy();
+                                    }
+                                });
+                                // Re-enable interaction (and remove confirmation) so the user can try another item.
+                                confirmation.destroy();
+                                container.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 20), Phaser.Geom.Rectangle.Contains);
+                                container.confirmation = null;
+                            }
                         } else {
                             let tipX = container.x + container.width / 2;
                             let tipY = container.y + 150;
-                            let shoptip = this.add.text(tipX, tipY, `Not enough space, stranger`, {
+                            let shoptip = this.add.text(tipX, tipY, `Not enough cash, stranger`, {
                                 fontSize: '14px',
                                 fill: '#fff', fontFamily: "SilkScreen",
                                 backgroundColor: 'rgba(0,0,0,0.7)',
@@ -2007,25 +2078,20 @@ class ShopScene extends Phaser.Scene {
                                     shoptip.destroy();
                                 }
                             });
+                            // Re-enable interaction after error.
+                            confirmation.destroy();
+                            container.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 20), Phaser.Geom.Rectangle.Contains);
+                            container.confirmation = null;
+
                         }
-                    } else {
-                        let tipX = container.x + container.width / 2;
-                        let tipY = container.y + 150;
-                        let shoptip = this.add.text(tipX, tipY, `Not enough cash, stranger`, {
-                            fontSize: '14px',
-                            fill: '#fff', fontFamily: "SilkScreen",
-                            backgroundColor: 'rgba(0,0,0,0.7)',
-                            padding: { x: 5, y: 5 }
-                        }).setOrigin(0.5);
-                        this.time.delayedCall(1500, () => {
-                            if (shoptip && shoptip.active) {
-                                shoptip.destroy();
-                            }
-                        });
-                    }
 
+                    });
+                    noButton.on('pointerdown', () => {
+                        confirmation.destroy();
+                        container.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 20), Phaser.Geom.Rectangle.Contains);
+                        container.confirmation = null;
+                    });
                 });
-
 
                 startY += 40;
                 this.itemContainer.add(container);
@@ -2183,7 +2249,7 @@ class ShopScene extends Phaser.Scene {
             }).setOrigin(0.5);
 
             // Create description text (using the description from GameConfig)
-            let descText = this.add.text(40, -8, `${consumable}: ${GameConfig.consumableDescriptions[consumable]}`, {
+            let descText = this.add.text(40, -8, `${consumable}`, {
                 fontSize: '16px',
                 fill: '#fff', fontFamily: "SilkScreen",
                 backgroundColor: 'rgba(0,0,0,0.7)'
@@ -2193,6 +2259,29 @@ class ShopScene extends Phaser.Scene {
             container.setSize(300, 20);
             container.setInteractive(new Phaser.Geom.Rectangle(0, 0, 300, 20), Phaser.Geom.Rectangle.Contains);
 
+            // Add pointerover event to show a tooltip with the item description.
+            container.on('pointerover', () => {
+                // Create a tooltip that shows the description.
+                // Position it relative to the container, adjust as needed.
+                let tooltip = this.add.text(container.x + 40, container.y + 290,
+                    `${GameConfig.consumableDescriptions[consumable]}`, {
+                    fontSize: '14px',
+                    fill: '#fff',
+                    fontFamily: "SilkScreen",
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    padding: { x: 5, y: 3 }
+                }
+                ).setOrigin(0, 0.5);
+                // Save the tooltip reference on the container for later removal.
+                container.tooltip = tooltip;
+            });
+            // Remove the tooltip on pointerout.
+            container.on('pointerout', () => {
+                if (container.tooltip) {
+                    container.tooltip.destroy();
+                    container.tooltip = null;
+                }
+            });
             container.on('pointerdown', () => {
                 if (GameState.money >= price) {
                     // Deduct the price and update cash display.
