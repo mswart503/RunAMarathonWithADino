@@ -1126,6 +1126,7 @@ class RaceScene extends Phaser.Scene {
         this.raceTime = (this.distance / 100) * (GameConfig.baseTimePer100m);
         this.elapsedTime = 0;
 
+
         // Smooth scaling of the dino based on race distance.
         let t = (this.distance - GameConfig.minDistance) / (GameConfig.maxDistance - GameConfig.minDistance);
         // Apply a power to slow growth (e.g., 0.5 makes it grow slower)
@@ -1133,9 +1134,30 @@ class RaceScene extends Phaser.Scene {
         t = Phaser.Math.Clamp(t, 0, 1);
         let baseScale = Phaser.Math.Linear(1, 0.2, t);
         let dinoScale = baseScale * 4;
-        let flagScale = baseScale * 1;
+        //let flagScale = baseScale * 1;
         //dinoScale *= (1 + (GameState.weight - 100) * 0.01);
 
+
+
+        // Create a Graphics object for the finish line.
+        this.finishLineGraphic = this.add.graphics();
+
+        // Set the line style. You can adjust the thickness, color, and alpha as needed.
+        this.finishLineGraphic.lineStyle(4, 0xffffff, 1.0);
+
+        // Start the path for the line.
+        this.finishLineGraphic.beginPath();
+
+        // For example, if your dino starts around x = 50 and finishes at x = 750,
+        // draw a horizontal line at the same y position as the flag.
+        this.finishLineGraphic.moveTo(700, 355);
+        this.finishLineGraphic.lineTo(700, 410);
+
+        // Stroke the path to render the line.
+        this.finishLineGraphic.strokePath();
+
+        // Place the checkered flag image at the finish line.
+        this.flag = this.add.image(739, 300, 'flag');
         // Create the dino sprite from its sprite sheet.
         // The running animation uses the first 14 frames.
         this.anims.create({
@@ -1147,8 +1169,7 @@ class RaceScene extends Phaser.Scene {
         this.dino = this.add.sprite(50, 330, 'dino').setScale(dinoScale);
         this.dino.play('run');
 
-        // Place the checkered flag image at the finish line.
-        this.flag = this.add.image(750, 330, 'flag').setScale(flagScale);
+
 
         // Create a stamina bar.
         // Background bar.
@@ -1356,7 +1377,7 @@ class RaceScene extends Phaser.Scene {
         }
 
         let startX = 50;
-        let endX = 750;
+        let endX = 700;
         let progress = Phaser.Math.Clamp(effectiveTime / this.raceTime, 0, 1);
         this.dino.x = Phaser.Math.Interpolation.Linear([startX, endX], progress);
 
@@ -1770,6 +1791,19 @@ class ShopScene extends Phaser.Scene {
         }).setOrigin(1, 0);
         // Create a container for the inventory display (equipped items) at the top middle.
         this.inventoryContainer = this.add.container(0, 0);
+        this.inventoryCountText = this.add.text(
+            300, // x coordinate (adjust as needed)
+            20,  // y coordinate (adjust as needed)
+            "",  // initial text (we'll set it below)
+            {
+                fontSize: '18px',
+                fill: '#fff',
+                fontFamily: 'SilkScreen',
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                padding: { x: 10, y: 5 }
+            }
+        ).setOrigin(1, 0); // Right-aligned (so it appears near the right border)
+
         this.updateInventoryDisplay = () => {
             // Clear any existing icons.
             if (!this.inventoryContainer) {
@@ -1877,6 +1911,8 @@ class ShopScene extends Phaser.Scene {
                         icon.tooltipPersistent = false;
                         // Refresh the inventory display.
                         this.updateInventoryDisplay();
+                        this.updateInventoryCount();   // Update the inventory count text.
+
                     });
 
                     // Optional: Remove the sell tooltip automatically after 3 seconds if not clicked.
@@ -1904,6 +1940,8 @@ class ShopScene extends Phaser.Scene {
 
         // Call this once initially.
         this.updateInventoryDisplay();
+        this.updateInventoryCount();   // Update the inventory count text.
+
 
         this.add.text(300, 50, "Shop", { fontSize: '28px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
         this.add.text(50, 100, "Click an item to buy it, click an item in your inventory to sell it", { fontSize: '18px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
@@ -2041,6 +2079,8 @@ class ShopScene extends Phaser.Scene {
 
                                 GameState.equippedItems.push(item);
                                 this.updateInventoryDisplay();
+                                this.updateInventoryCount();   // Update the inventory count text.
+
 
                                 // Update maxStamina for stamina increasers
                                 //GameState.maxStamina = GameConfig.maxStamina;
@@ -2439,6 +2479,13 @@ class ShopScene extends Phaser.Scene {
             // Optionally, add pointer events or tooltips to these inventory icons.
             this.consumablesPanel.add(icon);
         });
+    }
+    updateInventoryCount() {
+        // Assuming GameState.equippedItems is an array of the equipped items
+        // and GameState.maxItems is the total available slots.
+        let filled = GameState.equippedItems.length;
+        let total = GameState.maxItems;
+        this.inventoryCountText.setText(`Inventory: ${filled} / ${total}`);
     }
 
 }
