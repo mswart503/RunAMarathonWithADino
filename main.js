@@ -497,7 +497,7 @@ var GameConfig = {
 var GameState = {
     currentLevel: 0,
     money: 0,
-    bonds: 0,  // For investment: each bond adds $1 per race
+    bonds: [],  // For investment: each bond adds $1 per race
     equippedItems: [],  // Max 5 item slots
     winCount: 0,
     maxStamina: 100,
@@ -512,6 +512,7 @@ var GameState = {
     computedTotalDistance: 0,
     computedMaxSpeed: 0,
     playerName: "Anon",
+
 
 
 };
@@ -1840,7 +1841,6 @@ class ShopScene extends Phaser.Scene {
                 padding: { x: 10, y: 5 }
             }
         ).setOrigin(1, 0); // Right-aligned (so it appears near the right border)
-
         this.updateInventoryDisplay = () => {
             // Clear any existing icons.
             if (!this.inventoryContainer) {
@@ -1978,6 +1978,7 @@ class ShopScene extends Phaser.Scene {
         // Call this once initially.
         this.updateInventoryDisplay();
         this.updateInventoryCount();   // Update the inventory count text.
+        //this.updateBondPayouts();
 
 
         this.add.text(300, 50, "Shop", { fontSize: '28px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
@@ -2571,9 +2572,157 @@ class ShopScene extends Phaser.Scene {
             // Add this icon to the consumables panel container.
             this.consumablesPanel.add(icon);
         });
+        // In ShopScene.create(), create the Investment section container:
+        this.investmentContainer = this.add.container(450, 150).setSize(200, 400);
+
+        // Create a sub-container for the unlock buttons.
+        let unlockContainer = this.add.container(100, 20); // Position relative to the investment container
+        // Create the Uncommon and Rare unlock buttons side-by-side.
+        let uncommonButton = this.add.text(0, 0, "Unlock Uncommon ($10)", {
+            fontSize: '16px',
+            fill: '#fff',
+            fontFamily: "SilkScreen",
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 5, y: 5 }
+        }).setOrigin(0, 0.5).setInteractive();
+
+        let rareButton = this.add.text(0, 30, "Unlock Rare ($20)", {
+            fontSize: '16px',
+            fill: '#fff',
+            fontFamily: "SilkScreen",
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 5, y: 5 }
+        }).setOrigin(0, 0.5).setInteractive();
+
+        unlockContainer.add([uncommonButton, rareButton]);
+        this.investmentContainer.add(unlockContainer);
+
+        // Unlock Button Events:
+        uncommonButton.on('pointerdown', () => {
+            if (!GameState.uncommonUnlocked && GameState.money >= 10) {
+                GameState.money -= 10;
+                this.cashText.setText(`$${GameState.money}`);
+                GameState.uncommonUnlocked = true;
+                uncommonButton.setText("Bought");
+                uncommonButton.setStyle({ fill: "#888" });
+                uncommonButton.disableInteractive();
+            }
+        });
+        rareButton.on('pointerdown', () => {
+            if (!GameState.rareUnlocked && GameState.money >= 20) {
+                GameState.money -= 20;
+                this.cashText.setText(`$${GameState.money}`);
+                GameState.rareUnlocked = true;
+                rareButton.setText("Bought");
+                rareButton.setStyle({ fill: "#888" });
+                rareButton.disableInteractive();
+            }
+        });
+
+        // Create a Grab Bag section container within the investmentContainer.
+        let grabBagContainer = this.add.container(100, 100); // adjust vertical position as needed
+        let grabBagButton = this.add.text(0, 0, "Grab Bag ($2)", {
+            fontSize: '16px',
+            fill: '#fff',
+            fontFamily: "SilkScreen",
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 5, y: 5 }
+        }).setOrigin(0, 0.5).setInteractive();
+        grabBagContainer.add(grabBagButton);
+        this.investmentContainer.add(grabBagContainer);
+
+        grabBagButton.on('pointerdown', () => {
+            // Ensure only one Grab Bag per shop scene.
+            if (!GameState.grabBagPurchased && GameState.money >= 2) {
+                GameState.money -= 2;
+                this.cashText.setText(`$${GameState.money}`);
+                GameState.grabBagPurchased = true;
+                // Launch a Grab Bag selection (could be a similar Accept/Skip UI with 3 random items).
+                this.launchGrabBagSelection();  // You'll implement this function similarly to the reward screen.
+            } else {
+                // Provide feedback that Grab Bag is not available or already purchased.
+                let tip = this.add.text(grabBagButton.x+400, grabBagButton.y + 300, "Already purchased", {
+                    fontSize: '14px',
+                    fill: '#fff',
+                    fontFamily: "SilkScreen",
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    padding: { x: 5, y: 5 }
+                }).setOrigin(0.5);
+                this.time.delayedCall(1500, () => { if (tip && tip.active) tip.destroy(); });
+            }
+        });
+        // Create a Bonds section container inside the investmentContainer.
+        let bondsContainer = this.add.container(0, 150);  // position accordingly, e.g. lower in the Investment container.
+        bondsContainer.setSize(100, 200); // Adjust as needed.
+        this.investmentContainer.add(bondsContainer);
+        this.currentBondPayout = 0;
+
+
+        // Create the Bond button at the top of the Bonds section.
+        let bondButton = this.add.text(100, 0, "Buy Bond ($3)", {
+            fontSize: '16px',
+            fill: '#fff',
+            fontFamily: "SilkScreen",
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 5, y: 5 }
+        }).setOrigin(0).setInteractive();
+        bondsContainer.add(bondButton);
+
+        // Create two text objects for the counters.
+        this.totalBondEarningsText = this.add.text(100, 100, "Total Earnings: $0", {
+            fontSize: '14px',
+            fill: '#fff',
+            fontFamily: "SilkScreen",
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 5, y: 5 }
+        }).setOrigin(0);
+        bondsContainer.add(this.totalBondEarningsText);
+
+        this.shopBondPayoutText = this.add.text(100, 140, "Shop Payouts: $0", {
+            fontSize: '14px',
+            fill: '#fff',
+            fontFamily: "SilkScreen",
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 5, y: 5 }
+        }).setOrigin(0);
+        bondsContainer.add(this.shopBondPayoutText);
+
+        // Create a container for bond icons (e.g., arranged in a row).
+        this.bondsPanel = this.add.container(100, 30); // inside bondsContainer
+        bondsContainer.add(this.bondsPanel);
+
+        // Make sure you have a global array for bonds (e.g., GameState.bonds)
+        if (!GameState.bonds) {
+            GameState.bonds = [];
+        }
+
+        // Bond button logic:
+        bondButton.on('pointerdown', () => {
+            if (GameState.money >= 3 && GameState.bonds.length < 5) {
+                GameState.money -= 3;
+                this.cashText.setText(`$${GameState.money}`);
+                // Create a new bond object with daysRemaining 3.
+                let newBond = { daysRemaining: 3 };
+                GameState.bonds.push(newBond);
+                this.updateBondsDisplay(bondsContainer);
+            } else {
+                let tip = this.add.text(100, 40, "Cannot buy more bonds", {
+                    fontSize: '14px',
+                    fill: '#fff',
+                    fontFamily: "SilkScreen",
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    padding: { x: 5, y: 5 }
+                }).setOrigin(0.5);
+                this.time.delayedCall(1500, () => { if (tip && tip.active) tip.destroy(); });
+            }
+        });
+
+        // When entering the ShopScene, update bonds (simulate one day passing).
+        this.updateBondPayouts();
 
 
     }
+
     updateConsumableInventory() {
         // If the panel already exists, remove its children; otherwise, create it.
         if (this.consumablesPanel) {
@@ -2596,6 +2745,7 @@ class ShopScene extends Phaser.Scene {
             this.consumablesPanel.add(icon);
         });
     }
+
     updateInventoryCount() {
         // Assuming GameState.equippedItems is an array of the equipped items
         // and GameState.maxItems is the total available slots.
@@ -2604,6 +2754,176 @@ class ShopScene extends Phaser.Scene {
         this.inventoryCountText.setText(`Inventory: ${filled} / ${total}`);
     }
 
+    updateBondPayouts() {
+        // Reset the shop payout counter for bonds.
+        this.currentBondPayout = 0;
+        
+        // Iterate through bonds (assume GameState.bonds is an array).
+        // We'll create a new array for bonds that haven't matured.
+        let activeBonds = [];
+        GameState.bonds.forEach(bond => {
+            // Each bond decrements its days by 1 when entering the shop.
+            bond.daysRemaining -= 1;
+            if (bond.daysRemaining > 0) {
+                // Bond pays out $1 for that day.
+                this.currentBondPayout += 1;
+                // Keep the bond active.
+                activeBonds.push(bond);
+            } else {
+                // On day 0 (matured), bond pays out $1 plus returns the $3.
+                this.currentBondPayout += 4;
+                // Also, add 4 to the total bond earnings (we’ll update that in a moment).
+                GameState.totalBondEarnings = (GameState.totalBondEarnings || 0) + 4;
+            }
+        });
+        GameState.bonds = activeBonds; // Update bonds array to only active bonds.
+        
+        // Update player's cash by the total payout for bonds in this shop.
+        GameState.money += this.currentBondPayout;
+        this.cashText.setText(`$${GameState.money}`);
+        
+        // Update the counters:
+        this.shopBondPayoutText.setText(`Shop Payouts: $${this.currentBondPayout}`);
+        this.totalBondEarningsText.setText(`Total Earnings: $${GameState.totalBondEarnings || 0}`);
+        
+        // Also update the bonds display.
+        this.updateBondsDisplay();
+    }
+
+    updateBondsDisplay() {
+        // Clear the bonds panel.
+        this.bondsPanel.removeAll(true);
+        // For each bond, create an icon and a number showing days remaining.
+        GameState.bonds.forEach((bond, index) => {
+            // Calculate a position for this bond icon in the panel.
+            let bondX = index * 40; // 40 pixels apart horizontally
+            // Use getBondFrame() or calculate based on col 54, row 8.
+            // For example, if your bulkItems sheet has, say, 12 columns:
+            let bondFrame = (8 - 1) * 12 + (54 - 1); // adjust if necessary
+            let bondIcon = this.add.image(bondX, 0, 'bulkItems', bondFrame).setScale(1).setOrigin(0, 0);
+            // Create a text object for days remaining.
+            let daysText = this.add.text(bondX + 20, 30, `${bond.daysRemaining}`, {
+                fontSize: '14px',
+                fill: '#fff',
+                fontFamily: 'SilkScreen'
+            }).setOrigin(0.5);
+            this.bondsPanel.add([bondIcon, daysText]);
+        });
+    }
+    launchGrabBagSelection() {
+        // Create a new container for the grab bag selection overlay.
+        // We'll center this container on the screen.
+        let selectionContainer = this.add.container(this.cameras.main.centerX, this.cameras.main.centerY);
+        // Set a background for clarity.
+        let bg = this.add.rectangle(0, 0, 400, 300, 0x000000, 0.8).setOrigin(0.5);
+        selectionContainer.add(bg);
+    
+        // Add a header text.
+        let header = this.add.text(0, -120, "Grab Bag! Pick One", {
+            fontSize: '24px',
+            fill: '#fff',
+            fontFamily: 'SilkScreen'
+        }).setOrigin(0.5);
+        selectionContainer.add(header);
+    
+        // Get three random items from your pool.
+        // For example, use all items from GameConfig.itemData.
+        let pool = Object.keys(GameConfig.itemData);
+        Phaser.Utils.Array.Shuffle(pool);
+        let grabBagItems = pool.slice(0, 3);
+    
+        // Create a container to hold the three item options.
+        let itemsContainer = this.add.container(0, -20);
+        let spacing = 130; // Horizontal spacing between items.
+        grabBagItems.forEach((itemKey, index) => {
+            let xPos = -spacing + index * spacing; // Position them evenly centered.
+            // Get the frame index for the item image.
+            let frameIndex = getItemFrameIndex(itemKey);
+            // Create the item sprite.
+            let sprite = this.add.image(xPos, 0, 'bulkItems', frameIndex)
+                .setScale(2)
+                .setOrigin(0.5);
+            // Make the sprite interactive.
+            sprite.setInteractive();
+            // Optionally add a label (item name) below the sprite.
+            let label = this.add.text(xPos, 50, itemKey, {
+                fontSize: '16px',
+                fill: '#fff',
+                fontFamily: 'SilkScreen',
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                padding: { x: 5, y: 2 }
+            }).setOrigin(0.5);
+            // Group the sprite and label in a container (or add individually to itemsContainer).
+            itemsContainer.add([sprite, label]);
+
+            sprite.on('pointerover', () => {
+                // Determine the tooltip's world coordinates.
+                // Since sprite.x and sprite.y are relative to itemsContainer,
+                // you may want to convert them to world coordinates.
+                let worldX = 400;
+                let worldY = 300;
+                
+                let tooltip = this.add.text(worldX, worldY - 60, GameConfig.itemData[itemKey].description, {
+                    fontSize: '14px',
+                    fill: '#fff',
+                    fontFamily: 'SilkScreen',
+                    backgroundColor: 'rgba(0,0,0,0.7)',
+                    padding: { x: 5, y: 5 },
+                    align: 'left'
+                }).setOrigin(0.5, 1);
+                this.children.bringToTop(tooltip);
+                sprite.tooltip = tooltip;  // Save the tooltip reference.
+            });
+        
+            // On pointerout, destroy the tooltip (if it exists).
+            sprite.on('pointerout', () => {
+                if (sprite.tooltip) {
+                    sprite.tooltip.destroy();
+                    sprite.tooltip = null;
+                }
+            });
+
+            // Set up the click event for the sprite: when clicked, add the item and exit.
+            sprite.on('pointerdown', () => {
+                // Check if there is inventory space.
+                if (GameState.equippedItems.length < GameState.maxItems) {
+                    GameState.equippedItems.push(itemKey);
+                    // Optionally show a brief confirmation message.
+                    this.add.text(this.cameras.main.centerX, this.cameras.main.centerY + 150, `You got ${itemKey}!`, {
+                        fontSize: '20px',
+                        fill: '#fff',
+                        fontFamily: 'SilkScreen',
+                        backgroundColor: 'rgba(0,0,0,0.7)',
+                        padding: { x: 10, y: 5 }
+                    }).setOrigin(0.5);
+                    // Destroy the selection overlay and transition back.
+                    selectionContainer.destroy();
+                    this.scene.start("ShopScene");
+                } else {
+                    alert("Not enough inventory space.");
+                }
+            });
+        });
+        selectionContainer.add(itemsContainer);
+    
+        // Add a Cancel button below the items.
+        let cancelButton = this.add.text(0, 120, "Cancel", {
+            fontSize: '20px',
+            fill: '#f00',
+            fontFamily: 'SilkScreen',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            padding: { x: 10, y: 5 }
+        }).setOrigin(0.5).setInteractive();
+        cancelButton.on('pointerdown', () => {
+            // If player cancels, simply destroy the overlay and return to the shop.
+            selectionContainer.destroy();
+            this.scene.start("ShopScene");
+        });
+        selectionContainer.add(cancelButton);
+    }
+    
+    
+    
 }
 
 
@@ -2926,7 +3246,7 @@ class RewardScene extends Phaser.Scene {
         /*let acceptButton = this.add.text(110, 140, "Accept", {
             fontSize: '20px',
             fill: '#0f0',
-            fontFamily: 'VT323',
+            fontFamily: 'SilkScreen',
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
         }).setOrigin(0.5).setInteractive();
@@ -2934,7 +3254,7 @@ class RewardScene extends Phaser.Scene {
         let skipButton = this.add.text(110, 170, "Skip", {
             fontSize: '20px',
             fill: '#f00',
-            fontFamily: 'VT323',
+            fontFamily: 'SilkScreen',
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 10, y: 5 }
         }).setOrigin(0.5).setInteractive();
