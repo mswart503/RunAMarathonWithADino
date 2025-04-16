@@ -1563,16 +1563,53 @@ class RaceScene extends Phaser.Scene {
             padding: { x: 10, y: 5 }
         }).setOrigin(0.5).setInteractive();
 
+        gotoRewardButton.on('pointerover', () => {
+            this.tweens.add({
+                targets: gotoRewardButton,
+                scale: 1.1,
+                duration: 150,
+                ease: 'Linear'
+            });
+        });
+        // Add pointerout event: restore its original scale.
+        gotoRewardButton.on('pointerout', () => {
+            this.tweens.add({
+                targets: gotoRewardButton,
+                scale: 1,
+                duration: 150,
+                ease: 'Linear'
+            });
+        });
+
         gotoRewardButton.on('pointerdown', () => {
-            GameState.currentLevel++;
-            if (GameState.currentLevel < GameConfig.totalRounds) {
-                this.scene.start('RewardScene');
-            } else {
-                // Pass the final time to the next scene via the registry.
-                this.registry.set("finalTime", completionTime);
-                // Transition to the win screen.
-                this.scene.start('WinScreenScene');
-            }
+
+            this.tweens.add({
+                targets: gotoRewardButton,
+                scale: 0.9,
+                duration: 50,
+                ease: 'Linear'
+            });
+
+        });
+        // Add pointerup event: restore the scale and trigger the desired action (such as starting the next scene).
+        gotoRewardButton.on('pointerup', () => {
+            this.tweens.add({
+                targets: gotoRewardButton,
+                scale: 1.1,
+                duration: 50,
+                ease: 'Linear',
+                onComplete: () => {
+                    GameState.currentLevel++;
+                    if (GameState.currentLevel < GameConfig.totalRounds) {
+                        this.scene.start('RewardScene');
+                    } else {
+                        // Pass the final time to the next scene via the registry.
+                        this.registry.set("finalTime", completionTime);
+                        // Transition to the win screen.
+                        this.scene.start('WinScreenScene');
+                    }
+                }
+            });
         });
 
 
@@ -2170,9 +2207,49 @@ class ShopScene extends Phaser.Scene {
             }).setOrigin(0.5).setInteractive();
             this.nextRoundText = this.add.text(leaveShopButton.x - 90, this.game.config.height - 85, `Next Round: ${GameConfig.rounds[GameState.currentLevel]}m`, { fontSize: '20px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
             console.log(GameState.currentLevel)
-            leaveShopButton.on('pointerdown', () => {
-                this.scene.start('RaceScene');
+
+
+            leaveShopButton.on('pointerover', () => {
+                this.tweens.add({
+                    targets: leaveShopButton,
+                    scale: 1.1,
+                    duration: 150,
+                    ease: 'Linear'
+                });
             });
+            // Add pointerout event: restore its original scale.
+            leaveShopButton.on('pointerout', () => {
+                this.tweens.add({
+                    targets: leaveShopButton,
+                    scale: 1,
+                    duration: 150,
+                    ease: 'Linear'
+                });
+            });
+
+            leaveShopButton.on('pointerdown', () => {
+
+                this.tweens.add({
+                    targets: leaveShopButton,
+                    scale: 0.9,
+                    duration: 50,
+                    ease: 'Linear'
+                });
+
+            });
+            // Add pointerup event: restore the scale and trigger the desired action (such as starting the next scene).
+            leaveShopButton.on('pointerup', () => {
+                this.tweens.add({
+                    targets: leaveShopButton,
+                    scale: 1.1,
+                    duration: 50,
+                    ease: 'Linear',
+                    onComplete: () => {
+                        this.scene.start('RaceScene');
+
+                    }
+                });
+            }); //this.rerollButton
         };
 
         this.displayShopItems();
@@ -2185,33 +2262,71 @@ class ShopScene extends Phaser.Scene {
             padding: { x: 10, y: 5 }
         }).setInteractive();
 
-        this.rerollButton.on('pointerdown', () => {
-            if (GameState.money >= this.rerollPrice) {
-                GameState.money -= this.rerollPrice;
-                this.cashText.setText(`$${GameState.money}`);
-                // Increase the reroll price by $1.
-                this.rerollPrice += 1;
-                // Update the reroll button text.
-                this.rerollButton.setText("Reroll \n ($" + this.rerollPrice + ")");
-
-                // Re-display shop items.
-                this.displayShopItems();
-            } else {
-                let tipX = this.rerollButton.x + 50 + this.rerollButton.width / 2;
-                let tipY = this.rerollButton.y + 60;
-                let shoptip = this.add.text(tipX, tipY, `Not enough cash, stranger`, {
-                    fontSize: '14px',
-                    fill: '#fff', fontFamily: "SilkScreen",
-                    backgroundColor: 'rgba(0,0,0,0.7)',
-                    padding: { x: 5, y: 5 }
-                }).setOrigin(0.5);
-                this.time.delayedCall(1500, () => {
-                    if (shoptip && shoptip.active) {
-                        shoptip.destroy();
-                    }
-                });
-            }
+        this.rerollButton.on('pointerover', () => {
+            this.tweens.add({
+                targets: this.rerollButton,
+                scale: 1.1,
+                duration: 150,
+                ease: 'Linear'
+            });
         });
+        // Add pointerout event: restore its original scale.
+        this.rerollButton.on('pointerout', () => {
+            this.tweens.add({
+                targets: this.rerollButton,
+                scale: 1,
+                duration: 150,
+                ease: 'Linear'
+            });
+        });
+
+        this.rerollButton.on('pointerdown', () => {
+
+            this.tweens.add({
+                targets: this.rerollButton,
+                scale: 0.9,
+                duration: 50,
+                ease: 'Linear'
+            });
+
+        });
+        // Add pointerup event: restore the scale and trigger the desired action (such as starting the next scene).
+        this.rerollButton.on('pointerup', () => {
+            this.tweens.add({
+                targets: this.rerollButton,
+                scale: 1.1,
+                duration: 50,
+                ease: 'Linear',
+                onComplete: () => {
+                    if (GameState.money >= this.rerollPrice) {
+                        GameState.money -= this.rerollPrice;
+                        this.cashText.setText(`$${GameState.money}`);
+                        // Increase the reroll price by $1.
+                        this.rerollPrice += 1;
+                        // Update the reroll button text.
+                        this.rerollButton.setText("Reroll \n ($" + this.rerollPrice + ")");
+
+                        // Re-display shop items.
+                        this.displayShopItems();
+                    } else {
+                        let tipX = this.rerollButton.x + 50 + this.rerollButton.width / 2;
+                        let tipY = this.rerollButton.y + 60;
+                        let shoptip = this.add.text(tipX, tipY, `Not enough cash, stranger`, {
+                            fontSize: '14px',
+                            fill: '#fff', fontFamily: "SilkScreen",
+                            backgroundColor: 'rgba(0,0,0,0.7)',
+                            padding: { x: 5, y: 5 }
+                        }).setOrigin(0.5);
+                        this.time.delayedCall(1500, () => {
+                            if (shoptip && shoptip.active) {
+                                shoptip.destroy();
+                            }
+                        });
+                    }
+                }
+            });
+        });
+
 
         // ----- New: Buy New Item Slot Button -----
         /*this.newSlotButton = this.add.text(
@@ -2456,6 +2571,7 @@ class ShopScene extends Phaser.Scene {
             // Add this icon to the consumables panel container.
             this.consumablesPanel.add(icon);
         });
+
 
     }
     updateConsumableInventory() {
@@ -2968,18 +3084,92 @@ class RewardScene extends Phaser.Scene {
 
         rewardContainer.add([acceptButton, skipButton]);
 
-        // Accept behavior.
-        acceptButton.on("pointerdown", () => {
-            if (GameState.equippedItems.length < GameState.maxItems) {
-                GameState.equippedItems.push(randomItem);
-                this.scene.start("ShopScene");
-            } else {
-                alert("Not enough inventory space.");
-            }
+        acceptButton.on('pointerover', () => {
+            this.tweens.add({
+                targets: acceptButton,
+                scale: 1.1,
+                duration: 150,
+                ease: 'Linear'
+            });
         });
-        // Skip behavior.
-        skipButton.on("pointerdown", () => {
-            this.scene.start("ShopScene");
+        // Add pointerout event: restore its original scale.
+        acceptButton.on('pointerout', () => {
+            this.tweens.add({
+                targets: acceptButton,
+                scale: 1,
+                duration: 150,
+                ease: 'Linear'
+            });
+        });
+
+        acceptButton.on('pointerdown', () => {
+
+            this.tweens.add({
+                targets: acceptButton,
+                scale: 0.9,
+                duration: 50,
+                ease: 'Linear'
+            });
+
+        });
+        // Add pointerup event: restore the scale and trigger the desired action (such as starting the next scene).
+        acceptButton.on('pointerup', () => {
+            this.tweens.add({
+                targets: acceptButton,
+                scale: 1.1,
+                duration: 50,
+                ease: 'Linear',
+                onComplete: () => {
+                    if (GameState.equippedItems.length < GameState.maxItems) {
+                        GameState.equippedItems.push(randomItem);
+                        this.scene.start("ShopScene");
+                    } else {
+                        alert("Not enough inventory space.");
+                    }
+                }
+            });
+        });
+
+
+        skipButton.on('pointerover', () => {
+            this.tweens.add({
+                targets: skipButton,
+                scale: 1.1,
+                duration: 150,
+                ease: 'Linear'
+            });
+        });
+        // Add pointerout event: restore its original scale.
+        skipButton.on('pointerout', () => {
+            this.tweens.add({
+                targets: skipButton,
+                scale: 1,
+                duration: 150,
+                ease: 'Linear'
+            });
+        });
+
+        skipButton.on('pointerdown', () => {
+
+            this.tweens.add({
+                targets: skipButton,
+                scale: 0.9,
+                duration: 50,
+                ease: 'Linear'
+            });
+
+        });
+        // Add pointerup event: restore the scale and trigger the desired action (such as starting the next scene).
+        skipButton.on('pointerup', () => {
+            this.tweens.add({
+                targets: skipButton,
+                scale: 1.1,
+                duration: 50,
+                ease: 'Linear',
+                onComplete: () => {
+                    this.scene.start("ShopScene");
+                }
+            });
         });
 
     }
