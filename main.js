@@ -205,91 +205,91 @@ var GameConfig = {
         RubyAmulet: {
             name: "Ruby Amulet",
             rarity: "Common", cycle: 5,
-            description: "Recovers 3% stamina every 5 sec.",
+            description: "Recovers 1% stamina every 5 sec.",
             image: { col: 11, row: 6 }, price: commonPrice
         },
         SapphireAmulet: {
             name: "Sapphire Amulet",
             rarity: "Common", cycle: 4,
-            description: "Recovers 3% stamina every 4 sec.",
+            description: "Recovers 1% stamina every 4 sec.",
             image: { col: 12, row: 6 }, price: commonPrice
         },
         AmethystAmulet: {
             name: "Amethyst Amulet",
             rarity: "Common", cycle: 3,
-            description: "Recovers 3% stamina every 3 sec.",
+            description: "Recovers 1% stamina every 3 sec.",
             image: { col: 13, row: 6 }, price: commonPrice
         },
         EmeraldAmulet: {
             name: "Emerald Amulet",
             rarity: "Common", cycle: 2,
-            description: "Recovers 3% stamina every 2 sec.",
+            description: "Recovers 1% stamina every 2 sec.",
             image: { col: 14, row: 6 }, price: commonPrice
         },
         BlessedRubyAmulet: {
             name: "Blessed Ruby Amulet",
             rarity: "Common", cycle: 5,
-            description: "Recovers 5% stamina every 5 sec.",
+            description: "Recovers 2% stamina every 5 sec.",
             image: { col: 1, row: 6 }, price: commonPrice
         },
         BlessedSapphireAmulet: {
             name: "Blessed Sapphire Amulet",
             rarity: "Common", cycle: 4,
-            description: "Recovers 5% stamina every 4 sec.",
+            description: "Recovers 2% stamina every 4 sec.",
             image: { col: 2, row: 6 }, price: commonPrice
         },
         BlessedAmethystAmulet: {
             name: "Blessed Amethyst Amulet",
             rarity: "Common", cycle: 3,
-            description: "Recovers 5% stamina every 3 sec.",
+            description: "Recovers 2% stamina every 3 sec.",
             image: { col: 3, row: 6 }, price: commonPrice
         },
         BlessedEmeraldAmulet: {
             name: "Blessed Emerald Amulet",
             rarity: "Common", cycle: 5,
-            description: "Recovers 7% stamina every 5 sec.",
+            description: "Recovers 3% stamina every 5 sec.",
             image: { col: 4, row: 6 }, price: commonPrice
         },
         PharaohsAmulet: {
             name: "Pharaohs Amulet",
             rarity: "Uncommon", cycle: 5,
-            description: "Recovers 9% stamina every 5 sec.",
+            description: "Recovers 4% stamina every 5 sec.",
             image: { col: 16, row: 6 }, price: uncommonPrice
         },
         DeceiversAmulet: {
             name: "Deceivers Amulet",
             rarity: "Uncommon", cycle: 4,
-            description: "Recovers 5% stamina every 4 sec.",
+            description: "Recovers 3% stamina every 4 sec.",
             image: { col: 18, row: 6 }, price: uncommonPrice
         },
         HolyAmulet: {
             name: "Holy Amulet",
             rarity: "Uncommon", cycle: 5,
-            description: "Recovers 11% stamina every 5 sec.",
+            description: "Recovers 5% stamina every 5 sec.",
             image: { col: 22, row: 6 }, price: uncommonPrice
         },
         MessiahAmulet: {
             name: "Messiah Amulet",
             rarity: "Rare", cycle: 1,
-            description: "Recovers 3% stamina every 1 sec.",
+            description: "Recovers 1% stamina every 1 sec.",
             image: { col: 30, row: 6 }, price: rarePrice
         },
         UnderworldAmulet: {
             name: "Underworld Amulet",
             rarity: "Rare", cycle: 2,
-            description: "Recovers 5% stamina every 2 sec.",
+            description: "Recovers 2% stamina every 2 sec.",
             image: { col: 21, row: 6 }, price: rarePrice
         },
         ShiningAmulet: {
             name: "Shining Amulet",
             rarity: "Rare", cycle: 3,
-            description: "Recovers 7% stamina every 3 sec.",
+            description: "Recovers 3% stamina every 3 sec.",
             image: { col: 20, row: 6 }, price: rarePrice
         },
         AmbixAmulet: {
             name: "Ambix Amulet",
             rarity: "Rare", cycle: 4,
-            description: "Recovers 9% stamina every 4 sec.",
+            description: "Recovers 4% stamina every 4 sec.",
             image: { col: 31, row: 6 }, price: rarePrice
         },
 
@@ -841,7 +841,7 @@ class RaceScene extends Phaser.Scene {
                 this.effectManager.addEffect({
                     name: "Ruby Amulet",
                     type: "staminaRecovery",
-                    value: 0.03,       // 3% of max stamina per cycle
+                    value: 0.01,       // 1% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
                     lastCycleCount: 0,
 
@@ -852,7 +852,7 @@ class RaceScene extends Phaser.Scene {
                 this.effectManager.addEffect({
                     name: "Sapphire Amulet",
                     type: "staminaRecovery",
-                    value: 0.03,       // 3% of max stamina per cycle
+                    value: 0.01,       // 1% of max stamina per cycle
                     cycle: 4,          // every 4 seconds
                     lastCycleCount: 0,
 
@@ -863,7 +863,7 @@ class RaceScene extends Phaser.Scene {
                 this.effectManager.addEffect({
                     name: "Amethyst Amulet",
                     type: "staminaRecovery",
-                    value: 0.03,       // 3% of max stamina per cycle
+                    value: 0.01,       // 1% of max stamina per cycle
                     cycle: 3,          // every 3 seconds
                     lastCycleCount: 0,
 
@@ -874,7 +874,7 @@ class RaceScene extends Phaser.Scene {
                 this.effectManager.addEffect({
                     name: "Emerald Amulet",
                     type: "staminaRecovery",
-                    value: 0.03,       // 3% of max stamina per cycle
+                    value: 0.01,       // 1% of max stamina per cycle
                     cycle: 2,          // every 2 seconds
                     lastCycleCount: 0,
 
@@ -886,7 +886,7 @@ class RaceScene extends Phaser.Scene {
                 this.effectManager.addEffect({
                     name: "Blessed Ruby Amulet",
                     type: "staminaRecovery",
-                    value: 0.05,       // 5% of max stamina per cycle
+                    value: 0.02,       // 2% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
                     lastCycleCount: 0,
 
@@ -897,7 +897,7 @@ class RaceScene extends Phaser.Scene {
                 this.effectManager.addEffect({
                     name: "Blessed Sapphire Amulet",
                     type: "staminaRecovery",
-                    value: 0.05,       // 5% of max stamina per cycle
+                    value: 0.02,       // 2% of max stamina per cycle
                     cycle: 4,          // every 4 seconds
                     lastCycleCount: 0,
 
@@ -908,7 +908,7 @@ class RaceScene extends Phaser.Scene {
                 this.effectManager.addEffect({
                     name: "Blessed Amethyst Amulet",
                     type: "staminaRecovery",
-                    value: 0.05,       // 5% of max stamina per cycle
+                    value: 0.02,       // 2% of max stamina per cycle
                     cycle: 3,          // every 3 seconds
                     lastCycleCount: 0,
 
@@ -919,7 +919,7 @@ class RaceScene extends Phaser.Scene {
                 this.effectManager.addEffect({
                     name: "Blessed Emerald Amulet",
                     type: "staminaRecovery",
-                    value: 0.07,       // 7% of max stamina per cycle
+                    value: 0.03,       // 3% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
                     lastCycleCount: 0,
 
@@ -931,7 +931,7 @@ class RaceScene extends Phaser.Scene {
                 this.effectManager.addEffect({
                     name: "Pharaohs Amulet",
                     type: "staminaRecovery",
-                    value: 0.09,       // 9% of max stamina per cycle
+                    value: 0.04,       // 4% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
                     lastCycleCount: 0,
 
@@ -942,7 +942,7 @@ class RaceScene extends Phaser.Scene {
                 this.effectManager.addEffect({
                     name: "Deceivers Amulet",
                     type: "staminaRecovery",
-                    value: 0.07,       // 7% of max stamina per cycle
+                    value: 0.03,       // 3% of max stamina per cycle
                     cycle: 4,          // every 4 seconds
                     lastCycleCount: 0,
 
@@ -953,7 +953,7 @@ class RaceScene extends Phaser.Scene {
                 this.effectManager.addEffect({
                     name: "Holy Amulet",
                     type: "staminaRecovery",
-                    value: 0.11,       // 11% of max stamina per cycle
+                    value: 0.5,       // 5% of max stamina per cycle
                     cycle: 5,          // every 5 seconds
                     lastCycleCount: 0,
 
@@ -964,7 +964,7 @@ class RaceScene extends Phaser.Scene {
                 this.effectManager.addEffect({
                     name: "Messiah Amulet",
                     type: "staminaRecovery",
-                    value: 0.03,       // 3% of max stamina per cycle
+                    value: 0.01,       // 1% of max stamina per cycle
                     cycle: 1,          // every 1 seconds
                     lastCycleCount: 0,
 
@@ -975,7 +975,7 @@ class RaceScene extends Phaser.Scene {
                 this.effectManager.addEffect({
                     name: "Underworld Amulet",
                     type: "staminaRecovery",
-                    value: 0.05,       // 5% of max stamina per cycle
+                    value: 0.02,       // 2% of max stamina per cycle
                     cycle: 2,          // every 2 seconds
                     lastCycleCount: 0,
 
@@ -986,7 +986,7 @@ class RaceScene extends Phaser.Scene {
                 this.effectManager.addEffect({
                     name: "Shining Amulet",
                     type: "staminaRecovery",
-                    value: 0.07,       // 7% of max stamina per cycle
+                    value: 0.03,       // 3% of max stamina per cycle
                     cycle: 3,          // every 3 seconds
                     lastCycleCount: 0,
 
@@ -997,7 +997,7 @@ class RaceScene extends Phaser.Scene {
                 this.effectManager.addEffect({
                     name: "Ambix Amulet",
                     type: "staminaRecovery",
-                    value: 0.09,       // 9% of max stamina per cycle
+                    value: 0.04,       // 4% of max stamina per cycle
                     cycle: 4,          // every 4 seconds
                     lastCycleCount: 0,
 
