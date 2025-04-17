@@ -3451,16 +3451,22 @@ class RewardScene extends Phaser.Scene {
             fill: '#0f0',
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 5, y: 5 }
-        }).setOrigin(0.5).setInteractive();
+        }).setOrigin(0.5).setInteractive().disableInteractive();
 
         let skipButton = this.add.text(0, 150, "Skip", {
             fontSize: '20px',
             fill: '#f00',
             backgroundColor: 'rgba(0,0,0,0.7)',
             padding: { x: 5, y: 5 }
-        }).setOrigin(0.5).setInteractive();
+        }).setOrigin(0.5).setInteractive().disableInteractive();
 
         rewardContainer.add([acceptButton, skipButton]);
+
+        this.time.delayedCall(200, ()=> {
+            acceptButton.setInteractive();
+            skipButton.setInteractive();
+          });
+
 
         acceptButton.on('pointerover', () => {
             this.tweens.add({
