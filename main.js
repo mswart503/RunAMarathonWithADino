@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebas
 import { getAnalytics, logEvent } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
 import { getFirestore, collection, query, orderBy, limit, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 const db = window.db;
-const currVersion = "v0.11"
+const currVersion = "v0.12"
 
 //const Phaser = require("phaser");
 
@@ -490,8 +490,31 @@ var GameConfig = {
         Orange: "10% stamina refill",
         Banana: "20% stamina refill"
     }
+
+
 };
 
+// Returns an array of item‑keys whose rarity is unlocked
+function getAllowedItemsByRarity() {
+    const allKeys = Object.keys(GameConfig.itemData);
+    const allowed = [];
+
+    // Always allow commons
+    allowed.push("Common");
+
+    // If they’ve bought the uncommon unlock, allow Uncommon too
+    if (GameState.uncommonUnlocked) {
+        allowed.push("Uncommon");
+    }
+
+    // If they’ve bought the rare unlock, allow Rare as well
+    if (GameState.rareUnlocked) {
+        allowed.push("Rare");
+    }
+
+    // Filter items based on their rarity field
+    return allKeys.filter(key => allowed.includes(GameConfig.itemData[key].rarity));
+}
 
 
 var GameState = {
@@ -512,6 +535,8 @@ var GameState = {
     computedTotalDistance: 0,
     computedMaxSpeed: 0,
     playerName: "Anon",
+    uncommonUnlocked: false,
+    rareUnlocked: false,
 
 
 
@@ -567,10 +592,10 @@ class StartScene extends Phaser.Scene {
         //let leftMarginY = 150;
         this.add.text(150, 150, "Run A Marathon With A Dino", { fontSize: '28px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
         this.add.text(150, 200, "Select your starting item", { fontSize: '20px', fill: '#fff', fontFamily: "SilkScreen", backgroundColor: 'rgba(0,0,0,0.7)' });
-        // Randomly pick 3 unique items from the available list.
-        let allItems = Object.keys(GameConfig.itemData);
-        Phaser.Utils.Array.Shuffle(allItems);
-        let availableItems = allItems.slice(0, 5);
+        // only items whose rarity is currently unlocked
+        let pool = getAllowedItemsByRarity();
+        Phaser.Utils.Array.Shuffle(pool);
+        let availableItems = pool.slice(0, 5);
         // List the 5 available items.
         let startY = 250;
         GameState.consumables = ['apple', 'Orange', 'Banana'];
@@ -1656,6 +1681,9 @@ class RaceScene extends Phaser.Scene {
         GameState.newSlotPrice = 20;
         GameState.scalerBonusSpeed = 0;
         GameState.mushroomCount = 0;
+        GameState.uncommonUnlocked = false;
+        GameState.rareUnlocked = false;
+        GameState.bonds = [];
         if (GameState.devMode == false) {
             storeHighScore()
 
@@ -1856,6 +1884,7 @@ class ShopScene extends Phaser.Scene {
             let totalWidth = numItems * iconSize + (numItems - 1) * spacing;
             let startX = (this.game.config.width - totalWidth) / 2 + iconSize / 2;
             let iconY = 30; // Y position for inventory icons.
+            GameState.grabBagPurchased = false;
 
             GameState.equippedItems.forEach((item, index) => {
                 let frameIndex = getItemFrameIndex(item);
@@ -1994,11 +2023,13 @@ class ShopScene extends Phaser.Scene {
             }
             // Create a container for shop items.
             this.itemContainer = this.add.container(0, 150);
-
+            let pool = getAllowedItemsByRarity();
+            Phaser.Utils.Array.Shuffle(pool);
+            let availableItemsTemp = pool;
             // Get all items from your configuration, but filter out those already in the player's inventory.
-            let allItems = Object.keys(GameConfig.itemData).filter(item => {
-                return !GameState.equippedItems.includes(item);
-            });
+            let allItems = pool.filter(item =>
+                !GameState.equippedItems.includes(item)
+            );
             Phaser.Utils.Array.Shuffle(allItems);
 
             // Pick the first 4 items.
@@ -2578,22 +2609,44 @@ class ShopScene extends Phaser.Scene {
         // Create a sub-container for the unlock buttons.
         let unlockContainer = this.add.container(100, 20); // Position relative to the investment container
         // Create the Uncommon and Rare unlock buttons side-by-side.
-        let uncommonButton = this.add.text(0, 0, "Unlock Uncommon ($10)", {
-            fontSize: '16px',
-            fill: '#fff',
-            fontFamily: "SilkScreen",
-            backgroundColor: 'rgba(0,0,0,0.7)',
-            padding: { x: 5, y: 5 }
-        }).setOrigin(0, 0.5).setInteractive();
 
-        let rareButton = this.add.text(0, 30, "Unlock Rare ($20)", {
-            fontSize: '16px',
-            fill: '#fff',
-            fontFamily: "SilkScreen",
-            backgroundColor: 'rgba(0,0,0,0.7)',
-            padding: { x: 5, y: 5 }
-        }).setOrigin(0, 0.5).setInteractive();
+        let uncommonButton = this.add.text(0,0,"");
+        let rareButton = this.add.text(0,0,"");
 
+        if (!GameState.uncommonUnlocked) {
+            uncommonButton = this.add.text(0, 0, "Unlock Uncommons ($10)", {
+                fontSize: '16px',
+                fill: '#fff',
+                fontFamily: "SilkScreen",
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                padding: { x: 5, y: 5 }
+            }).setOrigin(0, 0.5).setInteractive();
+        } else {
+            uncommonButton = this.add.text(0, 0, "Uncommons Bought", {
+                fontSize: '16px',
+                fill: "#888",
+                fontFamily: "SilkScreen",
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                padding: { x: 5, y: 5 }
+            }).setOrigin(0, 0.5);
+        }
+        if (!GameState.rareUnlocked) {
+            rareButton = this.add.text(0, 30, "Unlock Rare ($20)", {
+                fontSize: '16px',
+                fill: '#fff',
+                fontFamily: "SilkScreen",
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                padding: { x: 5, y: 5 }
+            }).setOrigin(0, 0.5).setInteractive();
+        } else {
+            rareButton = this.add.text(0, 30, "Rares Bought", {
+                fontSize: '16px',
+                fill: "#888",
+                fontFamily: "SilkScreen",
+                backgroundColor: 'rgba(0,0,0,0.7)',
+                padding: { x: 5, y: 5 }
+            }).setOrigin(0, 0.5);
+        }
         unlockContainer.add([uncommonButton, rareButton]);
         this.investmentContainer.add(unlockContainer);
 
@@ -2603,7 +2656,7 @@ class ShopScene extends Phaser.Scene {
                 GameState.money -= 10;
                 this.cashText.setText(`$${GameState.money}`);
                 GameState.uncommonUnlocked = true;
-                uncommonButton.setText("Bought");
+                uncommonButton.setText("Uncommons Bought");
                 uncommonButton.setStyle({ fill: "#888" });
                 uncommonButton.disableInteractive();
             }
@@ -2613,7 +2666,7 @@ class ShopScene extends Phaser.Scene {
                 GameState.money -= 20;
                 this.cashText.setText(`$${GameState.money}`);
                 GameState.rareUnlocked = true;
-                rareButton.setText("Bought");
+                rareButton.setText("Rares Bought");
                 rareButton.setStyle({ fill: "#888" });
                 rareButton.disableInteractive();
             }
@@ -2641,7 +2694,7 @@ class ShopScene extends Phaser.Scene {
                 this.launchGrabBagSelection();  // You'll implement this function similarly to the reward screen.
             } else {
                 // Provide feedback that Grab Bag is not available or already purchased.
-                let tip = this.add.text(grabBagButton.x+400, grabBagButton.y + 300, "Already purchased", {
+                let tip = this.add.text(grabBagButton.x + 400, grabBagButton.y + 300, "Already purchased", {
                     fontSize: '14px',
                     fill: '#fff',
                     fontFamily: "SilkScreen",
@@ -2757,7 +2810,7 @@ class ShopScene extends Phaser.Scene {
     updateBondPayouts() {
         // Reset the shop payout counter for bonds.
         this.currentBondPayout = 0;
-        
+
         // Iterate through bonds (assume GameState.bonds is an array).
         // We'll create a new array for bonds that haven't matured.
         let activeBonds = [];
@@ -2777,15 +2830,15 @@ class ShopScene extends Phaser.Scene {
             }
         });
         GameState.bonds = activeBonds; // Update bonds array to only active bonds.
-        
+
         // Update player's cash by the total payout for bonds in this shop.
         GameState.money += this.currentBondPayout;
         this.cashText.setText(`$${GameState.money}`);
-        
+
         // Update the counters:
         this.shopBondPayoutText.setText(`Shop Payouts: $${this.currentBondPayout}`);
         this.totalBondEarningsText.setText(`Total Earnings: $${GameState.totalBondEarnings || 0}`);
-        
+
         // Also update the bonds display.
         this.updateBondsDisplay();
     }
@@ -2817,7 +2870,7 @@ class ShopScene extends Phaser.Scene {
         // Set a background for clarity.
         let bg = this.add.rectangle(0, 0, 400, 300, 0x000000, 0.8).setOrigin(0.5);
         selectionContainer.add(bg);
-    
+
         // Add a header text.
         let header = this.add.text(0, -120, "Grab Bag! Pick One", {
             fontSize: '24px',
@@ -2825,13 +2878,13 @@ class ShopScene extends Phaser.Scene {
             fontFamily: 'SilkScreen'
         }).setOrigin(0.5);
         selectionContainer.add(header);
-    
+
         // Get three random items from your pool.
         // For example, use all items from GameConfig.itemData.
-        let pool = Object.keys(GameConfig.itemData);
+        let pool = getAllowedItemsByRarity();
         Phaser.Utils.Array.Shuffle(pool);
         let grabBagItems = pool.slice(0, 3);
-    
+
         // Create a container to hold the three item options.
         let itemsContainer = this.add.container(0, -20);
         let spacing = 130; // Horizontal spacing between items.
@@ -2862,7 +2915,7 @@ class ShopScene extends Phaser.Scene {
                 // you may want to convert them to world coordinates.
                 let worldX = 400;
                 let worldY = 300;
-                
+
                 let tooltip = this.add.text(worldX, worldY - 60, GameConfig.itemData[itemKey].description, {
                     fontSize: '14px',
                     fill: '#fff',
@@ -2874,7 +2927,7 @@ class ShopScene extends Phaser.Scene {
                 this.children.bringToTop(tooltip);
                 sprite.tooltip = tooltip;  // Save the tooltip reference.
             });
-        
+
             // On pointerout, destroy the tooltip (if it exists).
             sprite.on('pointerout', () => {
                 if (sprite.tooltip) {
@@ -2905,7 +2958,7 @@ class ShopScene extends Phaser.Scene {
             });
         });
         selectionContainer.add(itemsContainer);
-    
+
         // Add a Cancel button below the items.
         let cancelButton = this.add.text(0, 120, "Cancel", {
             fontSize: '20px',
@@ -2921,9 +2974,9 @@ class ShopScene extends Phaser.Scene {
         });
         selectionContainer.add(cancelButton);
     }
-    
-    
-    
+
+
+
 }
 
 
@@ -3357,8 +3410,13 @@ class RewardScene extends Phaser.Scene {
         //this.text.destroy();
 
         // Now, reveal the random item reward.
-        let availableItems = Object.keys(GameConfig.itemData)
-            .filter(item => !GameState.equippedItems.includes(item));
+        let pool = getAllowedItemsByRarity();
+        Phaser.Utils.Array.Shuffle(pool);
+        
+        // Filter out items already equipped:
+        let availableItems = pool.filter(item => 
+            !GameState.equippedItems.includes(item)
+        );
         if (availableItems.length === 0) {
             // No new items available.
             this.add.text(400, 350, "No new items available", { fontSize: '24px', fill: '#fff' }).setOrigin(0.5);
